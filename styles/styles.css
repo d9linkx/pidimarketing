@@ -372,7 +372,6 @@ ul { list-style: none; }
 }
 
 .hero-step {
-    font-weight: 700;
     text-transform: uppercase;
     color: var(--accent);
     letter-spacing: 2px;
