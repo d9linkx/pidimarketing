@@ -425,7 +425,7 @@ ul { list-style: none; }
 .audit-form .btn-orange {
     white-space: nowrap;
     border-radius: 5px;
-    padding: 15px 35px;
+    padding: 25px 35px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -459,6 +459,15 @@ ul { list-style: none; }
     .audit-form input {
         padding: 14px 15px;
     }
+
+    .audit-form .btn-orange {
+    white-space: nowrap;
+    border-radius: 5px;
+    padding: 25px 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 }
 
 /* Mobile View */
@@ -487,6 +496,15 @@ ul { list-style: none; }
     .audit-form .btn-orange {
         width: 100%;
         padding: 15px;
+    }
+
+    .audit-form .btn-orange {
+        white-space: nowrap;
+        border-radius: 5px;
+        padding: 25px 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
