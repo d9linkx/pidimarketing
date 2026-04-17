@@ -113,7 +113,7 @@ ul { list-style: none; }
 }
 
 .lang-trigger {
-    background: #f15a24;
+    background: #7fb085;
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: #fff;
     padding: 6px 14px;
@@ -126,7 +126,7 @@ ul { list-style: none; }
 }
 
 .lang-trigger:hover {
-    background: #a10000fe;
+    background: #5b8660;
 }
 
 /* Simple CSS Chevron */
