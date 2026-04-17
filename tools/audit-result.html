@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Audit Result — V Do Marketing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <main class="container" style="padding:40px 0">
+    <h1>Website Audit (Preview)</h1>
+    <p id="auditFor">Running a quick analysis…</p>
+    <div style="background:var(--light-gray);padding:18px;border-radius:8px;margin-top:16px">
+      <strong>Summary</strong>
+      <p>This is a placeholder audit result page. Integrate your analyzer engine here to provide actionable insights and CTAs to book a call or hire the agency.</p>
+    </div>
+  </main>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const site = params.get('site');
+    const el = document.getElementById('auditFor');
+    if(site){ el.textContent = 'Audit for: ' + site; }
+  </script>
+</body>
+</html>
