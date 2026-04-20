@@ -1,10 +1,10 @@
 /* --- 1. ROOT VARIABLES & RESET --- */
 :root {
-    --primary: #7f7f7f;
-    --primary-dark: #5c5c5c;
-    --accent: #ff541b;
-    --accent-hover: #a10000fe;
-    --green-text: #4c865b;
+    --primary: #000000;
+    --primary-dark: #000000;
+    --accent: #2b7cff;
+    --accent-hover: #2b7cff;
+    --green-text: #0ca434;
     --text: #555555;
     --light-gray: #f4f7f6;
     --white: #ffffff;
@@ -64,7 +64,6 @@ ul { list-style: none; }
 .btn-orange:hover { 
     background: var(--accent-hover); 
     transform: translateY(-2px); 
-    box-shadow: 0 4px 15px rgba(241, 90, 36, 0.3); 
 }
 
 .hiring-badge {
@@ -122,7 +121,7 @@ ul { list-style: none; }
 }
 
 .lang-trigger {
-    background: #4c865b;
+    background: var(--accent);
     border: 1px solid #ffffff;
     color: #fff;
     padding: 6px 14px;
@@ -511,13 +510,7 @@ ul { list-style: none; }
 
 /* Headline Color Variants */
 .grey-text { color: #8a8a8a; font-weight: 700; }
-.black-text { color: #515151; font-weight: 600; }
-.green-text { 
-    background: linear-gradient(135deg, #4c865b 0%, #3c704a 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 600; 
+.black-text { color: #000000; font-weight: 600; }
 }
 .gradient-text {
     background: linear-gradient(135deg, var(--accent) 0%, #f15a24 100%);
@@ -551,11 +544,96 @@ ul { list-style: none; }
 .hero-step {
     text-transform: uppercase;
     color: var(--accent);
-    letter-spacing: 2px;
-    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    font-size: 1.0rem;
     margin-bottom: 30px;
 }
 
+.hero-emoji {
+    font-size: 1rem;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+/* --- CTA & SOCIAL PROOF ROW --- */
+.cta-trust-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 32px;
+    margin-top: 40px;
+}
+
+.cta-primary-btn {
+    background: #4F36FD; /* Modern Vibrant Purple/Blue */
+    color: #fff;
+    padding: 16px 36px;
+    border-radius: 100px;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 10px 20px rgba(79, 54, 253, 0.15);
+}
+
+.cta-primary-btn:hover {
+    transform: translateY(-3px);
+    background: #3e29d4;
+    box-shadow: 0 15px 30px rgba(79, 54, 253, 0.25);
+}
+
+.cta-primary-btn .btn-icon {
+    background: #fff;
+    color: #4F36FD;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.cta-primary-btn:hover .btn-icon {
+    transform: rotate(45deg);
+}
+
+.social-proof-mini {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.avatar-stack {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-stack img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    margin-left: -12px;
+    transition: transform 0.2s ease;
+}
+
+.avatar-stack img:first-child { margin-left: 0; }
+.avatar-stack img:hover { transform: translateY(-4px); z-index: 2; }
+
+.star-rating {
+    color: #f59e0b;
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 640px) { .cta-trust-container { flex-direction: column; gap: 24px; } }
 /* --- THE AUDIT FORM --- */
 .audit-form {
     display: flex;
