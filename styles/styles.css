@@ -2,7 +2,7 @@
 :root {
     --primary: #000000;
     --primary-dark: #000000;
-    --accent: #2b7cff;
+    --accent: #2b44ff;
     --accent-hover: #2b7cff;
     --green-text: #0ca434;
     --text: #555555;
@@ -193,7 +193,7 @@ ul { list-style: none; }
 }
 /* --- 4. MAIN NAVIGATION --- */
 .main-nav { 
-    background: rgba(244, 247, 246, 0.478); 
+    background: rgba(255, 255, 255, 0); 
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     padding: 20px 0; 
@@ -213,7 +213,7 @@ ul { list-style: none; }
 .main-nav.scrolled { 
     padding: 10px 0; 
     box-shadow: 0 5px 20px rgba(0,0,0,0.08); 
-    background: rgba(255, 255, 255, 0.95); /* Transition to clean white glass */
+    background: rgba(255, 255, 255, 0.481); /* Transition to clean white glass */
     border-color: rgba(0, 0, 0, 0.05);
 }
 .nav-wrapper { display: flex; justify-content: space-between; align-items: center; position: relative; }
@@ -489,12 +489,12 @@ ul { list-style: none; }
     position: absolute;
     top: -10%;
     right: -10%;
-    width: 400px;
+    width: 100%;
     height: 400px;
     z-index: 1;
     background: 
-        radial-gradient(circle at 15% 25%, rgba(255, 84, 27, 0.15) 0%, transparent 40%),
         radial-gradient(circle at 85% 15%, rgba(52, 168, 83, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 15% 25%, rgba(221, 221, 221, 0.15) 0%, transparent 40%),
         radial-gradient(circle at 50% 55%, rgba(66, 133, 244, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 35% 85%, rgba(251, 188, 5, 0.15) 0%, transparent 40%);
     filter: blur(100px);
@@ -504,7 +504,7 @@ ul { list-style: none; }
 .hero-content {
     position: relative;
     z-index: 2;
-    max-width: 900px;
+    max-width: 1000px;
     animation: fadeInUp 1s ease-out;
 
 
