@@ -884,6 +884,12 @@ ul { list-style: none; }
     gap: 12px;
 }
 
+.pill-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* PILL TYPOGRAPHY (The "Rhyme" factor) */
 .pill-text {
     font-family: 'Cormorant Garamond', serif; /* Or any high-end serif */
