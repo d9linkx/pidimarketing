@@ -169,8 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const websiteUrl = auditForm.querySelector('input').value;
             
             // UI Feedback
-            const originalText = submitBtn.innerText;
-            submitBtn.innerText = "Analyzing...";
+            const originalHTML = submitBtn.innerHTML;
+            const arrow = submitBtn.querySelector('svg')?.outerHTML || '';
+            submitBtn.innerHTML = `Analyzing... ${arrow}`;
             submitBtn.disabled = true;
             submitBtn.style.opacity = "0.7";
 
