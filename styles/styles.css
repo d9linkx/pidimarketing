@@ -848,3 +848,109 @@ ul { list-style: none; }
         flex: 0 0 calc(50% - 30px); /* 2 per row on mobile */
     }
 }
+
+/* --- STATS SECTION STYLE --- */
+.stats-section {
+    padding: 120px 0;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+/* THE INTRO TEXT */
+.display-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    max-width: 1000px;
+    margin: 0 auto 40px;
+    color: #1d1d1f;
+}
+
+/* THE PILLS AREA */
+.pill-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 100px;
+}
+
+.design-pill {
+    display: flex;
+    align-items: center;
+    padding: 12px 28px;
+    border-radius: 100px;
+    gap: 12px;
+}
+
+/* PILL TYPOGRAPHY (The "Rhyme" factor) */
+.pill-text {
+    font-family: 'Cormorant Garamond', serif; /* Or any high-end serif */
+    font-style: italic;
+    font-size: 2.2rem;
+    font-weight: 500;
+}
+
+/* PILL COLORS (Translucent) */
+.purple { background: #f3e8ff; color: #a855f7; }
+.blue   { background: #e0f2fe; color: #0ea5e9; }
+.orange { background: #ffedd5; color: #f97316; }
+
+/* THE STATS GRID */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid #eee;
+    padding-top: 60px;
+}
+
+.stat-item {
+    position: relative;
+    padding: 20px;
+}
+
+/* Vertical Dividers */
+.stat-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: #e5e5e5;
+}
+
+.stat-number {
+    font-size: 8rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: #1d1d1f;
+    line-height: 1;
+    margin-bottom: 15px;
+}
+
+.stat-number span {
+    font-size: 4rem;
+    vertical-align: top;
+    margin-right: 5px;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    color: #86868b;
+    font-weight: 500;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 991px) {
+    .display-title { font-size: 2.5rem; }
+    .stat-number { font-size: 5rem; }
+    .pill-text { font-size: 1.5rem; }
+}
+
+@media (max-width: 768px) {
+    .stats-grid { grid-template-columns: 1fr; gap: 40px; }
+    .stat-item::after { display: none; }
+    .display-title { font-size: 2rem; }
+}
