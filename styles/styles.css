@@ -193,7 +193,7 @@ ul { list-style: none; }
 }
 /* --- 4. MAIN NAVIGATION --- */
 .main-nav { 
-    background: rgba(255, 255, 255, 0); 
+    background: rgba(244, 247, 246, 0); 
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     padding: 20px 0; 
@@ -207,14 +207,14 @@ ul { list-style: none; }
     transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
                 padding 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
                 box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .main-nav.scrolled { 
     padding: 10px 0; 
     box-shadow: 0 5px 20px rgba(0,0,0,0.08); 
     background: rgba(255, 255, 255, 0.481); /* Transition to clean white glass */
-    border-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.331);
 }
 .nav-wrapper { display: flex; justify-content: space-between; align-items: center; position: relative; }
 .brand-logo { font-size: 1.2rem; color: #424242; display: flex; align-items: center; gap: 10px; z-index: 10; }
