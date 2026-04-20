@@ -10,13 +10,28 @@
 </head>
 <body>
 
-
 <nav class="main-nav sticky-nav">
     <div class="container nav-wrapper">
         <a href="index.html" class="brand-logo">
             <img src="assets/pidi.png" alt="PIDIMarketing Logo" height="32">
             <span style="margin-top: 7px;">PIDIMarketing</span>
         </a>
+
+        <div class="lang-selector">
+            <button class="lang-trigger" aria-haspopup="true">
+                <span class="active-lang">EN</span>
+                <span class="chevron"></span>
+            </button>
+            <ul class="lang-dropdown">
+                <li data-lang="EN">English (EN)</li>
+                <li data-lang="BR">Português (BR)</li>
+                <li data-lang="DE">Deutsch (DE)</li>
+                <li data-lang="ES">Español (ES)</li>
+                <li data-lang="IT">Italiano (IT)</li>
+                <li data-lang="NL">Nederlands (NL)</li>
+                <li data-lang="FR">Français (FR)</li>
+            </ul>
+        </div>
 
         <div class="nav-center">
             <ul class="desktop-nav">
@@ -64,13 +79,13 @@
         <div class="nav-right">
             <a href="contact.html" class="nav-cta-btn">
                 Book a Call
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 8px;">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="7" y1="17" x2="17" y2="7"></line>
                     <polyline points="7 7 17 7 17 17"></polyline>
                 </svg>
             </a>
             <button id="menu-trigger" class="menu-btn" aria-label="Open Navigation Menu">
-                <span class="menu-label">MENU</span>
+                <span class="menu-label"></span>
                 <div class="hamburger-icon">
                     <span class="line top"></span>
                     <span class="line middle"></span>
@@ -156,43 +171,16 @@
     </div>
 </div>
 
-<div class="top-bar">
-    <div class="container">
-        <p class="announcement-text">
-            Do you want more traffic? 
-            <a href="https://avantaland.vercel.app/product-test.html" class="pulse-link">Yes, I want more traffic</a> / 
-            <a href="#" class="neg-link">No, I have enough traffic</a>
-        </p>
-        
-        <div class="lang-selector">
-            <button class="lang-trigger" aria-haspopup="true">
-                <span class="active-lang">EN</span>
-                <span class="chevron"></span>
-            </button>
-            <ul class="lang-dropdown">
-                <li data-lang="EN">English (EN)</li>
-                <li data-lang="BR">Português (BR)</li>
-                <li data-lang="DE">Deutsch (DE)</li>
-                <li data-lang="ES">Español (ES)</li>
-                <li data-lang="IT">Italiano (IT)</li>
-                <li data-lang="NL">Nederlands (NL)</li>
-                <li data-lang="FR">Français (FR)</li>
-            </ul>
-        </div>
-    </div>
-</div>
-
     <section id="hero" class="hero-section">
         <div class="container hero-content">
             <h1>
-                <span class="grey-text">Get Better Visibility on 
+                <span class="black-text">Get Better Visibility on 
                     <span class="google-text">
                         <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
                     </span> &
                 </span> 
                 <span class="gradient-text"> AI Search</span>
-                <span class="grey-text"> With</span>
-                <span class="black-text"> PIDIMarketing</span>
+                <span class="black-text"> with Our Free Audit</span>
             </h1>
             <p class="hero-step">Step 1: Analyze your website</p>
             
@@ -206,9 +194,20 @@
                     </svg>
                 </button>
             </form>
+
+            
             
             <p class="hero-subtext">Get the answer in minutes. 100% Free. No credit card required.</p>
-        </div>
+            <div class="top-bar">
+                    <div class="container">
+                        <p class="announcement-text">
+                            Do you want more traffic? 
+                            <a href="#" class="pulse-link">Yes, I want more traffic</a> / 
+                            <a href="#" class="neg-link">No, I have enough traffic</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
     </section>
 
     <section class="social-proof">

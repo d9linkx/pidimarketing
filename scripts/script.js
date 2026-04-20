@@ -106,14 +106,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 5. STICKY HEADER SCROLL ---
     if (header) {
+        const heroSection = document.getElementById('hero');
         let scrollTimeout;
+        
         window.addEventListener('scroll', () => {
             if (scrollTimeout) return;
             scrollTimeout = setTimeout(() => {
-                if (window.scrollY > 50) {
+                // Trigger transition when the header passes the hero section
+                const threshold = heroSection ? heroSection.offsetHeight - 100 : 50;
+                
+                if (window.scrollY > threshold) {
                     header.classList.add('scrolled');
+                    body.classList.add('scrolled');
                 } else {
                     header.classList.remove('scrolled');
+                    body.classList.remove('scrolled');
                 }
                 scrollTimeout = null;
             }, 15);
