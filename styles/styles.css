@@ -455,6 +455,7 @@ ul { list-style: none; }
 @media (max-width: 768px) {
     .nav-cta-desktop { display: none; }
     .menu-overlay { max-width: 100%; }
+    .top-bar { padding-left: 50px; padding-right: 50px; }
     .top-bar .container { 
         flex-direction: row; 
         justify-content: center; 
@@ -506,7 +507,7 @@ ul { list-style: none; }
     z-index: 2;
     max-width: 900px;
     animation: fadeInUp 1s ease-out;
-}
+
 
 /* Headline Color Variants */
 .grey-text { color: #8a8a8a; font-weight: 700; }
