@@ -159,6 +159,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+
+    // --- 9. DYNAMIC FOOTER LOAD ---
+    const footerPlaceholder = document.getElementById('footer-placeholder');
+    if (footerPlaceholder) {
+        fetch('footer.html')
+            .then(response => response.text())
+            .then(data => {
+                footerPlaceholder.outerHTML = data;
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+            });
+    }
 });
 
 
