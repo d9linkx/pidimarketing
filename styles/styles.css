@@ -961,3 +961,188 @@ ul { list-style: none; }
     .display-title { font-size: 2rem; }
 }
 
+/* --- SECTION RESET & FOUNDATION --- */
+.innovation-section {
+    padding: 120px 0;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* --- TYPOGRAPHY: THE HERO TEXT --- */
+.section-intro {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.hero-title {
+    font-size: clamp(3rem, 8vw, 6rem); /* Fluid typography */
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: #1d1d1f;
+    line-height: 0.95;
+    margin: 0;
+}
+
+.italic-serif {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: #ceced1; /* Soft muted grey for contrast */
+}
+
+/* --- THE BENTO GRID --- */
+.services-grid {
+    display: grid;
+    /* Uses 5 columns on desktop, adapts automatically */
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.service-card {
+    position: relative;
+    padding: 48px 32px;
+    border-radius: 32px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-decoration: none;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.service-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.06);
+}
+
+.service-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #1d1d1f;
+    margin: 0;
+    max-width: 140px; /* Forces natural line breaks */
+}
+
+/* --- WORLD CLASS ICON STYLING --- */
+.service-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+}
+
+.service-icon svg {
+    width: 36px;
+    height: 36px;
+    stroke-width: 1.25px; /* Ultra-thin is the agency standard */
+    transition: transform 0.5s ease;
+}
+
+.service-card:hover svg {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+/* Card Specific Color Schemes */
+.purple { background-color: #f6f1ff; color: #8b5cf6; }
+.pink   { background-color: #fff0f3; color: #f43f5e; }
+.blue   { background-color: #f0f7ff; color: #3b82f6; }
+.cream  { background-color: #fff9f0; color: #f59e0b; }
+.green  { background-color: #f0faf4; color: #10b981; }
+
+.service-card svg { stroke: currentColor; }
+
+/* --- CTA BANNER --- */
+.cta-banner {
+    background-color: #111111;
+    border-radius: 40px;
+    padding: 60px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.cta-text h3 {
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+}
+
+.cta-text p {
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* --- BUTTONS & MICRO-INTERACTIONS --- */
+.cta-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.btn-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 32px;
+    border-radius: 100px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.4s ease;
+}
+
+.btn-pill.white {
+    background: #ffffff;
+    color: #000000;
+}
+
+.btn-pill.outline {
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #ffffff;
+}
+
+.btn-pill:hover {
+    transform: scale(1.03);
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.btn-icon {
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 50%;
+}
+
+.btn-pill.outline .btn-icon {
+    background: rgba(255,255,255,0.1);
+}
+
+/* --- RESPONSIVE LOGIC --- */
+@media (max-width: 1100px) {
+    .services-grid { grid-template-columns: repeat(3, 1fr); }
+    .cta-banner { padding: 40px; flex-direction: column; text-align: center; gap: 32px; }
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 24px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .service-card { min-height: 220px; }
+    .cta-buttons { flex-direction: column; width: 100%; }
+    .btn-pill { justify-content: center; }
+}
