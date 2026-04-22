@@ -510,14 +510,23 @@ ul { list-style: none; }
 
 /* Headline Color Variants */
 .grey-text { color: #8a8a8a; font-weight: 700; }
-.black-text { color: #000000; font-weight: 600; }
+.black-text { color: #000000; font-weight: 800;     font-size: clamp(3rem, 8vw, 5rem); /* Fluid typography */
+    letter-spacing: -0.05em;
+    color: #1d1d1f;
+    line-height: 0.95;
+    margin: 0; }
 }
 .gradient-text {
     background: linear-gradient(135deg, var(--accent) 0%, #f15a24 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-weight: 900;
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 5rem); /* Fluid typography */
+    letter-spacing: -0.05em;
+    color: #1d1d1f;
+    line-height: 0.95;
+    margin: 0;
 }
 
 /* Google Brand Colors */
@@ -981,8 +990,8 @@ ul { list-style: none; }
 }
 
 .hero-title {
-    font-size: clamp(3rem, 8vw, 6rem); /* Fluid typography */
-    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 5rem); /* Fluid typography */
+    font-weight: 600;
     letter-spacing: -0.05em;
     color: #1d1d1f;
     line-height: 0.95;
@@ -1009,7 +1018,7 @@ ul { list-style: none; }
     position: relative;
     padding: 48px 32px;
     border-radius: 32px;
-    min-height: 280px;
+    min-height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -1026,7 +1035,8 @@ ul { list-style: none; }
 
 .service-card h3 {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 400;
+    line-height: 1.5rem;
     letter-spacing: -0.02em;
     color: #1d1d1f;
     margin: 0;
@@ -1053,11 +1063,11 @@ ul { list-style: none; }
 }
 
 /* Card Specific Color Schemes */
-.purple { background-color: #f6f1ff; color: #8b5cf6; }
-.pink   { background-color: #fff0f3; color: #f43f5e; }
-.blue   { background-color: #f0f7ff; color: #3b82f6; }
-.cream  { background-color: #fff9f0; color: #f59e0b; }
-.green  { background-color: #f0faf4; color: #10b981; }
+.purple { background-color: #dbc7ff; color: #8b5cf6; }
+.pink   { background-color: #ffccd6; color: #f43f5e; }
+.blue   { background-color: #bcdbff; color: #3b82f6; }
+.cream  { background-color: #ffe5bd; color: #f59e0b; }
+.green  { background-color: #b9ebcd; color: #10b981; }
 
 .service-card svg { stroke: currentColor; }
 
@@ -1065,7 +1075,7 @@ ul { list-style: none; }
 .cta-banner {
     background-color: #111111;
     border-radius: 40px;
-    padding: 60px 80px;
+    padding: 20px 80px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1074,17 +1084,16 @@ ul { list-style: none; }
 
 .cta-text h3 {
     color: #ffffff;
-    font-size: 2.2rem;
-    font-weight: 700;
+    font-size: 1.8rem;
+    font-weight: 500;
     letter-spacing: -0.03em;
-    margin-bottom: 8px;
+    margin-bottom: -8px;
 }
 
 .cta-text p {
     color: #ffffff;
     font-size: 1.8rem;
     font-weight: 500;
-    opacity: 0.8;
 }
 
 /* --- BUTTONS & MICRO-INTERACTIONS --- */
@@ -1410,13 +1419,13 @@ ul { list-style: none; }
 /* The Grid Layout */
 .testimonial-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr; /* Two main columns */
+  grid-template-columns: repeat(5, 1fr);
   grid-template-rows: auto auto;
   gap: 20px;
 }
 
 .card {
-  border-radius: var(--radius);
+  border-radius: 10px;
   padding: 30px;
   display: flex;
   flex-direction: column;
@@ -1435,7 +1444,7 @@ ul { list-style: none; }
 
 /* Main Story Card */
 .main-story {
-  grid-column: 1 / 2;
+  grid-column: span 3;
   background: url('woman-laptop.jpg') center/cover no-repeat;
   min-height: 400px;
   color: white;
