@@ -1419,8 +1419,7 @@ ul { list-style: none; }
 /* The Grid Layout */
 .testimonial-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: auto auto;
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
@@ -1444,7 +1443,6 @@ ul { list-style: none; }
 
 /* Main Story Card */
 .main-story {
-  grid-column: span 3;
   background: url('woman-laptop.jpg') center/cover no-repeat;
   min-height: 400px;
   color: white;
@@ -1483,6 +1481,7 @@ ul { list-style: none; }
 /* Light Card */
 .light-card {
   background-color: var(--bg-light);
+  max-width: 100%;
   justify-content: space-between;
 }
 
@@ -1653,16 +1652,6 @@ summary::-webkit-details-marker {
 }
 
 
-
-
-
-
-.awards-section {
-  padding: 100px 0;
-  background-color: #ffffff;
-  font-family: 'Inter', sans-serif;
-}
-
 .awards-grid {
   display: flex;
   justify-content: center;
@@ -1670,6 +1659,71 @@ summary::-webkit-details-marker {
   flex-wrap: wrap;
 }
 
+.award-card {
+  flex: 1;
+  min-width: 300px;
+  max-width: 380px;
+  background: var(--white);
+  border: 1px solid #f2f2f2;
+  border-radius: 24px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  transition: var(--transition);
+}
+
+.award-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  border-color: #e5e5e5;
+}
+
+.award-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: grayscale(1);
+  transition: filter 0.3s ease;
+}
+
+.award-card:hover .award-icon {
+  filter: grayscale(0);
+}
+
+.award-icon img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.award-org {
+  color: #8c8c8c;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+}
+
+.award-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--primary);
+  margin-bottom: 32px;
+}
+
+.award-year {
+  margin-top: auto;
+  color: #b2b2b2;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
 /* --- REDESIGNED SECTIONS --- */
 .accordion-section { /* Added padding and background for the section itself */
     padding: 120px 0;
@@ -1955,13 +2009,34 @@ summary::-webkit-details-marker {
 }
 
 .country-pill {
-    background: #fff;
+    background: #ffffff;
     padding: 12px 25px;
     border-radius: 100px;
     border: 1px solid #eee;
     font-weight: 600;
     color: #333;
+    transition: var(--transition);
 }
+
+.country-pill i { transition: color 0.3s ease; }
+
+.flag-usa { background: #002868; color: #ffffff; }
+.flag-usa i { color: #BF0A30; }
+
+.flag-canada { background: #FF0000; color: #ffffff; }
+
+.flag-brazil { background: #009739; color: #FEDD00; }
+.flag-brazil i { color: #002776; }
+
+.flag-uk { background: #00247D; color: #ffffff; }
+.flag-uk i { color: #CF142B; }
+
+.flag-germany { background: #000000; color: #FFCE00; }
+
+.flag-india { background: #FF9933; color: #ffffff; }
+
+.flag-australia { background: #00008B; color: #ffffff; }
+.flag-australia i { color: #FF0000; }
 
 /* --- RESPONSIVE ADJUSTMENTS --- */
 @media (min-width: 768px) { /* Tablet layout */
@@ -2006,7 +2081,9 @@ summary::-webkit-details-marker {
 /* Responsive adjustments for Blog Feed */
 @media (max-width: 768px) {
     .article-grid {
-        grid-template-columns: 1fr; /* Stack articles on mobile */
+        grid-template-columns: 1fr; /* Stack articles vertically on mobile */
+        gap: 24px;
+        margin-top: 0;
     }
     .blog-filters {
         justify-content: flex-start; /* Align filters to start on mobile if they wrap */
@@ -2037,7 +2114,7 @@ summary::-webkit-details-marker {
 
 .footer-top {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
   gap: 40px;
   margin-bottom: 80px;
 }
@@ -2147,4 +2224,66 @@ summary::-webkit-details-marker {
     gap: 20px;
     text-align: center;
   }
+}
+
+/* --- CTA CARD & BUTTON STYLES --- */
+.cta-card {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 40px;
+  border: 1px solid #f0f0f0;
+  padding: 100px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 100% 100%, rgba(94, 23, 235, 0.05), transparent 40%),
+              radial-gradient(circle at 0% 0%, rgba(241, 90, 36, 0.05), transparent 30%),
+              #ffffff;
+}
+
+.cta-content {
+  max-width: 750px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.cta-content p {
+  font-size: 1.15rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  background-color: var(--primary);
+  color: var(--white);
+  text-decoration: none;
+  padding: 18px 35px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.cta-btn:hover {
+  transform: scale(1.03);
+}
+
+.btn-arrow {
+  background-color: var(--white);
+  color: var(--primary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
