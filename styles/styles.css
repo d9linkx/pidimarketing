@@ -788,7 +788,8 @@ ul { list-style: none; }
 
 /* --- SOCIAL PROOF SECTION --- */
 .social-proof {
-    padding: 40px 0;
+    padding-top: 50px;
+    margin-bottom: -20px;
     background: radial-gradient(circle at top right, rgba(94, 23, 235, 0.04), transparent 40%), 
                 radial-gradient(circle at bottom left, rgba(241, 90, 36, 0.04), transparent 40%), 
                 #ffffff;
@@ -806,59 +807,100 @@ ul { list-style: none; }
 }
 
 .client-logos {
-    overflow: hidden;
-    padding: 20px 0;
-    width: 100%;
-    margin-bottom: 40px;
-    position: relative;
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  overflow: hidden;
+  padding: 40px 0;
+  position: relative;
+  width: 100%;
+  display: grid; /* Use grid for columnar layout */
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Better wrapping logic */
+  gap: 0; /* Columns are joined together */
+  margin-bottom: 40px;
 }
 
-.logo-track {
-    display: flex;
-    width: max-content;
-    gap: 50px;
-    animation: logo-scroll 30s linear infinite;
-}
 
 .logo-item {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #888;
-    padding: 12px 30px;
-    background: var(--white);
-    border: 1px solid #e1e8f0;
-    border-radius: 100px;
-    white-space: nowrap;
-    transition: var(--transition);
-    cursor: default;
-    filter: none;
-    opacity: 1;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center content within each column */
+  gap: 15px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  white-space: normal; /* Allow text to wrap if column is too narrow */
+  text-align: center;
+  opacity: 0.7;
+  padding: 20px 10px; /* Padding within each column */
+  height: 100%; /* Ensure items fill their grid cell height */
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.logo-item i, 
+.logo-item i,
 .logo-item svg {
-    width: 20px;
-    height: 20px;
+    width: 28px; /* Larger icons */
+    height: 28px;
+    stroke-width: 1.5px;
 }
 
 .logo-item:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-    transform: translateY(-3px);
+  opacity: 1;
+  transform: scale(1.03); /* Subtle scale on hover */
 }
 
-@keyframes logo-scroll {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(0); /* Animation removed for static layout */
+  }
+}
+
+/* Pause animation on hover for better UX */
+.client-logos:hover .logo-track {
+  animation-play-state: running; /* Animation removed, so this has no effect */
+}
+
+/* Unique background colors for each brand column */
+.brand-color-1 { background-color: #f4470890; } /* Very light blue */
+.brand-color-2 { background-color: #8dbbff; } /* Very light cream */
+.brand-color-3 { background-color: #ffcf94; } /* Light blue */
+.brand-color-4 { background-color: #f0fdf4; } /* Light green */
+.brand-color-5 { background-color: #e8dbdb; } /* Off-white */
+.brand-color-6 { background-color: #fde8cc; } /* Light peach */
+.brand-color-7 { background-color: #f2f8ff; } /* Another light blue */
+.brand-color-8 { background-color: #ffedd9; } /* Another light cream */
+.brand-color-9 { background-color: #f0f0f0; } /* Light gray */
+.brand-color-10 { background-color: #d7b9b9; } /* Another light gray */
+.brand-color-11 { background-color: #4cff9a94; } /* Almost white */
+.brand-color-12 { background-color: #b9eae7; } /* Very light gray */
+.brand-color-13 { background-color: #fefdfa; } /* Warm off-white */
+.brand-color-14 { background-color: #eff8ff; } /* Pale blue */
+
+/* Responsive adjustments for the new grid layout */
+@media (max-width: 1024px) {
+  .client-logos { 
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+    padding: 20px 0;
+  }
+  .logo-item { font-size: 0.9rem; padding: 15px 5px; }
+  .logo-item i, .logo-item svg { width: 22px; height: 22px; }
+}
+@media (max-width: 768px) {
+  .client-logos { 
+    grid-template-columns: 1fr; /* Stacks brands vertically */
+    margin-bottom: 20px;
+    padding: 20; /* Removes outer spacing so cards touch the section boundaries */
+  }
+  .social-proof { padding: 30px 0; }
+  .logo-item { 
+    font-size: 0.9rem;
+    padding: 12px 10px; /* Reduced internal padding for a tighter vertical stack */
+    border: none;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .logo-item:first-child {
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
 }
 
 /* Secondary Action Button */
