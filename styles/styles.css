@@ -1277,7 +1277,7 @@ ul { list-style: none; }
 }
 
 .team-section {
-  padding: 80px 20px;
+  padding: 120px 0;
   text-align: center;
   font-family: 'Inter', sans-serif; /* Similar to the font in image */
 }
@@ -1358,17 +1358,22 @@ ul { list-style: none; }
 }
 
 .socials a {
-  color: #aaa;
-  text-decoration: none;
-  margin: 0 5px;
-  font-size: 1.2rem;
-  transition: color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    margin: 0 8px;
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .socials a:hover {
-  color: var(--text-dark);
+    color: var(--accent);
+    transform: translateY(-2px);
 }
 
+.socials svg {
+    stroke: currentColor;
+}
 
 
 :root {
@@ -1379,7 +1384,7 @@ ul { list-style: none; }
 }
 
 .testimonials {
-  padding: 80px 5%;
+  padding: 120px 0;
   font-family: 'Inter', sans-serif;
   max-width: 1200px;
   margin: 0 auto;
@@ -1558,7 +1563,9 @@ li { margin-bottom: 12px; font-size: 0.9rem; display: flex; align-items: center;
 .awards-section,
 .global-presence,
 .blog-feed,
-.careers, /* This was already here */
+.careers,
+.team-section,
+.testimonials,
 .faq-section,
 .pricing-section,
 .cta-section {
