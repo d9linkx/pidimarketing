@@ -170,6 +170,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(typeof lucide !== 'undefined') lucide.createIcons();
             });
     }
+
+    // --- 10. DYNAMIC INFINITE SLIDER ---
+    const logoTrack = document.querySelector('.logo-track');
+    if (logoTrack) {
+        // Clone the content for a seamless loop before starting
+        const clone = logoTrack.innerHTML;
+        logoTrack.insertAdjacentHTML('beforeend', clone);
+        
+        // Re-initialize icons for the cloned elements
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // Pause/Resume logic
+        logoTrack.addEventListener('mouseenter', () => logoTrack.style.animationPlayState = 'paused');
+        logoTrack.addEventListener('mouseleave', () => logoTrack.style.animationPlayState = 'running');
+    }
 });
 
 

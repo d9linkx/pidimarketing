@@ -788,7 +788,7 @@ ul { list-style: none; }
 
 /* --- SOCIAL PROOF SECTION --- */
 .social-proof {
-    padding: 100px 0;
+    padding: 40px 0;
     background: radial-gradient(circle at top right, rgba(94, 23, 235, 0.04), transparent 40%), 
                 radial-gradient(circle at bottom left, rgba(241, 90, 36, 0.04), transparent 40%), 
                 #ffffff;
@@ -840,17 +840,17 @@ ul { list-style: none; }
     gap: 10px;
 }
 
-.logo-item:hover {
-    transform: translateY(-3px);
+.logo-item i, 
+.logo-item svg {
+    width: 20px;
+    height: 20px;
 }
 
-.brand-google:hover { color: #4285F4; border-color: #4285F4; }
-.brand-meta:hover { color: #0668E1; border-color: #0668E1; }
-.brand-amazon:hover { color: #FF9900; border-color: #FF9900; }
-.brand-shopify:hover { color: #95BF47; border-color: #95BF47; }
-.brand-stripe:hover { color: #635BFF; border-color: #635BFF; }
-.brand-airbnb:hover { color: #FF5A5F; border-color: #FF5A5F; }
-.brand-spotify:hover { color: #1DB954; border-color: #1DB954; }
+.logo-item:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+}
 
 @keyframes logo-scroll {
     0% {
