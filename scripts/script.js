@@ -197,8 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Simulate the analysis delay
             setTimeout(() => {
                 console.log(`Starting analysis for: ${websiteUrl}`);
-                // Redirect to the Google Form for earning
-                window.location.href = `https://docs.google.com/forms/d/e/1FAIpQLScv_h7u6N1mD-2_0pgemrx8hFC2L0TeEZRqc_sgBP0AJY4TDA/viewform`;
+                // Redirect to your product test page or result page
+                window.location.href = `https://avantaland.vercel.app/product-test.html?url=${encodeURIComponent(websiteUrl)}`;
             }, 1500);
         });
     }
