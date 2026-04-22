@@ -293,9 +293,10 @@ ul { list-style: none; }
     text-transform: uppercase;
     box-shadow: none;
     border: none;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 12px;
+    width: fit-content;
 }
 
 .nav-cta-btn svg {
@@ -787,8 +788,10 @@ ul { list-style: none; }
 
 /* --- SOCIAL PROOF SECTION --- */
 .social-proof {
-    padding: 60px 0;
-    background: var(--white);
+    padding: 100px 0;
+    background: radial-gradient(circle at top right, rgba(94, 23, 235, 0.04), transparent 40%), 
+                radial-gradient(circle at bottom left, rgba(241, 90, 36, 0.04), transparent 40%), 
+                #ffffff;
     text-align: center;
     border-bottom: 1px solid #eee;
 }
@@ -803,29 +806,59 @@ ul { list-style: none; }
 }
 
 .client-logos {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 50px;
+    overflow: hidden;
+    padding: 20px 0;
+    width: 100%;
     margin-bottom: 40px;
+    position: relative;
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+
+.logo-track {
+    display: flex;
+    width: max-content;
+    gap: 50px;
+    animation: logo-scroll 30s linear infinite;
 }
 
 .logo-item {
-    font-weight: 800;
-    font-size: 1.5rem;
-    color: #ccc; /* Placeholder color */
-    filter: grayscale(100%);
-    opacity: 0.6;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #888;
+    padding: 12px 30px;
+    background: var(--white);
+    border: 1px solid #e1e8f0;
+    border-radius: 100px;
+    white-space: nowrap;
     transition: var(--transition);
     cursor: default;
+    filter: none;
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .logo-item:hover {
-    filter: grayscale(0%);
-    opacity: 1;
-    color: var(--primary);
-    transform: scale(1.05);
+    transform: translateY(-3px);
+}
+
+.brand-google:hover { color: #4285F4; border-color: #4285F4; }
+.brand-meta:hover { color: #0668E1; border-color: #0668E1; }
+.brand-amazon:hover { color: #FF9900; border-color: #FF9900; }
+.brand-shopify:hover { color: #95BF47; border-color: #95BF47; }
+.brand-stripe:hover { color: #635BFF; border-color: #635BFF; }
+.brand-airbnb:hover { color: #FF5A5F; border-color: #FF5A5F; }
+.brand-spotify:hover { color: #1DB954; border-color: #1DB954; }
+
+@keyframes logo-scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 /* Secondary Action Button */
@@ -1695,10 +1728,12 @@ summary::-webkit-details-marker {
   filter: grayscale(0);
 }
 
-.award-icon img {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
+.award-icon i,
+.award-icon svg {
+  width: 32px;
+  height: 32px;
+  color: var(--accent);
+  stroke-width: 1.5px;
 }
 
 .award-org {
