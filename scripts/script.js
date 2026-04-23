@@ -145,20 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('click', (e) => { if (e.target === exitModal) hideModal(); });
     }
 
-    // --- 7. COOKIE BANNER ---
-    if (cookieBanner) {
-        const acceptCookies = cookieBanner.querySelector('.btn-orange');
-        
-        if (localStorage.getItem('cookiesAccepted') === 'true') {
-            cookieBanner.style.display = 'none';
-        } else if (acceptCookies) {
-            acceptCookies.addEventListener('click', () => {
-                cookieBanner.classList.add('hide');
-                localStorage.setItem('cookiesAccepted', 'true');
-                setTimeout(() => { cookieBanner.style.display = 'none'; }, 500);
-            });
-        }
-    }
 
     // --- 9. DYNAMIC FOOTER LOAD ---
     const footerPlaceholder = document.getElementById('footer-placeholder');
