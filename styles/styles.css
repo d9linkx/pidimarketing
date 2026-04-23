@@ -1412,7 +1412,7 @@ ul { list-style: none; }
 
 /* Unique Shapes */
 .shape-1 { 
-  background-color: var(--bg-blue); 
+  background-color: #f1c7ff; 
   border-radius: 40% 40% 40% 40% / 15% 15% 85% 85%; /* Organic blob-ish */
 }
 
@@ -1593,7 +1593,7 @@ ul { list-style: none; }
 .img-wrap { width: 100%; aspect-ratio: 1/1.2; overflow: hidden; display: flex; align-items: flex-end; margin-bottom: 20px; }
 .img-wrap img { width: 100%; height: auto; }
 
-.shape-1 { background: #4a3aff; border-radius: 40% 40% 40% 40% / 15% 15% 85% 85%; }
+.shape-1 { background: #f1c7ff; border-radius: 40% 40% 40% 40% / 15% 15% 85% 85%; }
 .shape-2 { background: #f5b075; border-radius: 150px 150px 0 0; }
 .shape-3 { background: #e8e88e; border-radius: 50%; }
 .shape-4 { background: #6ec1e4; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }

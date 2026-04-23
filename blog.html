@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="10EOmarkets - High-performance digital marketing agency specializing in Paid Media, GEO, and Growth Strategy.">
+    <title>PIDIMarketing | Authority Performance Marketing Agency</title>
+    <link rel="icon" type="image/png" href="assets/pidifav.png">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="main-nav sticky-nav">
+    <div class="container nav-wrapper">
+        <a href="index.html" class="brand-logo">
+            <img src="assets/pidi.png" alt="PIDIMarketing Logo" height="70" style="margin-top: -10px; margin-bottom: -10px;">
+            <span></span>
+        </a>
+
+
+        <div class="nav-center">
+            <ul class="desktop-nav">
+                <li><a href="index.html">Home</a></li>
+                <li class="has-dropdown">
+                    <a href="#">Services <span class="chevron-down"></span></a>
+                    <div class="dropdown-cluster">
+                        <div class="cluster-grid">
+                            <div class="cluster-col">
+                                <h5>Performance</h5>
+                                <a href="services/paid-media.html">Paid Media Scaling</a>
+                                <a href="services/cro.html">Conversion Optimization</a>
+                                <a href="services/copywriting.html">Direct Response Creative</a>
+                            </div>
+                            <div class="cluster-col">
+                                <h5>Search & Growth</h5>
+                                <a href="services/geo.html">GEO (AI Search)</a>
+                                <a href="services/gtm-strategy.html">GTM Strategy</a>
+                                <a href="services/fractional-cmo.html">Fractional CMO</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="has-dropdown">
+                    <a href="#">Resources <span class="chevron-down"></span></a>
+                    <div class="dropdown-cluster mini">
+                        <a href="blog.html">Blog</a>
+                        <a href="#">Case Studies</a>
+                        <a href="#">Marketing Guides</a>
+                    </div>
+                </li>
+                <li class="has-dropdown">
+                    <a href="#">Tools <span class="chevron-down"></span></a>
+                    <div class="dropdown-cluster mini">
+                        <a href="grow.html">Grow Your Brand</a>
+                        <a href="earn.html">Earn by Engaging</a>
+                    </div>
+                </li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="company.html">Company</a></li>
+            </ul>
+        </div>
+        
+        <div class="nav-right">
+            <a href="contact.html" class="nav-cta-btn">
+                Book a Call
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+            </a>
+            <button id="menu-trigger" class="menu-btn" aria-label="Open Navigation Menu">
+                <span class="menu-label"></span>
+                <div class="hamburger-icon">
+                    <span class="line top"></span>
+                    <span class="line middle"></span>
+                    <span class="line bottom"></span>
+                </div>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div id="side-menu" class="menu-overlay">
+    <div class="menu-header container">
+        <a href="index.html" class="brand-logo">
+            <img src="assets/pidi.png" alt="PIDIMarketing Logo" height="70" style="margin-top: -10px; margin-bottom: -10px;">
+            <span></span>
+        </a>
+        <button id="close-menu" class="close-btn" aria-label="Close Menu">
+            &times; CLOSE
+        </button>
+    </div>
+    
+    <div class="menu-body container">
+        <div class="menu-columns">
+            <div class="menu-section">
+                <h4 class="menu-title">Navigation</h4>
+                <ul class="menu-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="company.html">Company</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <h4 class="menu-title">Services</h4>
+                <ul class="menu-links">
+                    <li><a href="services/geo.html">Earned Media (GEO & AI SEO)</a></li>
+                    <li><a href="services/paid-media.html">Paid Media Scaling</a></li>
+                    <li><a href="services/cro.html">Data & Analytics (CRO & UX)</a></li>
+                    <li><a href="services/copywriting.html">Direct-Response Creative</a></li>
+                    <li><a href="services/gtm-strategy.html">GTM Strategy</a></li>
+                    <li><a href="services/marketing-ops.html">Technology & Marketing Ops</a></li>
+                    <li><a href="services/fractional-cmo.html">Fractional CMO Consulting</a></li>
+                    <li><a href="services/youtube-automation.html">YouTube Automation</a></li>
+                    <li><a href="services/social-growth.html">Hybrid Social Growth</a></li>
+                    <li><a href="services/thought-leadership.html">Executive Thought Leadership</a></li>
+                </ul>
+            </div>
+
+            <div class="menu-section">
+                <h4 class="menu-title">Tools</h4>
+                <ul class="menu-links">
+                    <li><a href="grow.html">Grow Your Brand</a></li>
+                    <li><a href="earn.html">Earn by Engaging</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="menu-footer">
+            <div class="footer-cta">
+                <p>Ready to scale your revenue?</p>
+                <a href="contact.html" class="btn-orange">
+                    Book a Call
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 8px;">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+            </div>
+            <div class="social-mini">
+                <p>Follow me around the web</p>
+                <div class="social-icons">
+                    <a href="#">LinkedIn</a>
+                    <a href="#">YouTube</a>
+                    <a href="#">X</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <section id="hero" class="hero-section">
+        <div class="container hero-content">
+            <h1>
+                <span class="black-text">Get Better Visibility on 
+                    <span class="google-text">
+                        <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
+                    </span> &
+                </span> 
+                <span class="gradient-text"> AI Search</span>
+                <span class="black-text"> with Our FREE Audit</span>
+            </h1>
+
+            
+            <form class="audit-form">
+                <input type="url" placeholder="Enter your website URL" required>
+                <button type="submit" class="btn-orange">
+                    ANALYSE MY WEBSITE (FREE)
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 10px;">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </form>
+
+
+
+            Want real human traffic to your social accounts? <a href="#" class="primary" style="text-decoration: underline; font-style: italic;">Click here instead</a>
+
+            <div class="cta-trust-container">
+                <div class="social-proof-mini">
+                    <div class="avatar-stack">
+                        <img src="https://i.pravatar.cc/150?u=1" alt="Client">
+                        <img src="https://i.pravatar.cc/150?u=2" alt="Client">
+                        <img src="https://i.pravatar.cc/150?u=3" alt="Client">
+                        <img src="https://i.pravatar.cc/150?u=4" alt="Client">
+                    </div>
+                    <div class="proof-meta">
+                        <div class="star-rating" style="display: flex; gap: 2px;">
+                            <i data-lucide="star" style="width: 14px; fill: currentColor;"></i>
+                            <i data-lucide="star" style="width: 14px; fill: currentColor;"></i>
+                            <i data-lucide="star" style="width: 14px; fill: currentColor;"></i>
+                            <i data-lucide="star" style="width: 14px; fill: currentColor;"></i>
+                            <i data-lucide="star" style="width: 14px; fill: currentColor;"></i>
+                        </div>
+                        <p>Trusted by <strong>200+</strong> clients</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="social-proof">
+        
+        <div class="container">
+            <h2 class="hero-title">
+                Brands trust us with  
+                <span class="italic-serif">their marketing</span>
+            </h2>
+            <div class="client-logos">
+                <div class="logo-item brand-color-1"><i data-lucide="shirt"></i> Prawnbox</div>
+                <div class="logo-item brand-color-2"><i data-lucide="graduation-cap"></i> Avantaland</div>
+                <div class="logo-item brand-color-3"><i data-lucide="shopping-bag"></i> Eeva's</div>
+                <div class="logo-item brand-color-4"><i data-lucide="gem"></i> Rych Empire</div>
+                <div class="logo-item brand-color-5"><i data-lucide="flask-conical"></i> Zenith Labs</div>
+                <div class="logo-item brand-color-6"><i data-lucide="trending-up"></i> Orion</div>
+                <div class="logo-item brand-color-7"><i data-lucide="zap"></i> Solara</div>
+                <div class="logo-item brand-color-8"><i data-lucide="database"></i> Nebula</div>
+                <div class="logo-item brand-color-9"><i data-lucide="heart-pulse"></i> Aether</div>
+                <div class="logo-item brand-color-10"><i data-lucide="truck"></i> Titan</div>
+                <div class="logo-item brand-color-11"><i data-lucide="film"></i> Vertex</div>
+                <div class="logo-item brand-color-12"><i data-lucide="lightbulb"></i> Lumina</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats-section" class="stats-section">
+    <div class="container">
+            <h2 class="hero-title">
+                Exceptional marketing <br> 
+                services that <span class="italic-serif">drive results</span>
+            </h2>
+        </div>
+        
+        <div class="stats-intro">
+            <div class="pill-group">
+                <div class="design-pill purple">
+                    <span class="pill-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
+                    </span>
+                    <span class="pill-text">Creativity</span>
+                </div>
+                <div class="design-pill blue">
+                    <span class="pill-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                    </span>
+                    <span class="pill-text">Innovation</span>
+                </div>
+                <div class="design-pill orange">
+                    <span class="pill-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    </span>
+                    <span class="pill-text">Strategy</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number"><span>+</span>40</div>
+                <p class="stat-label">Total Projects Completed</p>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number"><span>+</span>15</div>
+                <p class="stat-label">Years of Experience</p>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number"><span>+</span>12</div>
+                <p class="stat-label">Design Awards</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section id="dynamic-accordion-scroll" class="accordion-section">
+    <div class="container">
+        <div class="section-intro">
+            <h2 class="hero-title">
+                Performance-obsessed <br> 
+                marketing <span class="italic-serif">solutions</span>
+            </h2>
+        </div>
+        <div class="accordion-engine">
+            
+            <div class="accordion-card" data-color="paid-navy">
+                <div class="card-header">
+                    <span class="icon"><i data-lucide="message-square"></i></span>
+                    <h3>Social Proof Injection</h3>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <p><strong>Outcome:</strong> Transform ghost-town posts into busy hubs with twenty high-quality, ten-word human comments and questions.</p>
+                    </div>
+                    <div>
+                        <div class="card-pills-container">
+                            <span class="pill-label">Trust Building</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #888;">Optimisation: Keyword variety & natural flow.</p>
+                    </div>
+                    <a href="#" class="btn-orange">Learn More</a>
+                </div>
+            </div>
+
+            <div class="accordion-card" data-color="gtm-cream">
+                <div class="card-header">
+                    <span class="icon"><i data-lucide="zap"></i></span>
+                    <h3>Viral Velocity Boost</h3>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <p><strong>Outcome:</strong> Trigger platform algorithms by delivering rapid, real-time shares and high-retention views within the first hour.</p>
+                    </div>
+                    <div>
+                        <div class="card-pills-container">
+                            <span class="pill-label">Algorithm Sync</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #888;">Optimisation: Save-to-like & watch-time ratios.</p>
+                    </div>
+                    <a href="#" class="btn-orange">Learn More</a>
+                </div>
+            </div>
+
+            <div class="accordion-card" data-color="cro-blue">
+                <div class="card-header">
+                    <span class="icon"><i data-lucide="user-check"></i></span>
+                    <h3>Authority Builder</h3>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <p><strong>Outcome:</strong> Establish immediate credibility by growing your following with real, active profiles that won't be purged.</p>
+                    </div>
+                    <div>
+                        <div class="card-pills-container">
+                            <span class="pill-label">Growth</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #888;">Optimisation: Conversion rates & health signals.</p>
+                    </div>
+                    <a href="#" class="btn-orange">Learn More</a>
+                </div>
+            </div>
+
+            <div class="accordion-card" data-color="paid-navy">
+                <div class="card-header">
+                    <span class="icon"><i data-lucide="filter"></i></span>
+                    <h3>Conversion Funnel Fix</h3>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <p><strong>Outcome:</strong> Double your sales leads by repairing broken landing page headlines, slow speeds, and confusing layouts.</p>
+                    </div>
+                    <div>
+                        <div class="card-pills-container">
+                            <span class="pill-label">Sales UX</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #888;">Optimisation: Heat-map friction & mobile response.</p>
+                    </div>
+                    <a href="#" class="btn-orange">Learn More</a>
+                </div>
+            </div>
+
+            <div class="accordion-card" data-color="geo-green">
+                <div class="card-header">
+                    <span class="icon"><i data-lucide="target"></i></span>
+                    <h3>Ad Campaign Tuning</h3>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <p><strong>Outcome:</strong> Slash your monthly ad spend while increasing clicks through hyper-targeted audience testing and high-response copywriting.</p>
+                    </div>
+                    <div>
+                        <div class="card-pills-container">
+                            <span class="pill-label">ROI Driven</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #888;">Optimisation: CPA metrics & creative hooks.</p>
+                    </div>
+                    <a href="#" class="btn-orange">Learn More</a>
+                </div>
+            </div>
+
+            <div class="accordion-card" data-color="gtm-cream">
+                <div class="card-header">
+                    <span class="icon"><i data-lucide="shield-check"></i></span>
+                    <h3>Reputation Management</h3>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <p><strong>Outcome:</strong> Dominate search results with authentic-looking positive feedback and strategic "frequently asked questions" that dissolve objections.</p>
+                    </div>
+                    <div>
+                        <div class="card-pills-container">
+                            <span class="pill-label">AI Search / SEO / Brand Authority</span>
+                        </div>
+                        <p><strong>Optimisation:</strong> Google reviews, Star ratings, AI response authority, & local SEO keywords.</p>
+                    </div>
+                    <a href="#" class="btn-orange">Learn More</a>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 60px;">
+            <a href="services.html" class="btn-outline">See All Services <i data-lucide="arrow-right" style="width: 16px; vertical-align: middle; margin-left: 8px; margin-top: -2px;"></i></a>
+        </div>
+    </div>
+</section>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<section id="innovation-section" class="innovation-section">
+    <div class="container">
+        
+        <div class="section-intro">
+            <h2 class="hero-title">
+                Other innovations that <br> 
+                meet <span class="italic-serif">aesthetics</span>
+            </h2>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card purple">
+                <div class="service-icon"><i data-lucide="shapes"></i></div>
+                <h3>Brand Strategy</h3>
+            </div>
+
+            <div class="service-card pink">
+                <div class="service-icon"><i data-lucide="code-2"></i></div>
+                <h3>Web Development</h3>
+            </div>
+
+            <div class="service-card blue">
+                <div class="service-icon"><i data-lucide="rocket"></i></div>
+                <h3>YouTube Automation</h3>
+            </div>
+
+            <div class="service-card cream">
+                <div class="service-icon"><i data-lucide="pen-tool"></i></div>
+                <h3>UI/UX Designing</h3>
+            </div>
+
+            <div class="service-card green">
+                <div class="service-icon"><i data-lucide="bar-chart-3"></i></div>
+                <h3>Growth Engine</h3>
+            </div>
+        </div>
+
+        <div class="cta-banner">
+            <div class="cta-text">
+                <h3>See Our Work in Action.</h3>
+                <p>Start Your Creative Journey with Us!</p>
+            </div>
+            <div class="cta-buttons">
+                <a href="#" class="btn-pill white">
+                    Let's Collaborate <i data-lucide="arrow-up-right" class="btn-icon"></i>
+                </a>
+                <a href="#" class="btn-pill outline">
+                    View Portfolio <i data-lucide="arrow-up-right" class="btn-icon"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+  lucide.createIcons();
+</script>
+
+
+<section id="work-section" class="work-section">
+    <div class="container">
+        <div class="section-intro">
+            <h2 class="hero-title">
+                How we transformed a small business's <span class="italic-serif">online presence</span>
+            </h2>
+        </div>
+
+
+        <div class="work-grid">
+            <div class="project-card">
+                <div class="project-image-wrapper">
+                    <img src="assets/djustee.png" alt="FlowBank">
+                    <div class="external-link">↗</div>
+                </div>
+                <div class="project-info">
+                    <h3>Djustee</h3>
+                    <div class="tag-group">
+                        <span class="tag">UX Research</span>
+                        <span class="tag">Interface Design</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image-wrapper">
+                    <img src="assets/fleetrait.png" alt="Academy.co">
+                    <div class="external-link">↗</div>
+                </div>
+                <div class="project-info">
+                    <h3>Fleetrait.co</h3>
+                    <div class="tag-group">
+                        <span class="tag">Product Marketing</span>
+                        <span class="tag">Google & Meta Ads</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image-wrapper">
+                    <img src="assets/husdrapp.png" alt="Genome">
+                    <div class="external-link">↗</div>
+                </div>
+                <div class="project-info">
+                    <h3>Husdrapp</h3>
+                    <div class="tag-group">
+                        <span class="tag">Brand identity design</span>
+                        <span class="tag">E-commerce</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image-wrapper">
+                    <img src="assets/hottope.png" alt="Hotto">
+                    <div class="external-link">↗</div>
+                </div>
+                <div class="project-info">
+                    <h3>Hottope</h3>
+                    <div class="tag-group">
+                        <span class="tag">Meta Ad Campaigns</span>
+                        <span class="tag">Landing Page Designs</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="team-section">
+  <div class="container">
+        <div class="section-intro">
+            <h2 class="hero-title">
+                Meet the creative minds behind <span class="italic-serif">our success</span>
+            </h2>
+        </div>
+
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="image-wrapper shape-1">
+          <img src="assets/prince.png" alt="Logan Dang">
+        </div>
+        <h3>Prince Dike</h3>
+        <p>Founder & Marketing Specialist <br> @ PIDI Marketing</p>
+        <div class="socials">
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-twitter">
+              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+            </svg>
+          </a>
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect width="4" height="12" x="2" y="9"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="image-wrapper shape-2">
+          <img src="assets/ana.png" alt="Ana Belić">
+        </div>
+        <h3>Ana Belić</h3>
+        <p>Head of Operations <br> @ PIDI Marketing</p>
+        <div class="socials">
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-twitter">
+              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+            </svg>
+          </a>
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect width="4" height="12" x="2" y="9"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="image-wrapper shape-3">
+          <img src="assets/brian.png" alt="Brian Hanley">
+        </div>
+        <h3>Brian Hanley</h3>
+        <p>Product Designer <br> @ PIDI Marketing</p>
+        <div class="socials">
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-twitter">
+              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+            </svg>
+          </a>
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect width="4" height="12" x="2" y="9"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="image-wrapper shape-4">
+          <img src="assets/darko.png" alt="Darko Stanković">
+        </div>
+        <h3>Darko Stanković</h3>
+        <p>Brand UIUX Designer <br> @ PIDI Marketing</p>
+        <div class="socials">
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-twitter">
+              <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+            </svg>
+          </a>
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect width="4" height="12" x="2" y="9"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="testimonials">
+  <div class="container">
+        <div class="section-intro">
+            <h2 class="hero-title">
+                What our satisfied customers are saying <span class="italic-serif">about us</span>
+            </h2>
+        </div>
+
+
+    <div class="testimonial-grid">
+      <div class="card main-story" style="background: url('https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&q=80&w=1200') center/cover no-repeat;">
+        <div class="overlay">
+          <span class="label">CUSTOMER STORIES</span>
+          <p class="quote">"Pidi Marketing's expertise transformed my vision into success with creativity, precision, and a deep understanding of my goals."</p>
+          <div class="author">
+            <strong>Sarah Mitchell</strong>
+            <span>Founder of Chipsland</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card stats-card">
+        <span class="label">FACTS & NUMBERS</span>
+        <h2>91%</h2>
+        <p>clients recommend our design services."</p>
+      </div>
+
+      <div class="card light-card">
+        <span class="label">CUSTOMER STORIES</span>
+        <p class="quote">“Pidi Marketing brought our ideas to life with exceptional creativity and precision, exceeding expectations.”</p>
+        <div class="author">
+          <strong>Sarah Mitchell</strong>
+          <span>Marketing Head at TalentConnect</span>
+        </div>
+      </div>
+
+      <div class="card dark-card">
+        <span class="label">CUSTOMER STORIES</span>
+        <p class="quote">Their creativity and attention to detail transformed our brand completely!</p>
+        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800" alt="Marketing performance dashboard" class="card-img">
+      </div>
+
+
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="section pricing-section">
+    <div class="container">
+        <div class="section-intro">
+            <h2 class="hero-title">
+                Pick the plan that fits your <span class="italic-serif">start-up</span>
+            </h2>
+        </div>
+
+      <div class="pricing-grid">
+        <div class="price-card yellow-card">
+          <div class="price-left">
+            <span class="badge">Starter</span>
+            <p class="card-desc">For companies who need design support. One request at a time</p>
+            <div class="price-tag"><h1>$2500</h1><span>/month</span></div>
+            <a href="#" class="price-btn">Let's Collaborate <div class="btn-arrow"><i data-lucide="arrow-up-right" style="width: 14px;"></i></div></a>
+          </div>
+          <div class="price-right">
+            <p class="feat-title">Features</p>
+            <ul>
+              <li>Design Updates Every 2 Days</li>
+              <li>Mid-level Designer</li>
+              <li>SEO optimization</li>
+              <li>Monthly analytics</li>
+              <li>2x Calls Per Month</li>
+              <li>License free assets</li>
+            </ul>
+          </div>
+        </div>
+        <div class="price-card blue-card">
+          <div class="price-left">
+            <span class="badge">Pro</span>
+            <p class="card-desc">2x the speed. Great for an MVP, Web App or complex problem</p>
+            <div class="price-tag"><h1>$3500</h1><span>/month</span></div>
+            <a href="#" class="price-btn">Let's Collaborate <div class="btn-arrow"><i data-lucide="arrow-up-right" style="width: 14px;"></i></div></a>
+          </div>
+          <div class="price-right">
+            <p class="feat-title">Features</p>
+            <ul>
+              <li>Design Updates Daily</li>
+              <li>Senior-level Designer</li>
+              <li>AI Advisory Framework</li>
+              <li>Full-service Creative Team</li>
+              <li>4x Calls Per Month</li>
+              <li>License free assets</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+    <section class="faq-section">
+        <div class="container">
+            <div class="section-intro">
+                <h2 class="hero-title">
+                    Got questions?<br> We've got <span class="italic-serif">answers</span>
+                </h2>
+            </div>
+
+            <div class="faq-container">
+                <details class="faq-item">
+                    <summary>What services does Pidi Marketing offer? <span class="chevron"></span></summary>
+                    <div class="faq-content">
+                        <p>We offer a full suite of design services including UI/UX design, brand identity, and custom web development.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>How long does a typical project take? <span class="chevron"></span></summary>
+                    <div class="faq-content">
+                        <p>Most projects take between 4 to 8 weeks depending on the complexity and scope of the work.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>How is pricing structured at Pidi Marketing? <span class="chevron"></span></summary>
+                    <div class="faq-content">
+                        <p>We offer both subscription-based models for ongoing design support and fixed-price models for specific projects.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>Do you offer ongoing support after project completion? <span class="chevron"></span></summary>
+                    <div class="faq-content">
+                        <p>Yes, we provide various maintenance packages to ensure your site or product stays updated and secure.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>How often will I receive updates on my project? <span class="chevron"></span></summary>
+                    <div class="faq-content">
+                        <p>Depending on your plan, you'll receive updates either daily or every 48 hours through our dedicated portal.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>How do I get started with Pidi Marketing? <span class="chevron"></span></summary>
+                    <div class="faq-content">
+                        <p>Simply click the "Let's Collaborate" button and schedule a discovery call with our team!</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+<section class="global-presence">
+    <div class="container">
+        <div class="section-intro">
+            <h2 class="hero-title">
+                A global agency for  
+                <span class="italic-serif">global reach</span>
+            </h2>
+        </div>
+        <div class="country-list">
+            <div class="country-pill flag-usa"><i data-lucide="globe" style="width: 14px; margin-right: 8px;"></i> United States</div>
+            <div class="country-pill flag-canada"><i data-lucide="globe" style="width: 14px; margin-right: 8px;"></i> Canada</div>
+            <div class="country-pill flag-brazil"><i data-lucide="globe" style="width: 14px; margin-right: 8px;"></i> Brazil</div>
+            <div class="country-pill flag-uk"><i data-lucide="globe" style="width: 14px; margin-right: 8px;"></i> United Kingdom</div>
+            <div class="country-pill flag-germany"><i data-lucide="globe" style="width: 14px; margin-right: 8px;"></i> Germany</div>
+            <div class="country-pill flag-india"><i data-lucide="globe" style="width: 14px; margin-right: 8px;"></i> India</div>
+            <div class="country-pill flag-australia"><i data-lucide="globe" style="width: 14px; margin-right: 8px;"></i> Australia</div>
+        </div>
+    </div>
+</section>
+
+<section class="awards-section">
+  <div class="container">
+        <div class="section-intro">
+            <h2 class="hero-title">
+                Accolades and achievements; <br> celebrating our <span class="italic-serif">marketing excellence</span>
+            </h2>
+        </div>
+
+    <div class="awards-grid">
+      <div class="award-card">
+        <div class="award-icon webflow-icon">
+          <i data-lucide="trophy"></i>
+        </div>
+        <span class="award-org">Webflow Awards</span>
+        <h3 class="award-title">Celebrated for cutting-edge marketing strategy and seamless user experiences.</h3>
+        <span class="award-year">2025</span>
+      </div>
+
+      <div class="award-card">
+        <div class="award-icon dribbble-icon">
+          <i data-lucide="award"></i>
+        </div>
+        <span class="award-org">Dribbble Awards</span>
+        <h3 class="award-title">Recognized for creative excellence and innovative design solutions</h3>
+        <span class="award-year">2024</span>
+      </div>
+
+      <div class="award-card">
+        <div class="award-icon awwwards-icon">
+          <i data-lucide="medal"></i>
+        </div>
+        <span class="award-org">awwwards Awards</span>
+        <h3 class="award-title">Honored with the Best Website Design for creativity, usability, and innovation.</h3>
+        <span class="award-year">2023</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-card">
+        <div class="section-intro">
+            <h2 class="hero-title">
+                Innovative solutions for <br><span class="italic-serif">bold brands</span>
+            </h2>
+                <div class="cta-content">
+                    <p>Looking to elevate your brand? We craft immersive experiences that captivate, engage, and make your business unforgettable in every interaction.</p>
+                    <a href="#" class="cta-btn">
+                        Let's craft together 
+                        <div class="btn-arrow"><i data-lucide="arrow-up-right" style="width: 16px;"></i></div>
+                    </a>
+                </div>
+            </div>
+
+    </div>
+  </div>
+</section>
+
+    <section class="blog-feed">
+        <div class="container">
+            <div class="section-intro">
+                <h2 class="hero-title">
+                    Blogs & 
+                    <span class="italic-serif">Articles</span>
+                </h2>
+            </div>
+            
+            <div class="blog-filters">
+                <button class="active">All Blogs</button>
+                <button>SEO / GEO</button>
+                <button>Paid Ads</button>
+                <button>CRO</button>
+                <button>Ecommerce</button>
+                <button>Marketing Strategy</button>
+            </div>
+
+            <div class="article-grid">
+                
+                <article class="blog-post">
+                    <span class="badge">New</span>
+                    <span class="category">SEO • 9 mins read</span>
+                    <h3>GEO Best Practices: Prompt Volume Shouldn't Drive Your Strategy</h3>
+                    <div class="key-takeaways">
+                        <strong>Key Takeaways:</strong> Most advice on generative engine optimization starts by finding prompts...
+                    </div>
+                    <div class="author-info">
+                        <img src="https://i.pravatar.cc/150?u=9" alt="Founder">
+                        <div>
+                            <p class="author-name">Founder of PIDIMarketing</p>
+                            <p class="post-date">Mar 17, 2026</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="blog-post">
+                    <span class="badge">New</span>
+                    <span class="category">Paid Ads • 12 mins read</span>
+                    <h3>Are AI Overviews Stealing Your Clicks?</h3>
+                    <div class="key-takeaways">
+                        <strong>Key Takeaways:</strong> Your impression numbers look healthy, but CTR tells a different story...
+                    </div>
+                    <div class="author-info">
+                        <img src="https://i.pravatar.cc/150?u=12" alt="Director">
+                        <div>
+                            <p class="author-name">Director, Paid Media</p>
+                            <p class="post-date">Apr 9, 2026</p>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+            <button class="btn-outline load-more">Load More Articles</button>
+        </div>
+    </section>
+
+    <section class="careers">
+        <div class="container">
+            <div class="cta-card">
+                <div class="section-intro">
+                    <h2 class="hero-title">Outstanding results require <br><span class="italic-serif">outstanding people</span></h2>
+                </div>
+                <div class="cta-content">
+                    <p>PIDI Marketing is a 100% remote workplace with industry-leading benefits. We put work-life balance first.</p>
+                    <a href="#" class="btn-orange">Geek out with us!</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div id="footer-placeholder"></div>
+
+    <div id="exit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Do You Want More Traffic?</h2>
+            <p>Let me help your business grow.</p>
+            <div class="modal-actions">
+                <button class="btn-orange">Yes, I want more traffic</button>
+                <button class="btn-gray">No, I have enough traffic</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cookie-banner">
+        <div class="container">
+            <p>This website uses cookies to improve user experience. By using our site you consent to all cookies. <a href="#">Read more</a></p>
+            <button class="btn-orange">Accept All</button>
+            <button class="btn-outline">Show Details</button>
+        </div>
+    </div>
+
+
+    <script src="scripts/script.js"></script>
+    <script>lucide.createIcons();</script>
+
+</body>
+
+</html>
