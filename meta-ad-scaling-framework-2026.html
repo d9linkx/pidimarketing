@@ -24,9 +24,149 @@
 </head>
 <body>
     <div class="reading-progress"></div>
-    <nav id="header-placeholder"></nav>
+    <nav class="main-nav sticky-nav">
+        <div class="container nav-wrapper">
+            <a href="index.html" class="brand-logo">
+                <img src="assets/pidi.png" alt="PIDIMarketing Logo" height="70" style="margin-top: -10px; margin-bottom: -10px;">
+                <span></span>
+            </a>
+    
+    
+            <div class="nav-center">
+                <ul class="desktop-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li class="has-dropdown">
+                        <a href="#">Services <span class="chevron-down"></span></a>
+                        <div class="dropdown-cluster">
+                            <div class="cluster-grid">
+                                <div class="cluster-col">
+                                    <h5>Performance</h5>
+                                    <a href="services/paid-media.html">Paid Media Scaling</a>
+                                    <a href="services/cro.html">Conversion Optimization</a>
+                                    <a href="services/copywriting.html">Direct Response Creative</a>
+                                </div>
+                                <div class="cluster-col">
+                                    <h5>Search & Growth</h5>
+                                    <a href="services/geo.html">GEO (AI Search)</a>
+                                    <a href="services/gtm-strategy.html">GTM Strategy</a>
+                                    <a href="services/fractional-cmo.html">Fractional CMO</a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="has-dropdown">
+                        <a href="#">Resources <span class="chevron-down"></span></a>
+                        <div class="dropdown-cluster mini">
+                            <a href="blog.html">Blog</a>
+                            <a href="#">Case Studies</a>
+                            <a href="#">Marketing Guides</a>
+                        </div>
+                    </li>
+                    <li class="has-dropdown">
+                        <a href="#">Tools <span class="chevron-down"></span></a>
+                        <div class="dropdown-cluster mini">
+                            <a href="grow.html">Grow Your Brand</a>
+                            <a href="earn.html">Earn by Engaging</a>
+                        </div>
+                    </li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="company.html">Company</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-right">
+                <a href="contact.html" class="nav-cta-btn">
+                    Book a Call
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+                <button id="menu-trigger" class="menu-btn" aria-label="Open Navigation Menu">
+                    <span class="menu-label"></span>
+                    <div class="hamburger-icon">
+                        <span class="line top"></span>
+                        <span class="line middle"></span>
+                        <span class="line bottom"></span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <div id="side-menu" class="menu-overlay">
+        <div class="menu-header container">
+            <a href="index.html" class="brand-logo">
+                <img src="assets/pidi.png" alt="PIDIMarketing Logo" height="70" style="margin-top: -10px; margin-bottom: -10px;">
+                <span></span>
+            </a>
+            <button id="close-menu" class="close-btn" aria-label="Close Menu">
+                &times; CLOSE
+            </button>
+        </div>
+        
+        <div class="menu-body container">
+            <div class="menu-columns">
+                <div class="menu-section">
+                    <h4 class="menu-title">Navigation</h4>
+                    <ul class="menu-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="company.html">Company</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="menu-section">
+                    <h4 class="menu-title">Services</h4>
+                    <ul class="menu-links">
+                        <li><a href="services/geo.html">Earned Media (GEO & AI SEO)</a></li>
+                        <li><a href="services/paid-media.html">Paid Media Scaling</a></li>
+                        <li><a href="services/cro.html">Data & Analytics (CRO & UX)</a></li>
+                        <li><a href="services/copywriting.html">Direct-Response Creative</a></li>
+                        <li><a href="services/gtm-strategy.html">GTM Strategy</a></li>
+                        <li><a href="services/marketing-ops.html">Technology & Marketing Ops</a></li>
+                        <li><a href="services/fractional-cmo.html">Fractional CMO Consulting</a></li>
+                        <li><a href="services/youtube-automation.html">YouTube Automation</a></li>
+                        <li><a href="services/social-growth.html">Hybrid Social Growth</a></li>
+                        <li><a href="services/thought-leadership.html">Executive Thought Leadership</a></li>
+                    </ul>
+                </div>
+    
+                <div class="menu-section">
+                    <h4 class="menu-title">Tools</h4>
+                    <ul class="menu-links">
+                        <li><a href="grow.html">Grow Your Brand</a></li>
+                        <li><a href="earn.html">Earn by Engaging</a></li>
+                    </ul>
+                </div>
+    
+            </div>
+    
+            <div class="menu-footer">
+                <div class="footer-cta">
+                    <p>Ready to scale your revenue?</p>
+                    <a href="contact.html" class="btn-orange">
+                        Book a Call
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 8px;">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                    </a>
+                </div>
+                <div class="social-mini">
+                    <p>Follow me around the web</p>
+                    <div class="social-icons">
+                        <a href="#">LinkedIn</a>
+                        <a href="#">YouTube</a>
+                        <a href="#">X</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <section class="hero-section" style="padding-top: 180px;">
+    <section id="hero" class="hero-section" style="padding-top: 180px;">
         <div class="container hero-content">
             <span class="badge" style="margin-bottom: 20px;">PERFORMANCE ADS</span>
             <h1>
@@ -216,6 +356,19 @@
     </div>
 
     <div id="footer-placeholder"></div>
+
+    <div id="exit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Do You Want More Traffic?</h2>
+            <p>Let me help your business grow.</p>
+            <div class="modal-actions">
+                <button class="btn-orange">Yes, I want more traffic</button>
+                <button class="btn-gray">No, I have enough traffic</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="scripts/script.js"></script>
 </body>
