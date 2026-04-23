@@ -9,8 +9,22 @@
   </url>
 
   <url>
-    <loc>https://pidimarketing.vercel.app/about.html</loc>
-    <lastmod>2026-04-20</lastmod>
+    <loc>https://pidimarketing.vercel.app/company.html</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://pidimarketing.vercel.app/contact.html</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://pidimarketing.vercel.app/earn.html</loc>
+    <lastmod>2026-04-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -23,10 +37,32 @@
   </url>
 
   <url>
-    <loc>https://pidimarketing.vercel.app/blog/how-to-code-manual-sites.html</loc>
-    <lastmod>2026-04-22</lastmod>
+    <loc>https://pidimarketing.vercel.app/geo-best-practices-strategy.html</loc>
+    <lastmod>2026-04-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+
+  <url>
+    <loc>https://pidimarketing.vercel.app/meta-ad-scaling-framework-2026.html</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://pidimarketing.vercel.app/shopify-conversion-ux-friction.html</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://pidimarketing.vercel.app/fractional-cmo-playbook-scaling.html</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
 
 </urlset>
