@@ -75,6 +75,11 @@
             header { text-align: left; align-items: flex-start; }
             header .text-right { text-align: left; }
         }
+        
+        /* Creation Flow Styles */
+        .step-node { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; border: 2px solid var(--border-dash); background: var(--bg-card); transition: all 0.3s; }
+        .step-node.active { border-color: #6a26da; background: #6a26da; color: white; }
+        .step-node.completed { border-color: #48bb78; background: #48bb78; color: white; }
 
         .accent-gradient { 
             background: linear-gradient(135deg, #6a26da 0%, #a366ff 100%); 
@@ -101,7 +106,7 @@
         </nav>
 
         <div class="flex items-center gap-2 md:gap-4">
-            <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition" id="theme-toggle">
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition focus:outline-none" id="theme-toggle">
                 <i class="fa-solid fa-moon" id="theme-icon"></i>
             </button>
             
@@ -112,7 +117,7 @@
                         <p class="text-[10px] text-dash-secondary uppercase font-bold tracking-tight">Verified User</p>
                         <p class="text-sm font-bold">Prince Dike</p>
                     </div>
-                    <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-11 h-11 rounded-2xl border-2 border-dash">
+                    <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-11 h-11 rounded-2xl border-2 border-dash" alt="User Avatar">
                 </button>
                 
                 <!-- Dropdown Menu -->
@@ -151,7 +156,7 @@
         <!-- Mobile Menu Overlay -->
         <div id="mobile-menu" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm">
             <div class="absolute right-0 top-0 h-full w-72 bg-[var(--bg-card)] border-l border-[var(--border-dash)] p-6 shadow-2xl flex flex-col transition-transform duration-300 transform translate-x-full overflow-y-auto" id="mobile-menu-panel" style="background-color: var(--bg-card); border-color: var(--border-dash);">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex justify-between items-center mb-8 pb-4 border-b border-dash">
                     <span class="font-bold">Dashboard Menu</span>
                     <button onclick="toggleMobileMenu()" class="text-2xl">&times;</button>
                 </div>
@@ -160,7 +165,7 @@
                     <button onclick="switchRole('creator')" class="mobile-nav-btn w-full text-left p-4 rounded-xl font-semibold transition" data-role="creator">Creator Mode</button>
                     <button onclick="switchRole('performer')" class="mobile-nav-btn w-full text-left p-4 rounded-xl font-semibold transition" data-role="performer">Performer Mode</button>
                     <button onclick="switchRole('admin')" class="mobile-nav-btn w-full text-left p-4 rounded-xl font-semibold transition" data-role="admin">Admin Mode</button>
-                    
+
                     <div class="my-4 border-t border-dash"></div>
                     
                     <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-4 mb-1">Account Management</p>
@@ -180,7 +185,7 @@
                         <i class="fa-solid fa-shield-halved w-5"></i> Login & Security
                     </a>
                     
-                    <div class="my-4 border-t border-dash"></div>
+                    <div class="my-4 border-t border-dash mt-6"></div>
                     
                     <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-4 mb-1">Help & Support</p>
                     <a href="contact.html" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
@@ -190,7 +195,7 @@
                         <i class="fa-solid fa-right-from-bracket w-5"></i> Sign Out
                     </button>
                 </div>
-            </div>
+            </div> 
         </div>
     </header>
 
@@ -199,12 +204,12 @@
         <div class="bento-card col-span-2 row-span-2 accent-gradient flex flex-col justify-between overflow-hidden relative group">
             <div class="relative z-10">
                 <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Revenue Hub</span>
-                <h2 class="text-4xl font-bold mt-4 leading-tight" id="main-stat-label">Active Campaigns</h2>
+                <h2 class="text-4xl font-bold mt-4 leading-tight" id="main-stat-label">Grow Your Brand</h2>
                 <p class="text-white/80 mt-2 max-w-xs" id="main-sub-label">Your strategic growth is currently pacing at 114% of monthly target.</p>
             </div>
             <div class="relative z-10 mt-8">
-                <h3 class="text-6xl font-bold tracking-tighter" id="main-value">12</h3>
-                <button class="mt-4 bg-white text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition">
+                <h3 class="text-6xl font-bold tracking-tighter" id="main-value">Launch</h3>
+                <button onclick="openCampaignWizard()" class="mt-4 bg-white text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition">
                     <i class="fa-solid fa-plus"></i> <span id="main-cta">New Campaign</span>
                 </button>
             </div>
@@ -213,12 +218,13 @@
 
         <div class="bento-card col-span-1 flex flex-col justify-between">
             <div>
-                <p class="text-dash-secondary text-sm font-semibold uppercase">Wallet Balance</p>
-                <p class="text-3xl font-bold mt-1">₦420,500</p>
+                <p class="text-dash-secondary text-sm font-semibold uppercase">Total Balance</p>
+                <p class="text-3xl font-bold mt-1" id="total-balance">₦0</p>
+                <p class="text-dash-secondary text-xs mt-1">Pending: <span id="pending-balance">₦0</span></p>
             </div>
             <div class="mt-4 flex gap-2">
                 <button class="flex-1 bg-dash-secondary py-2 rounded-xl text-xs font-bold hover:opacity-80">Withdraw</button>
-                <button class="flex-1 bg-white text-black py-2 rounded-xl text-xs font-bold hover:bg-gray-200">History</button>
+                <button class="flex-1 bg-white text-black py-2 rounded-xl text-xs font-bold hover:bg-gray-200">Transactions</button>
             </div>
         </div>
 
@@ -236,7 +242,7 @@
                     <p class="text-sm">Payout processed: ₦15,000 to Chidi.</p>
                 </div>
             </div>
-        </div>
+        </div> 
 
         <div class="bento-card col-span-1">
             <p class="text-dash-secondary text-sm font-semibold uppercase">Engagement Score</p>
@@ -247,7 +253,7 @@
             <div class="w-full bg-dash-secondary h-1.5 mt-4 rounded-full overflow-hidden">
                 <div class="bg-[#6a26da] h-full w-[98%]"></div>
             </div>
-        </div>
+        </div> 
 
         <div class="bento-card col-span-3">
             <div class="flex justify-between items-center mb-6">
@@ -268,39 +274,201 @@
                         </tbody>
                 </table>
             </div>
-        </div>
+        </div> 
 
     </main>
 
+    <!-- Campaign Creation Wizard Overlay -->
+    <div id="wizard-overlay" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
+            <button onclick="closeCampaignWizard()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <!-- Progress Header -->
+            <div class="flex items-center justify-between mb-10 px-4">
+                <div class="flex gap-4">
+                    <div class="step-node active" id="node-1">1</div>
+                    <div class="step-node" id="node-2">2</div>
+                    <div class="step-node" id="node-3">3</div>
+                    <div class="step-node" id="node-4">4</div>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Current Step</p>
+                    <p class="text-sm font-bold" id="step-title">Campaign Goal</p>
+                </div>
+            </div>
+
+            <!-- Step 1: Goal & URL -->
+            <div id="step-1" class="wizard-step space-y-6">
+                <h3 class="text-2xl font-bold">What are we promoting?</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Select Platform</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="selectPlatform('instagram')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[#6a26da] transition text-center active" id="plt-instagram"><i class="fa-brands fa-instagram text-xl mb-2"></i><p class="text-xs font-bold">Instagram</p></button>
+                            <button onclick="selectPlatform('google')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[#6a26da] transition text-center" id="plt-google"><i class="fa-brands fa-google text-xl mb-2"></i><p class="text-xs font-bold">Google</p></button>
+                            <button onclick="selectPlatform('tiktok')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[#6a26da] transition text-center" id="plt-tiktok"><i class="fa-brands fa-tiktok text-xl mb-2"></i><p class="text-xs font-bold">TikTok</p></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Target URL</label>
+                        <input type="url" id="target-url" placeholder="https://..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[#6a26da]">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Quantity -->
+            <div id="step-2" class="wizard-step hidden space-y-6">
+                <h3 class="text-2xl font-bold">Set your target</h3>
+                <div class="p-6 bg-dash-secondary rounded-2xl border border-dash">
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-4">Quantity of Engagements</label>
+                    <input type="range" id="goal-range" min="10" max="1000" step="10" value="50" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#6a26da]" oninput="updateCalculation()">
+                    <div class="flex justify-between mt-4">
+                        <span class="text-3xl font-bold" id="goal-val">50</span>
+                        <span class="text-3xl font-bold text-[#6a26da]" id="cost-val">₦7,500</span>
+                    </div>
+                </div>
+                <p class="text-xs text-dash-secondary italic">* Price calculated at ₦150 per high-quality human interaction.</p>
+            </div>
+
+            <!-- Step 3: Instructions -->
+            <div id="step-3" class="wizard-step hidden space-y-6">
+                <h3 class="text-2xl font-bold">Custom Instructions</h3>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Required Keywords / Context</label>
+                    <textarea id="task-instructions" rows="4" placeholder="e.g. Please ask about international shipping. Use at least 10 words. Mention 'quality'..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[#6a26da]"></textarea>
+                </div>
+                <div class="flex gap-2">
+                    <span class="bg-[#6a26da]/10 text-[#6a26da] px-3 py-1 rounded-lg text-[10px] font-bold">RULE OF 10 WORDS</span>
+                    <span class="bg-[#6a26da]/10 text-[#6a26da] px-3 py-1 rounded-lg text-[10px] font-bold">HUMAN VERIFIED</span>
+                </div>
+            </div>
+
+            <!-- Step 4: Payment -->
+            <div id="step-4" class="wizard-step hidden space-y-6">
+                <h3 class="text-2xl font-bold">Secure Checkout</h3>
+                <div class="p-8 border-2 border-dashed border-dash rounded-3xl text-center space-y-4">
+                    <img src="https://checkout.paystack.com/static/media/paystack-logo.3f19318b.svg" class="h-6 mx-auto opacity-50 grayscale" alt="Paystack">
+                    <p class="text-sm text-dash-secondary">You are about to lock <span class="font-bold text-[var(--text-primary)]" id="final-cost">₦7,500</span> in escrow.</p>
+                    <div class="py-4 px-6 bg-dash-secondary rounded-2xl flex items-center justify-between text-left">
+                        <div>
+                            <p class="text-[10px] font-bold text-dash-secondary uppercase">Order Summary</p>
+                            <p class="text-xs font-bold" id="summary-text">50 Instagram Comments</p>
+                        </div>
+                        <i class="fa-solid fa-shield-halved text-green-500"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Navigation -->
+            <div class="mt-10 flex gap-3">
+                <button onclick="prevStep()" id="prev-btn" class="hidden flex-1 bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Back</button>
+                <button onclick="nextStep()" id="next-btn" class="flex-[2] accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Continue</button>
+                <button onclick="finishCreation()" id="finish-btn" class="hidden flex-[2] bg-green-500 text-white py-4 rounded-2xl font-bold text-sm shadow-lg hover:bg-green-600 transition">Complete Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Execution Workspace Overlay -->
+    <div id="execution-workspace-overlay" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
+            <button onclick="closeExecutionWorkspace()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button> 
+
+            <h3 class="text-2xl font-bold mb-6">Perform Task: <span id="exec-task-name"></span></h3>
+            
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-dash">
+                <p class="text-dash-secondary text-sm">Time remaining: <span id="task-timer" class="font-bold text-red-500">20:00</span></p>
+                <p class="text-dash-secondary text-sm">Reward: <span id="exec-task-reward" class="font-bold text-green-500"></span></p>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Target Post</label>
+                    <a id="go-to-post-btn" href="#" target="_blank" class="w-full accent-gradient py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:scale-[1.02] transition">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Go to Post
+                    </a>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Requirements Checklist</label>
+                    <div class="p-4 bg-dash-secondary rounded-xl border border-dash space-y-2">
+                        <p class="text-sm flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> <span id="exec-task-requirement"></span></p>
+                        <p class="text-sm flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Use at least 10 words in your comment.</p>
+                        <p class="text-sm flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Ensure your comment is relevant and adds value.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">About the Brand</label>
+                    <p id="exec-brand-info" class="text-sm p-4 bg-dash-secondary rounded-xl border border-dash"></p>
+                </div>
+
+                <div class="my-6 border-t border-dash"></div>
+
+                <h4 class="text-xl font-bold mb-4">Submit Proof of Work</h4>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Your @Username</label>
+                    <input type="text" id="proof-username" placeholder="@yourhandle" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da] transition">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Your Comment / Engagement Text</label>
+                    <textarea id="proof-comment" rows="3" placeholder="Paste the exact comment you left..." required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da] transition"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Screenshot (Optional, but recommended)</label>
+                    <input type="file" id="proof-screenshot" accept="image/*" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da] transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200">
+                </div>
+            </div>
+
+            <div class="mt-10 flex gap-3">
+                <button onclick="cancelTaskClaim()" class="flex-1 bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Cancel Task</button>
+                <button onclick="submitProof()" id="submit-proof-btn" class="flex-[2] bg-green-500 text-white py-4 rounded-2xl font-bold text-sm shadow-lg hover:bg-green-600 transition">Submit Proof</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const roles = {
+        let roles = {
             creator: {
                 label: "Active Campaigns",
                 sub: "Your strategic growth is pacing at 114% of target.",
-                value: "12",
+                value: "4",
                 cta: "New Campaign",
                 items: [
                     { name: "Hair Vendor Trust", status: "Active", metric: "24/50 comments" },
                     { name: "Ibadan Real Estate", status: "Pending", metric: "15/100 shares" }
-                ]
+                ] 
             },
             performer: {
                 label: "Available Gigs",
                 sub: "You have 14 new tasks waiting in your vicinity.",
-                value: "₦14.5k",
+                value: "₦1,250", // Total estimated earnings from available tasks
                 cta: "Browse Tasks",
                 items: [
-                    { name: "Comment on iPhone Ad", status: "High Pay", metric: "₦150" },
-                    { name: "TikTok Share Challenge", status: "Fast", metric: "₦200" }
-                ]
+                    { id: 'task-001', platform: 'instagram', name: "Instagram: Like & Comment (Ten words)", reward: 150, requirement: "10+ word comment", targetUrl: "https://www.instagram.com/p/C4s_u_4x_y_/?img_index=1", brandInfo: "Kemi's Hair: A luxury hair brand targeting young, fashion-conscious women.", status: "available" },
+                    { id: 'task-002', platform: 'youtube', name: "YouTube: High Retention Watch (3 Mins)", reward: 200, requirement: "Watch 3 mins, leave a relevant comment", targetUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", brandInfo: "Tech Insights: A channel reviewing the latest gadgets and software.", status: "available" },
+                    { id: 'task-003', platform: 'google', name: "Google: Search & Brand Interaction", reward: 250, requirement: "Search 'PIDI Marketing', click website, browse 2 pages", targetUrl: "https://www.google.com/search?q=PIDI+Marketing", brandInfo: "PIDI Marketing: Our own brand, seeking genuine search engagement.", status: "available" },
+                    { id: 'task-004', platform: 'tiktok', name: "TikTok: Duet & Share", reward: 300, requirement: "Create a duet with the target video and share to your story", targetUrl: "https://www.tiktok.com/@tiktok/video/7348421060907107626", brandInfo: "Viral Trends Co: A new agency specializing in viral content.", status: "available" },
+                    { id: 'task-005', platform: 'instagram', name: "Instagram: Story Reshare", reward: 100, requirement: "Reshare the target story to your own story", targetUrl: "https://www.instagram.com/stories/instagram/3327654321098765432/", brandInfo: "Fashionista Boutique: Promoting their new spring collection.", status: "available" },
+                    { id: 'task-006', platform: 'linkedin', name: "LinkedIn: Like & Comment", reward: 200, requirement: "Like and leave a professional comment (20+ words)", targetUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7176543210987654321/", brandInfo: "TalentConnect: A recruitment firm sharing industry insights.", status: "available" },
+                ],
+                totalBalance: 0,
+                pendingBalance: 0,
+                activeTask: null, // Stores the ID of the currently claimed task
+                taskTimer: null, // Stores the interval ID for the timer
             },
             admin: {
-                label: "Platform Volume",
-                sub: "Total system load: 84%. All nodes operational.",
-                value: "4.2M",
-                cta: "Manage Users",
-                items: [
-                    { name: "Global Payouts", status: "Queued", metric: "450 users" },
+                label: "PIDI Revenue",
+                sub: "Operating account liquidity: 94%.",
+                value: "₦0.0k",
+                cta: "Payout Queue",
+                revenueLog: 0,
+                pendingSubmissions: [],
+                withdrawalRequests: [],
+                items: [ 
                     { name: "Flagged Content", status: "Urgent", metric: "12 reports" }
                 ]
             }
@@ -356,6 +524,10 @@
             document.getElementById('main-stat-label').innerText = data.label;
             document.getElementById('main-sub-label').innerText = data.sub;
             document.getElementById('main-value').innerText = data.value;
+            
+            // Update wallet display if performer role
+            if (role === 'performer') updateWalletDisplay();
+
             document.getElementById('main-cta').innerText = data.cta;
 
             // Update List
@@ -367,7 +539,12 @@
                     <td class="py-4 text-dash-secondary">${item.metric}</td>
                     <td class="py-4 text-right"><button class="hover:text-[#6a26da] text-dash-secondary"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
                 </tr>
-            `).join('');
+            `).join(''); 
+
+            // Render performer tasks if role is performer
+            if (role === 'performer') renderPerformerTasks();
+            // Render verification queue if admin
+            if (role === 'admin') renderAdminQueue();
         }
 
         function toggleTheme() {
@@ -386,6 +563,327 @@
             }
         }
 
+        // --- CAMPAIGN WIZARD LOGIC ---
+        let currentStep = 1;
+        let selectedPlatform = 'instagram';
+        let claimedTask = null; // Stores the currently claimed task object
+        let taskTimerInterval = null; // Stores the interval ID for the task timer
+        let taskCountdownSeconds = 0; // Stores the remaining seconds for the task
+
+
+        function openCampaignWizard() {
+            document.getElementById('wizard-overlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCampaignWizard() {
+            document.getElementById('wizard-overlay').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            resetWizard();
+        }
+
+        function selectPlatform(plt) {
+            selectedPlatform = plt;
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active', 'border-[#6a26da]'));
+            document.getElementById(`plt-${plt}`).classList.add('active', 'border-[#6a26da]');
+        }
+
+        function updateCalculation() {
+            const qty = document.getElementById('goal-range').value;
+            const cost = qty * 150;
+            document.getElementById('goal-val').innerText = qty;
+            document.getElementById('cost-val').innerText = `₦${cost.toLocaleString()}`;
+            document.getElementById('final-cost').innerText = `₦${cost.toLocaleString()}`;
+            document.getElementById('summary-text').innerText = `${qty} ${selectedPlatform.charAt(0).toUpperCase() + selectedPlatform.slice(1)} Engagements`;
+        }
+
+        function nextStep() {
+            if (currentStep < 4) {
+                document.getElementById(`step-${currentStep}`).classList.add('hidden');
+                document.getElementById(`node-${currentStep}`).classList.add('completed');
+                currentStep++;
+                document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+                document.getElementById(`node-${currentStep}`).classList.add('active');
+                updateWizardUI();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step-${currentStep}`).classList.add('hidden');
+                document.getElementById(`node-${currentStep}`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+                document.getElementById(`node-${currentStep}`).classList.remove('completed');
+                updateWizardUI();
+            }
+        }
+
+        function updateWizardUI() {
+            const titles = ["", "Campaign Goal", "Set Quantity", "Instructions", "Checkout"];
+            document.getElementById('step-title').innerText = titles[currentStep];
+            document.getElementById('prev-btn').classList.toggle('hidden', currentStep === 1);
+            document.getElementById('next-btn').classList.toggle('hidden', currentStep === 4);
+            document.getElementById('finish-btn').classList.toggle('hidden', currentStep !== 4);
+        }
+
+        function finishCreation() {
+            const qty = document.getElementById('goal-range').value;
+            const url = document.getElementById('target-url').value || "New Project";
+            
+            // Add to Creator's active list
+            roles.creator.items.unshift({
+                name: url.length > 20 ? url.substring(0, 20) + '...' : url,
+                status: "Active",
+                metric: `0/${qty} comments`
+            });
+            
+            // Pushing to Performer's available gigs
+            roles.performer.items.unshift({
+                name: `${selectedPlatform.toUpperCase()} Engagement`,
+                status: "High Pay",
+                metric: `₦150`
+            });
+
+            alert("Campaign Launched Successfully! Your task is now live in the performer marketplace.");
+            closeCampaignWizard();
+            switchRole('creator'); // Refresh view
+        }
+
+        function resetWizard() {
+            document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
+            document.getElementById('step-1').classList.remove('hidden');
+            currentStep = 1;
+            updateWizardUI();
+        }
+
+        // --- PERFORMER TASK LOGIC ---
+        function renderPerformerTasks(filter = 'all') {
+            const taskFeed = document.getElementById('active-list'); // Reusing active-list for now
+            taskFeed.innerHTML = ''; // Clear previous tasks
+
+            const filteredTasks = roles.performer.items.filter(task => {
+                if (task.status !== 'available') return false; // Only show available tasks
+                if (filter === 'all') return true;
+                if (filter === 'high-pay') return task.reward >= 250; // Example threshold for high pay
+                return task.platform === filter;
+            });
+
+            if (filteredTasks.length === 0) {
+                taskFeed.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">No available tasks for this filter.</td></tr>`;
+                return;
+            }
+
+            filteredTasks.forEach(task => {
+                const row = document.createElement('tr');
+                row.classList.add('border-b', 'border-dash');
+                row.innerHTML = `
+                    <td class="py-4 font-bold flex items-center gap-3">
+                        <i class="fa-brands fa-${task.platform} text-xl text-dash-secondary"></i>
+                        ${task.name}
+                    </td>
+                    <td class="py-4 text-dash-secondary">${task.requirement}</td>
+                    <td class="py-4 text-green-500 font-bold">₦${task.reward}</td>
+                    <td class="py-4 text-right">
+                        <button onclick="claimTask('${task.id}')" class="btn-orange px-4 py-2 rounded-xl text-xs font-bold hover:opacity-80" id="claim-btn-${task.id}">START TASK</button>
+                    </td>
+                `;
+                taskFeed.appendChild(row);
+            });
+        }
+
+        function claimTask(taskId) {
+            const task = roles.performer.items.find(t => t.id === taskId);
+            if (!task) return;
+
+            // Prevent claiming if another task is active
+            if (claimedTask) {
+                alert("You already have an active task. Please complete or cancel it first.");
+                return;
+            }
+
+            claimedTask = task;
+            task.status = 'claimed';
+            roles.performer.activeTask = taskId;
+
+            // Disable all other claim buttons
+            document.querySelectorAll('.task-item button').forEach(btn => btn.disabled = true);
+            const currentClaimBtn = document.getElementById(`claim-btn-${taskId}`);
+            if (currentClaimBtn) {
+                currentClaimBtn.textContent = "TASK CLAIMED";
+                currentClaimBtn.classList.remove('btn-orange');
+                currentClaimBtn.classList.add('bg-dash-secondary', 'text-dash-secondary');
+            }
+
+            // Open execution workspace
+            openExecutionWorkspace(task);
+
+            // Start timer (20 minutes = 1200 seconds)
+            taskCountdownSeconds = 1200; 
+            updateTaskTimerDisplay();
+            taskTimerInterval = setInterval(() => {
+                taskCountdownSeconds--;
+                updateTaskTimerDisplay();
+                if (taskCountdownSeconds <= 0) {
+                    clearInterval(taskTimerInterval);
+                    alert("Time's up! The task has been released.");
+                    cancelTaskClaim(true); // true to indicate timer expiry
+                }
+            }, 1000);
+        }
+
+        function openExecutionWorkspace(task) {
+            document.getElementById('exec-task-name').innerText = task.name;
+            document.getElementById('exec-task-reward').innerText = `₦${task.reward}`;
+            document.getElementById('go-to-post-btn').href = task.targetUrl;
+            document.getElementById('exec-task-requirement').innerText = task.requirement;
+            document.getElementById('exec-brand-info').innerText = task.brandInfo;
+            document.getElementById('proof-username').value = '';
+            document.getElementById('proof-comment').value = '';
+            document.getElementById('proof-screenshot').value = '';
+            document.getElementById('execution-workspace-overlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeExecutionWorkspace() {
+            document.getElementById('execution-workspace-overlay').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateTaskTimerDisplay() {
+            const minutes = Math.floor(taskCountdownSeconds / 60);
+            const seconds = taskCountdownSeconds % 60;
+            document.getElementById('task-timer').innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function cancelTaskClaim(fromTimer = false) {
+            if (claimedTask) {
+                claimedTask.status = 'available'; // Release the task
+                claimedTask = null;
+                roles.performer.activeTask = null;
+                clearInterval(taskTimerInterval);
+                taskTimerInterval = null;
+                closeExecutionWorkspace();
+                switchRole('performer'); // Refresh performer view
+                if (!fromTimer) alert("Task claim cancelled.");
+            }
+        }
+
+        function submitProof() {
+            if (!claimedTask) return;
+
+            const username = document.getElementById('proof-username').value;
+            const comment = document.getElementById('proof-comment').value;
+            if (!username || !comment) {
+                alert("Please fill in your username and comment.");
+                return;
+            }
+
+            // V1 Automated Word Count Check
+            const wordCount = comment.trim().split(/\s+/).length;
+            if (wordCount < 10) {
+                alert("Task Rejected: Rule of 10 not met. Your comment must be at least 10 words. Try again.");
+                return; 
+            }
+
+            // Push to Admin Verification Queue
+            const submission = {
+                id: 'sub-' + Date.now(),
+                taskId: claimedTask.id,
+                taskName: claimedTask.name,
+                performerHandle: username,
+                commentText: comment,
+                reward: claimedTask.reward,
+                targetUrl: claimedTask.targetUrl,
+                timestamp: new Date().toISOString()
+            };
+            roles.admin.pendingSubmissions.push(submission);
+
+            claimedTask.status = 'under_review'; // Performer view state
+            roles.performer.pendingBalance += claimedTask.reward;
+            claimedTask = null;
+            roles.performer.activeTask = null;
+            clearInterval(taskTimerInterval);
+            taskTimerInterval = null;
+            
+            alert("Proof submitted! Reward moved to pending balance. Admin will verify shortly.");
+            closeExecutionWorkspace();
+            switchRole('performer'); // Refresh performer view
+        }
+
+        // --- PHASE 3: ADMIN VERIFICATION & PAYOUTS ---
+        function renderAdminQueue() {
+            const list = document.getElementById('active-list');
+            if (roles.admin.pendingSubmissions.length === 0) {
+                list.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">No pending task verifications.</td></tr>`;
+                return;
+            }
+            list.innerHTML = roles.admin.pendingSubmissions.map(sub => `
+                <tr class="border-b border-dash">
+                    <td class="py-4 font-bold">
+                        <p class="text-xs text-dash-secondary">${sub.taskName}</p>
+                        <p>${sub.performerHandle}</p>
+                    </td>
+                    <td class="py-4">
+                        <p class="text-xs italic">"${sub.commentText}"</p>
+                        <a href="${sub.targetUrl}" target="_blank" class="text-[10px] text-[#6a26da] font-bold underline">VIEW POST</a>
+                    </td>
+                    <td class="py-4 text-green-500 font-bold">₦${sub.reward}</td>
+                    <td class="py-4 text-right">
+                        <div class="flex gap-2 justify-end">
+                            <button onclick="approveTask('${sub.id}')" class="bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-green-600 transition">APPROVE</button>
+                            <button onclick="rejectTask('${sub.id}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-red-600 transition">REJECT</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function approveTask(subId) {
+            const subIndex = roles.admin.pendingSubmissions.findIndex(s => s.id === subId);
+            const sub = roles.admin.pendingSubmissions[subIndex];
+
+            // 90/10 Financial Split
+            roles.performer.totalBalance += sub.reward;
+            roles.performer.pendingBalance -= sub.reward;
+            
+            const pidiShare = sub.reward * 9; // Assuming reward is 10%
+            roles.admin.revenueLog += pidiShare;
+            roles.admin.value = `₦${(roles.admin.revenueLog / 1000).toFixed(1)}k`;
+
+            // Update Live Feed for Creator
+            const feed = document.getElementById('feed-container');
+            const notice = document.createElement('div');
+            notice.className = "border-b border-dash pb-3";
+            notice.innerHTML = `<p class="text-xs text-green-500 font-bold">VERIFIED</p><p class="text-sm">High-quality comment added to campaign.</p>`;
+            feed.prepend(notice);
+
+            // Remove and Refresh
+            roles.admin.pendingSubmissions.splice(subIndex, 1);
+            alert("Task approved. Funds distributed.");
+            renderAdminQueue();
+        }
+
+        function rejectTask(subId) {
+            const subIndex = roles.admin.pendingSubmissions.findIndex(s => s.id === subId);
+            const sub = roles.admin.pendingSubmissions[subIndex];
+
+            roles.performer.pendingBalance -= sub.reward;
+            
+            // Reopen the task slot for others
+            const originalTask = roles.performer.items.find(t => t.id === sub.taskId);
+            if (originalTask) originalTask.status = 'available';
+
+            roles.admin.pendingSubmissions.splice(subIndex, 1);
+            alert("Task rejected. Performer notified and slot reopened.");
+            renderAdminQueue();
+        }
+
+        function updateWalletDisplay() {
+            document.getElementById('total-balance').innerText = `₦${roles.performer.totalBalance.toLocaleString()}`;
+            document.getElementById('pending-balance').innerText = `₦${roles.performer.pendingBalance.toLocaleString()}`;
+        }
+
         function handleLogout() {
             console.log("Clearing session and logging out...");
             window.location.href = 'index.html';
@@ -396,8 +894,8 @@
             updateThemeIcon();
         }
 
-        // Initialize with Creator view
-        switchRole('creator');
+        // Initialize with Performer view for testing this phase
+        switchRole('performer');
     </script>
 </body>
 </html>
