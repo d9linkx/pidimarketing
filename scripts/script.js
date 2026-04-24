@@ -104,6 +104,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- 11. USER DROPDOWN LOGIC ---
+    const userBtn = document.querySelector('.user-avatar-btn');
+    const userDropdown = document.querySelector('.user-dropdown');
+
+    if (userBtn && userDropdown) {
+        userBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (userDropdown.classList.contains('show') && !userDropdown.contains(e.target) && !userBtn.contains(e.target)) {
+                userDropdown.classList.remove('show');
+            }
+        });
+    }
+
     // --- 5. STICKY HEADER SCROLL ---
     if (header) {
         const heroSection = document.getElementById('hero');
