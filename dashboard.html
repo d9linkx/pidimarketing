@@ -109,6 +109,11 @@
             <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition focus:outline-none" id="theme-toggle">
                 <i class="fa-solid fa-moon" id="theme-icon"></i>
             </button>
+
+            <!-- Milestone Notification (Full-Stack Bridge) -->
+            <div id="milestone-alert" class="hidden absolute top-20 right-8 z-[150] bg-[#6a26da] text-white p-4 rounded-2xl shadow-2xl animate-bounce">
+                <p class="text-xs font-bold">Authority Milestone Hit!</p>
+            </div>
             
             <!-- Desktop Profile Dropdown -->
             <div class="relative hidden md:block group">
@@ -124,17 +129,17 @@
                 <div class="absolute right-0 mt-2 w-64 bg-[var(--bg-card)] border border-[var(--border-dash)] rounded-2xl shadow-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[110]">
                     <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account Management</p>
                     <div class="flex flex-col gap-1">
-                        <a href="#" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <a href="#" onclick="openSettings('profile')" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                             <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
                         </a>
-                        <a href="#" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <a href="#" onclick="openSettings('bank')" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                             <i class="fa-solid fa-building-columns w-4 text-center"></i> Bank Account
                         </a>
-                        <a href="#" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <a href="#" onclick="openSettings('id-verification')" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                             <i class="fa-solid fa-id-card-clip w-4 text-center"></i> ID Verification
                         </a>
                         <div class="my-2 border-t border-dash"></div>
-                        <a href="contact.html" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <a href="#" onclick="openSettings('support')" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                             <i class="fa-solid fa-circle-question w-4 text-center"></i> Support Desk
                         </a>
                         <button onclick="handleLogout()" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-red-500 hover:bg-red-500/10 transition mt-1 w-full text-left font-semibold">
@@ -169,26 +174,26 @@
                     <div class="my-4 border-t border-dash"></div>
                     
                     <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-4 mb-1">Account Management</p>
-                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                    <a href="#" onclick="openSettings('profile')" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
                         <i class="fa-solid fa-user-gear w-5"></i> Profile Settings
                     </a>
-                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                    <a href="#" onclick="openSettings('bank')" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
                         <i class="fa-solid fa-building-columns w-5"></i> Bank Account
                     </a>
-                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                    <a href="#" onclick="openSettings('id-verification')" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
                         <i class="fa-solid fa-id-card-clip w-5"></i> ID Verification
                     </a>
-                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                    <a href="#" onclick="openSettings('notifications')" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
                         <i class="fa-solid fa-bell w-5"></i> Notification Prefs
                     </a>
-                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                    <a href="#" onclick="openSettings('security')" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
                         <i class="fa-solid fa-shield-halved w-5"></i> Login & Security
                     </a>
                     
                     <div class="my-4 border-t border-dash mt-6"></div>
                     
                     <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-4 mb-1">Help & Support</p>
-                    <a href="contact.html" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                    <a href="#" onclick="openSettings('support')" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
                         <i class="fa-solid fa-circle-question w-5"></i> Support Desk
                     </a>
                     <button onclick="handleLogout()" class="flex items-center gap-3 p-4 rounded-xl text-red-500 hover:bg-red-500/10 transition mt-2 text-left w-full">
@@ -220,10 +225,11 @@
             <div>
                 <p class="text-dash-secondary text-sm font-semibold uppercase">Total Balance</p>
                 <p class="text-3xl font-bold mt-1" id="total-balance">₦0</p>
-                <p class="text-dash-secondary text-xs mt-1">Pending: <span id="pending-balance">₦0</span></p>
+                <p class="text-dash-secondary text-[10px] mt-1 uppercase font-bold tracking-widest" id="trust-indicator">Credit Status: 100%</p>
+                <p class="text-dash-secondary text-xs mt-2"><span id="pending-balance-label">Pending:</span> <span id="pending-balance">₦0</span></p>
             </div>
             <div class="mt-4 flex gap-2">
-                <button class="flex-1 bg-dash-secondary py-2 rounded-xl text-xs font-bold hover:opacity-80">Withdraw</button>
+                <button id="wallet-action-btn" class="flex-1 bg-dash-secondary py-2 rounded-xl text-xs font-bold hover:opacity-80">Withdraw</button>
                 <button class="flex-1 bg-white text-black py-2 rounded-xl text-xs font-bold hover:bg-gray-200">Transactions</button>
             </div>
         </div>
@@ -430,15 +436,124 @@
         </div>
     </div>
 
+    <!-- Wallet: Deposit Modal (Creator) -->
+    <div id="deposit-overlay" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card w-full max-w-md relative">
+            <button onclick="closeDepositModal()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-6">Deposit Funds</h3>
+            <p class="text-dash-secondary text-sm mb-6">Securely fund your growth account.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Amount (₦)</label>
+                    <input type="number" id="deposit-amount" placeholder="e.g. 50000" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-lg font-bold focus:outline-none focus:border-[#6a26da]">
+                </div>
+                <button onclick="processDeposit()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Pay with Paystack</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wallet: Withdrawal Modal (Performer) -->
+    <div id="withdraw-overlay" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card w-full max-w-md relative">
+            <button onclick="closeWithdrawModal()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-6">Withdraw Earnings</h3>
+            
+            <!-- Step A: Bank Info -->
+            <div id="bank-setup" class="space-y-4 hidden">
+                <p class="text-dash-secondary text-sm">Verify your Nigerian bank details for instant payout.</p>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Select Bank</label>
+                    <select id="bank-name" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none">
+                        <option>GTBank</option>
+                        <option>Zenith Bank</option>
+                        <option>Access Bank</option>
+                        <option>OPay</option>
+                        <option>Kuda MFB</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Account Number</label>
+                    <input type="text" id="account-number" maxlength="10" placeholder="10 digits" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none">
+                </div>
+                <button onclick="verifyAndSaveBank()" class="w-full bg-white text-black py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Verify Account Name</button>
+            </div>
+
+            <!-- Step B: Amount -->
+            <div id="withdraw-form" class="space-y-4">
+                <div class="p-4 bg-dash-secondary rounded-xl border border-dash mb-4">
+                    <p class="text-[10px] font-bold text-dash-secondary uppercase">Withdrawable Balance</p>
+                    <p class="text-2xl font-bold text-green-500" id="withdraw-max">₦0</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Amount to Withdraw</label>
+                    <input type="number" id="withdraw-amount" placeholder="Min ₦2,000" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-lg font-bold focus:outline-none focus:border-[#6a26da]">
+                </div>
+                <button onclick="processWithdrawal()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Request Withdrawal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unified Settings Overlay -->
+    <div id="settings-overlay" class="hidden fixed inset-0 z-[250] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card w-full max-w-5xl h-[85vh] md:h-[75vh] overflow-hidden relative flex flex-col md:flex-row p-0">
+            <!-- Sidebar Navigation -->
+            <aside class="w-full md:w-64 border-b md:border-b-0 md:border-r border-dash p-6 bg-dash-secondary/30 flex-shrink-0">
+                <h3 class="font-bold mb-6 hidden md:block">Settings Hub</h3>
+                <nav class="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 no-scrollbar">
+                    <button onclick="switchSettingsView('profile')" class="settings-nav-btn active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition whitespace-nowrap w-full text-left" data-view="profile"><i class="fa-solid fa-user-gear w-5"></i> Profile</button>
+                    <button onclick="switchSettingsView('bank')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="bank"><i class="fa-solid fa-building-columns w-5"></i> Bank Account</button>
+                    <button onclick="switchSettingsView('id-verification')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="id-verification"><i class="fa-solid fa-id-card-clip w-5"></i> ID Verification</button>
+                    <button onclick="switchSettingsView('security')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="security"><i class="fa-solid fa-shield-halved w-5"></i> Login & Security</button>
+                    <button onclick="switchSettingsView('notifications')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="notifications"><i class="fa-solid fa-bell w-5"></i> Notifications</button>
+                    <button onclick="switchSettingsView('support')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="support"><i class="fa-solid fa-circle-question w-5"></i> Support Desk</button>
+                </nav>
+                <button onclick="closeSettings()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)] md:hidden">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </aside>
+
+            <!-- Main Settings Content -->
+            <main class="flex-1 p-6 md:p-10 overflow-y-auto relative bg-[var(--bg-card)]">
+                <button onclick="closeSettings()" class="absolute top-8 right-10 text-dash-secondary hover:text-[var(--text-primary)] hidden md:block">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                <div id="settings-content-area"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Signout Confirmation Overlay -->
+    <div id="signout-overlay" class="hidden fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card max-w-sm text-center p-10 relative">
+            <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-right-from-bracket text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">Sign Out?</h3>
+            <p class="text-dash-secondary text-sm mb-8">Are you sure you want to log out? Your active campaigns and pending tasks will be saved.</p>
+            <div class="flex flex-col gap-3">
+                <button onclick="confirmSignout()" class="w-full bg-red-500 text-white py-4 rounded-2xl font-bold text-sm hover:bg-red-600 transition shadow-lg shadow-red-500/20">Sign Out Now</button>
+                <button onclick="closeSignoutModal()" class="w-full bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Stay Logged In</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let roles = {
             creator: {
                 label: "Active Campaigns",
                 sub: "Your strategic growth is pacing at 114% of target.",
                 value: "4",
-                cta: "New Campaign",
+                cta: "Engagement Autopilot: OFF",
+                isSubscriptionActive: false,
+                totalGrowthMetric: 280, // % growth since joining
+                availableBalance: 125000, // Pre-funded for demo
+                allocatedFunds: 0,
                 items: [
-                    { name: "Hair Vendor Trust", status: "Active", metric: "24/50 comments" },
+                    { name: "Hair Vendor Trust", status: "Active", metric: "24/50 comments", rawValue: 24 },
                     { name: "Ibadan Real Estate", status: "Pending", metric: "15/100 shares" }
                 ] 
             },
@@ -458,6 +573,10 @@
                 totalBalance: 0,
                 pendingBalance: 0,
                 activeTask: null, // Stores the ID of the currently claimed task
+                reputationScore: 100,
+                isElite: false,
+                fakeProofCount: 0,
+                bankDetails: null,
                 taskTimer: null, // Stores the interval ID for the timer
             },
             admin: {
@@ -467,6 +586,10 @@
                 cta: "Payout Queue",
                 revenueLog: 0,
                 pendingSubmissions: [],
+                grossRevenue: 150000,
+                totalPayouts: 15000,
+                netProfit: 135000,
+                currentTab: 'verify',
                 withdrawalRequests: [],
                 items: [ 
                     { name: "Flagged Content", status: "Urgent", metric: "12 reports" }
@@ -529,10 +652,44 @@
             if (role === 'performer') updateWalletDisplay();
 
             document.getElementById('main-cta').innerText = data.cta;
+            
+            // SaaS Phase 4: Handle Creator Autopilot Toggle Visuals
+            if (role === 'creator') {
+                const ctaBtn = document.querySelector('.accent-gradient button');
+                if (ctaBtn) {
+                    ctaBtn.classList.toggle('bg-green-500', data.isSubscriptionActive);
+                    ctaBtn.classList.toggle('text-white', data.isSubscriptionActive);
+                }
+                checkMilestones(data.totalGrowthMetric);
+            }
 
             // Update List
             const list = document.getElementById('active-list');
-            list.innerHTML = data.items.map(item => `
+
+            // SaaS Phase 4: Admin Revenue Dashboard Card
+            if (role === 'admin') {
+                list.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div class="p-4 bg-dash-secondary rounded-2xl border border-dash">
+                            <p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">Gross Billing</p>
+                            <p class="text-xl font-bold">₦${data.grossRevenue.toLocaleString()}</p>
+                        </div>
+                        <div class="p-4 bg-dash-secondary rounded-2xl border border-dash">
+                            <p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">Tasker Payouts</p>
+                            <p class="text-xl font-bold text-red-500">₦${data.totalPayouts.toLocaleString()}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mb-6 border-b border-dash">
+                        <button onclick="setAdminTab('verify')" id="tab-verify" class="pb-3 text-xs font-bold ${data.currentTab === 'verify' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">VERIFICATIONS</button>
+                        <button onclick="setAdminTab('payouts')" id="tab-payouts" class="pb-3 text-xs font-bold ${data.currentTab === 'payouts' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">PAYOUT QUEUE (${data.withdrawalRequests.length})</button>
+                    </div>
+
+                    <h4 class="font-bold mb-4">Pending Verifications</h4>
+                ` + list.innerHTML;
+            }
+
+            list.innerHTML += data.items.map(item => `
                 <tr class="border-b border-dash">
                     <td class="py-4 font-bold">${item.name}</td>
                     <td class="py-4"><span class="bg-dash-secondary px-2 py-1 rounded-lg text-[10px] uppercase font-bold">${item.status}</span></td>
@@ -542,7 +699,12 @@
             `).join(''); 
 
             // Render performer tasks if role is performer
-            if (role === 'performer') renderPerformerTasks();
+            if (role === 'performer') {
+                renderPerformerTasks();
+                const withdrawBtn = document.getElementById('wallet-action-btn');
+                withdrawBtn.onclick = openWithdrawalModal;
+                withdrawBtn.disabled = roles.performer.totalBalance < 2000;
+            }
             // Render verification queue if admin
             if (role === 'admin') renderAdminQueue();
         }
@@ -560,6 +722,19 @@
                 icon.classList.replace('fa-moon', 'fa-sun');
             } else {
                 icon.classList.replace('fa-sun', 'fa-moon');
+            }
+        }
+
+        // --- PHASE 4: SAAS INTELLIGENCE & AUTO-RETENTION ---
+        function checkMilestones(growth) {
+            if (growth >= 250) {
+                const alert = document.getElementById('milestone-alert');
+                alert.innerHTML = `
+                    <p class="text-[10px] font-bold">🚀 GROWTH MILESTONE: ${growth}%</p>
+                    <p class="text-xs">Your engagement is soaring! Ready for Google Ads?</p>
+                    <a href="contact.html" class="text-[10px] underline font-bold mt-2 inline-block">BOOK LANDING PAGE AUDIT</a>
+                `;
+                alert.classList.remove('hidden');
             }
         }
 
@@ -590,11 +765,11 @@
 
         function updateCalculation() {
             const qty = document.getElementById('goal-range').value;
-            const cost = qty * 150;
+            const cost = qty * 1500; // Creator pays 10x performer reward
             document.getElementById('goal-val').innerText = qty;
             document.getElementById('cost-val').innerText = `₦${cost.toLocaleString()}`;
             document.getElementById('final-cost').innerText = `₦${cost.toLocaleString()}`;
-            document.getElementById('summary-text').innerText = `${qty} ${selectedPlatform.charAt(0).toUpperCase() + selectedPlatform.slice(1)} Engagements`;
+            document.getElementById('summary-text').innerText = `${qty} Human ${selectedPlatform.charAt(0).toUpperCase() + selectedPlatform.slice(1)} Engagements`;
         }
 
         function nextStep() {
@@ -630,6 +805,19 @@
         function finishCreation() {
             const qty = document.getElementById('goal-range').value;
             const url = document.getElementById('target-url').value || "New Project";
+            const totalCost = qty * 1500;
+
+            // Wallet Flow: Check Available Balance
+            if (roles.creator.availableBalance < totalCost) {
+                alert(`Insufficient credits. Campaign cost: ₦${totalCost.toLocaleString()}. Current balance: ₦${roles.creator.availableBalance.toLocaleString()}`);
+                closeCampaignWizard();
+                openDepositModal();
+                return;
+            }
+
+            // Logic Ledger: Allocation
+            roles.creator.availableBalance -= totalCost;
+            roles.creator.allocatedFunds += totalCost;
             
             // Add to Creator's active list
             roles.creator.items.unshift({
@@ -655,6 +843,70 @@
             document.getElementById('step-1').classList.remove('hidden');
             currentStep = 1;
             updateWizardUI();
+        }
+
+        // --- WALLET FLOWS ---
+        function openDepositModal() {
+            document.getElementById('deposit-overlay').classList.remove('hidden');
+        }
+        function closeDepositModal() {
+            document.getElementById('deposit-overlay').classList.add('hidden');
+        }
+        function processDeposit() {
+            const amt = parseInt(document.getElementById('deposit-amount').value);
+            if (!amt || amt <= 0) return alert("Please enter a valid deposit amount.");
+            
+            // Simulate Payment Gateway Handshake
+            roles.creator.availableBalance += amt;
+            alert(`₦${amt.toLocaleString()} credited to your Available Balance via Paystack.`);
+            closeDepositModal();
+            updateWalletDisplay();
+        }
+
+        function openWithdrawalModal() {
+            document.getElementById('withdraw-overlay').classList.remove('hidden');
+            document.getElementById('withdraw-max').innerText = `₦${roles.performer.totalBalance.toLocaleString()}`;
+            
+            if (!roles.performer.bankDetails) {
+                document.getElementById('bank-setup').classList.remove('hidden');
+                document.getElementById('withdraw-form').classList.add('hidden');
+            } else {
+                document.getElementById('bank-setup').classList.add('hidden');
+                document.getElementById('withdraw-form').classList.remove('hidden');
+            }
+        }
+        function closeWithdrawModal() {
+            document.getElementById('withdraw-overlay').classList.add('hidden');
+        }
+        function verifyAndSaveBank() {
+            const acc = document.getElementById('account-number').value;
+            const bank = document.getElementById('bank-name').value;
+            if (acc.length !== 10) return alert("Please enter a valid 10-digit Nigerian account number.");
+            
+            // Simulating Bank API Name Verification
+            roles.performer.bankDetails = { account: acc, bank: bank, verifiedName: "PRINCE DIKE" };
+            alert(`Account Verified: ${roles.performer.bankDetails.verifiedName}`);
+            openWithdrawalModal(); // Toggle to step B
+        }
+        function processWithdrawal() {
+            const amt = parseInt(document.getElementById('withdraw-amount').value);
+            if (!amt || amt < 2000) return alert("Minimum withdrawal is ₦2,000.");
+            if (amt > roles.performer.totalBalance) return alert("Withdrawal amount exceeds available balance.");
+            
+            // Logical Ledger: Debit Wallet, Credit Payout Pool
+            roles.performer.totalBalance -= amt;
+            roles.admin.totalPayouts += amt;
+            roles.admin.withdrawalRequests.push({
+                id: 'payout-' + Date.now(),
+                user: "Prince Dike",
+                amount: amt,
+                bank: roles.performer.bankDetails.bank,
+                acc: roles.performer.bankDetails.account
+            });
+            
+            alert("Withdrawal request logged. Funds will hit your bank account within 24 hours.");
+            closeWithdrawModal();
+            updateWalletDisplay();
         }
 
         // --- PERFORMER TASK LOGIC ---
@@ -775,47 +1027,95 @@
             const username = document.getElementById('proof-username').value;
             const comment = document.getElementById('proof-comment').value;
             if (!username || !comment) {
-                alert("Please fill in your username and comment.");
+                alert("Submission Error: Details missing.");
                 return;
             }
 
-            // V1 Automated Word Count Check
+            // Automated Word Count Check (Phase 3 inherited)
             const wordCount = comment.trim().split(/\s+/).length;
             if (wordCount < 10) {
-                alert("Task Rejected: Rule of 10 not met. Your comment must be at least 10 words. Try again.");
+                alert("SaaS Bot-Killer: Rule of 10 not met. Submission rejected.");
+                roles.performer.fakeProofCount++;
+                if(roles.performer.fakeProofCount >= 3) alert("CRITICAL: Your account is flagged for review due to repeated low-quality submissions.");
                 return; 
             }
 
-            // Push to Admin Verification Queue
-            const submission = {
-                id: 'sub-' + Date.now(),
-                taskId: claimedTask.id,
-                taskName: claimedTask.name,
-                performerHandle: username,
-                commentText: comment,
-                reward: claimedTask.reward,
-                targetUrl: claimedTask.targetUrl,
-                timestamp: new Date().toISOString()
-            };
-            roles.admin.pendingSubmissions.push(submission);
+            // --- PHASE 4: AUTO-VERIFICATION SCRIPT SIMULATION ---
+            const isAutoApproved = roles.performer.reputationScore >= 95;
+            
+            if (isAutoApproved) {
+                // Direct API Verification (Simulated)
+                console.log(`Phase 4: API pinged ${claimedTask.platform}. Handle ${username} verified.`);
+                
+                // 90/10 Split Logic
+                roles.performer.totalBalance += claimedTask.reward;
+                roles.admin.grossRevenue += (claimedTask.reward * 10);
+                
+                // Financial Split
+                const pidiShare = claimedTask.reward * 9;
+                roles.admin.netProfit += pidiShare;
+                roles.admin.totalPayouts += claimedTask.reward;
+                
+                alert("SaaS Instant Pay: Comment verified via API. Funds added to your Available Balance!");
+            } else {
+                // Manual Queue for New/Low-Trust users
+                const submission = {
+                    id: 'sub-' + Date.now(),
+                    taskId: claimedTask.id,
+                    taskName: claimedTask.name,
+                    performerHandle: username,
+                    commentText: comment,
+                    reward: claimedTask.reward,
+                    targetUrl: claimedTask.targetUrl,
+                    timestamp: new Date().toISOString()
+                };
+                roles.admin.pendingSubmissions.push(submission);
+                roles.performer.pendingBalance += claimedTask.reward;
+                alert("Proof submitted! Manual verification required for your current Trust Score.");
+            }
 
-            claimedTask.status = 'under_review'; // Performer view state
-            roles.performer.pendingBalance += claimedTask.reward;
+            claimedTask.status = 'under_review'; 
             claimedTask = null;
             roles.performer.activeTask = null;
             clearInterval(taskTimerInterval);
             taskTimerInterval = null;
             
-            alert("Proof submitted! Reward moved to pending balance. Admin will verify shortly.");
             closeExecutionWorkspace();
             switchRole('performer'); // Refresh performer view
         }
 
         // --- PHASE 3: ADMIN VERIFICATION & PAYOUTS ---
+        function setAdminTab(tab) {
+            roles.admin.currentTab = tab;
+            switchRole('admin');
+        }
+
         function renderAdminQueue() {
             const list = document.getElementById('active-list');
+            
+            if (roles.admin.currentTab === 'payouts') {
+                if (roles.admin.withdrawalRequests.length === 0) {
+                    list.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">Payout queue is empty.</td></tr>`;
+                    return;
+                }
+                list.innerHTML = roles.admin.withdrawalRequests.map(req => `
+                    <tr class="border-b border-dash">
+                        <td class="py-4 font-bold">
+                            <p>${req.user}</p>
+                            <p class="text-[10px] text-dash-secondary">${req.bank} • ${req.acc}</p>
+                        </td>
+                        <td class="py-4"><span class="bg-blue-500/10 text-blue-500 px-2 py-1 rounded-lg text-[10px] uppercase font-bold">Payout Ready</span></td>
+                        <td class="py-4 text-green-500 font-bold">₦${req.amount.toLocaleString()}</td>
+                        <td class="py-4 text-right">
+                            <button onclick="approvePayout('${req.id}')" class="accent-gradient text-white px-4 py-2 rounded-xl text-[10px] font-bold">PROCESS TRANSFER</button>
+                        </td>
+                    </tr>
+                `).join('');
+                return;
+            }
+
             if (roles.admin.pendingSubmissions.length === 0) {
-                list.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">No pending task verifications.</td></tr>`;
+                list.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">Verification queue is clean.</td></tr>`;
                 return;
             }
             list.innerHTML = roles.admin.pendingSubmissions.map(sub => `
@@ -824,32 +1124,41 @@
                         <p class="text-xs text-dash-secondary">${sub.taskName}</p>
                         <p>${sub.performerHandle}</p>
                     </td>
-                    <td class="py-4">
-                        <p class="text-xs italic">"${sub.commentText}"</p>
-                        <a href="${sub.targetUrl}" target="_blank" class="text-[10px] text-[#6a26da] font-bold underline">VIEW POST</a>
-                    </td>
+                    <td class="py-4"><span class="bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded-lg text-[10px] uppercase font-bold">Pending Review</span></td>
                     <td class="py-4 text-green-500 font-bold">₦${sub.reward}</td>
                     <td class="py-4 text-right">
                         <div class="flex gap-2 justify-end">
-                            <button onclick="approveTask('${sub.id}')" class="bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-green-600 transition">APPROVE</button>
-                            <button onclick="rejectTask('${sub.id}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-red-600 transition">REJECT</button>
+                            <button onclick="approveTask('${sub.id}')" class="bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">APPROVE</button>
+                            <button onclick="rejectTask('${sub.id}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">REJECT</button>
                         </div>
                     </td>
                 </tr>
             `).join('');
         }
 
+        function approvePayout(reqId) {
+            const index = roles.admin.withdrawalRequests.findIndex(r => r.id === reqId);
+            roles.admin.withdrawalRequests.splice(index, 1);
+            alert("Payout Approved! Payment sent to bank via Transfer API.");
+            renderAdminQueue();
+        }
+
         function approveTask(subId) {
             const subIndex = roles.admin.pendingSubmissions.findIndex(s => s.id === subId);
             const sub = roles.admin.pendingSubmissions[subIndex];
 
-            // 90/10 Financial Split
+            // Logical Ledger: 90/10 Split
+            const totalInteractionCost = sub.reward * 10;
             roles.performer.totalBalance += sub.reward;
             roles.performer.pendingBalance -= sub.reward;
             
+            roles.admin.grossRevenue += totalInteractionCost;
             const pidiShare = sub.reward * 9; // Assuming reward is 10%
             roles.admin.revenueLog += pidiShare;
             roles.admin.value = `₦${(roles.admin.revenueLog / 1000).toFixed(1)}k`;
+
+            // Real-time Creator Reporting: Deduct from Allocated
+            roles.creator.allocatedFunds -= totalInteractionCost;
 
             // Update Live Feed for Creator
             const feed = document.getElementById('feed-container');
@@ -880,13 +1189,203 @@
         }
 
         function updateWalletDisplay() {
-            document.getElementById('total-balance').innerText = `₦${roles.performer.totalBalance.toLocaleString()}`;
-            document.getElementById('pending-balance').innerText = `₦${roles.performer.pendingBalance.toLocaleString()}`;
+            const roleBtn = document.querySelector('nav button.active-btn');
+            if (!roleBtn) return;
+            const role = roleBtn.id.replace('btn-', '');
+
+            if (role === 'performer') {
+                document.getElementById('total-balance').innerText = `₦${roles.performer.totalBalance.toLocaleString()}`;
+                document.getElementById('pending-balance').innerText = `₦${roles.performer.pendingBalance.toLocaleString()}`;
+                document.getElementById('pending-balance-label').innerText = "Pending: ";
+                document.getElementById('trust-indicator').innerText = `Trust Score: ${roles.performer.reputationScore}%`;
+                if(roles.performer.reputationScore >= 95) document.getElementById('trust-indicator').innerHTML += " <span class='text-[#6a26da]'>[ELITE]</span>";
+                document.getElementById('wallet-action-btn').innerText = "Withdraw";
+                document.getElementById('wallet-action-btn').disabled = roles.performer.totalBalance < 2000;
+            } else if (role === 'creator') {
+                document.getElementById('total-balance').innerText = `₦${roles.creator.availableBalance.toLocaleString()}`;
+                document.getElementById('pending-balance').innerText = `₦${roles.creator.allocatedFunds.toLocaleString()}`;
+                document.getElementById('pending-balance-label').innerText = "Allocated: ";
+                document.getElementById('trust-indicator').innerText = "Ad Account Health: Excellent";
+                document.getElementById('wallet-action-btn').innerText = "Deposit";
+                document.getElementById('wallet-action-btn').disabled = false;
+            }
+        }
+
+        // --- PHASE 5: SETTINGS HUB & ACCOUNT MGMT ---
+        function openSettings(initialView = 'profile') {
+            document.getElementById('settings-overlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            switchSettingsView(initialView);
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-overlay').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function switchSettingsView(view) {
+            // Update Sidebar UI
+            document.querySelectorAll('.settings-nav-btn').forEach(btn => {
+                const isActive = btn.getAttribute('data-view') === view;
+                btn.classList.toggle('active', isActive);
+                btn.classList.toggle('text-dash-secondary', !isActive);
+            });
+
+            const area = document.getElementById('settings-content-area');
+            const roleBtn = document.querySelector('nav button.active-btn');
+            const currentRole = roleBtn ? roleBtn.id.replace('btn-', '') : 'performer';
+
+            let content = '';
+
+            switch(view) {
+                case 'profile':
+                    content = `
+                        <h2 class="text-3xl font-bold mb-2">Profile Settings</h2>
+                        <p class="text-dash-secondary mb-8">Manage your personal brand identity on PIDI.</p>
+                        <div class="space-y-6 max-w-xl">
+                            <div class="flex items-center gap-6 mb-8">
+                                <div class="relative group cursor-pointer">
+                                    <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-24 h-24 rounded-3xl border-4 border-dash">
+                                    <div class="absolute inset-0 bg-black/40 rounded-3xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-camera text-white"></i></div>
+                                </div>
+                                <div>
+                                    <button class="bg-dash-secondary px-4 py-2 rounded-xl text-xs font-bold mb-2">Change Avatar</button>
+                                    <div class="flex items-center gap-2 text-[10px] font-bold text-green-500 uppercase tracking-widest"><i class="fa-solid fa-circle-check"></i> Verified Profile</div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 gap-5">
+                                <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Full Legal Name</label><input type="text" value="Prince Dike" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
+                                ${currentRole === 'creator' ? `
+                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Business Name</label><input type="text" value="PIDI Marketing" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
+                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Website URL</label><input type="url" value="https://pidimarketing.com" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
+                                ` : `
+                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Social Handles (Instagram, X)</label><input type="text" value="@princedike, @pidihq" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
+                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Performer Bio</label><textarea class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]" rows="3">Performance marketer specializing in high-velocity organic engagement.</textarea></div>
+                                `}
+                            </div>
+                            <button onclick="alert('Profile Updated!')" class="accent-gradient px-8 py-3 rounded-xl font-bold text-sm mt-4">Save Changes</button>
+                        </div>
+                    `;
+                    break;
+                case 'bank':
+                    const hasBank = roles.performer.bankDetails;
+                    content = `
+                        <h2 class="text-3xl font-bold mb-2">Bank Account</h2>
+                        <p class="text-dash-secondary mb-8">Manage where your earnings and reimbursements are sent.</p>
+                        ${hasBank ? `
+                            <div class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl max-w-md">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div><p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">${hasBank.bank}</p><p class="text-lg font-bold">${hasBank.verifiedName}</p></div>
+                                    <i class="fa-solid fa-building-columns text-dash-secondary"></i>
+                                </div>
+                                <p class="text-sm font-mono tracking-widest text-dash-secondary">**** **** ${hasBank.account.slice(-4)}</p>
+                                <button onclick="roles.performer.bankDetails = null; switchSettingsView('bank')" class="text-red-500 text-[10px] font-bold uppercase mt-6 tracking-widest">Unlink Account</button>
+                            </div>
+                        ` : `
+                            <div class="p-8 border-2 border-dashed border-dash rounded-3xl text-center max-w-md">
+                                <div class="w-12 h-12 bg-dash-secondary rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-plus text-dash-secondary"></i></div>
+                                <h4 class="font-bold mb-2">No Bank Linked</h4>
+                                <p class="text-xs text-dash-secondary mb-6">Link a Nigerian commercial bank or FinTech account to start receiving payouts.</p>
+                                <button onclick="openWithdrawalModal()" class="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-bold">Link New Bank</button>
+                            </div>
+                        `}
+                    `;
+                    break;
+                case 'id-verification':
+                    content = `
+                        <h2 class="text-3xl font-bold mb-2">Identity Verification</h2>
+                        <p class="text-dash-secondary mb-8">We verify all human taskers to maintain 100% engagement quality.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl">
+                                <div class="flex justify-between items-center mb-4"><h4 class="font-bold">Level 1: Basic</h4><span class="text-[10px] font-bold text-green-500 bg-green-500/10 px-2 py-1 rounded-lg uppercase">Completed</span></div>
+                                <p class="text-xs text-dash-secondary mb-4">Phone number verified via OTP. Access to standard tasks.</p>
+                                <p class="text-sm font-bold">+234 810 **** 221</p>
+                            </div>
+                            <div class="p-6 bg-[var(--bg-card)] border border-[#6a26da] rounded-2xl relative overflow-hidden">
+                                <div class="flex justify-between items-center mb-4"><h4 class="font-bold">Level 2: Elite</h4><span class="text-[10px] font-bold text-[#6a26da] bg-[#6a26da]/10 px-2 py-1 rounded-lg uppercase">Action Required</span></div>
+                                <p class="text-xs text-dash-secondary mb-4">Upload ID + Liveness selfie. Access to high-paying "Viral Engine" tasks.</p>
+                                <button class="accent-gradient w-full py-2.5 rounded-xl text-xs font-bold">Start Verification</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'security':
+                    content = `
+                        <h2 class="text-3xl font-bold mb-2">Security & Access</h2>
+                        <p class="text-dash-secondary mb-8">Protect your wallet and login credentials.</p>
+                        <div class="space-y-8">
+                            <div class="max-w-xl"><h4 class="font-bold mb-4">Change Password</h4>
+                                <div class="space-y-3">
+                                    <input type="password" placeholder="Current Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]">
+                                    <input type="password" placeholder="New Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]">
+                                    <button class="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-bold">Update Password</button>
+                                </div>
+                            </div>
+                            <div><h4 class="font-bold mb-4">Active Sessions</h4>
+                                <div class="p-4 bg-dash-secondary/50 border border-dash rounded-2xl flex items-center justify-between">
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-mobile-screen-button text-2xl text-dash-secondary"></i><div><p class="text-sm font-bold">iPhone 15 Pro • Lagos, NG</p><p class="text-[10px] text-green-500 uppercase font-bold">Current Device</p></div></div>
+                                    <button class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Logout</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'notifications':
+                    content = `
+                        <h2 class="text-3xl font-bold mb-2">Notifications</h2>
+                        <p class="text-dash-secondary mb-8">Choose how you want to be alerted about task updates.</p>
+                        <div class="space-y-6 max-w-xl">
+                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Email Alerts</p><p class="text-xs text-dash-secondary">Summary of tasks and payouts</p></div><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">In-App Push</p><p class="text-xs text-dash-secondary">Real-time task claims and review status</p></div><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Telegram Bot</p><p class="text-xs text-dash-secondary">Instant alerts for High-Pay gigs</p></div><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+                        </div>
+                    `;
+                    break;
+                case 'support':
+                    content = `
+                        <h2 class="text-3xl font-bold mb-2">Support Desk</h2>
+                        <p class="text-dash-secondary mb-8">Need help? We typically respond within 15 minutes.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                            <div class="p-6 bg-[#6a26da]/10 border border-[#6a26da]/30 rounded-2xl text-center cursor-pointer hover:bg-[#6a26da]/20 transition"><i class="fa-solid fa-ticket text-xl text-[#6a26da] mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Open Ticket</p></div>
+                            <div class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl text-center cursor-pointer hover:bg-dash-secondary transition"><i class="fa-solid fa-book-open text-xl text-dash-secondary mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Knowledge Base</p></div>
+                            <div class="p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center cursor-pointer hover:bg-green-500/20 transition"><i class="fa-brands fa-whatsapp text-xl text-green-500 mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Live Chat</p></div>
+                        </div>
+                        <h4 class="font-bold mb-4 text-sm uppercase tracking-widest text-dash-secondary">Quick FAQ</h4>
+                        <div class="space-y-2">
+                            <div class="p-4 bg-dash-secondary/30 rounded-xl border border-dash flex justify-between items-center cursor-pointer"><p class="text-sm font-semibold">How do I withdraw my earnings?</p><i class="fa-solid fa-chevron-right text-[10px]"></i></div>
+                            <div class="p-4 bg-dash-secondary/30 rounded-xl border border-dash flex justify-between items-center cursor-pointer"><p class="text-sm font-semibold">What is the "Rule of 10"?</p><i class="fa-solid fa-chevron-right text-[10px]"></i></div>
+                        </div>
+                    `;
+                    break;
+            }
+
+            area.innerHTML = content;
         }
 
         function handleLogout() {
-            console.log("Clearing session and logging out...");
-            window.location.href = 'index.html';
+            document.getElementById('signout-overlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSignoutModal() {
+            document.getElementById('signout-overlay').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function confirmSignout() {
+            // Create Toast Container if it doesn't exist
+            let toast = document.createElement('div');
+            toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-3 rounded-2xl shadow-2xl z-[500] font-bold text-sm transition-all transform translate-y-20';
+            toast.innerText = 'See you soon, Prince! Logging out...';
+            document.body.appendChild(toast);
+
+            // Animate In
+            setTimeout(() => toast.style.transform = 'translateY(0) translateX(-50%)', 10);
+
+            // Redirect after delay
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
         }
 
         if (localStorage.getItem('theme') === 'light') {
