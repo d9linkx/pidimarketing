@@ -576,6 +576,8 @@
                 reputationScore: 100,
                 isElite: false,
                 fakeProofCount: 0,
+                verificationLevel: 1,
+                notificationPrefs: { email: true, push: true, telegram: false },
                 bankDetails: null,
                 taskTimer: null, // Stores the interval ID for the timer
             },
@@ -886,6 +888,7 @@
             // Simulating Bank API Name Verification
             roles.performer.bankDetails = { account: acc, bank: bank, verifiedName: "PRINCE DIKE" };
             alert(`Account Verified: ${roles.performer.bankDetails.verifiedName}`);
+            if (!document.getElementById('settings-overlay').classList.contains('hidden')) switchSettingsView('bank');
             openWithdrawalModal(); // Toggle to step B
         }
         function processWithdrawal() {
@@ -1263,7 +1266,7 @@
                                     <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Performer Bio</label><textarea class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]" rows="3">Performance marketer specializing in high-velocity organic engagement.</textarea></div>
                                 `}
                             </div>
-                            <button onclick="alert('Profile Updated!')" class="accent-gradient px-8 py-3 rounded-xl font-bold text-sm mt-4">Save Changes</button>
+                            <button onclick="saveProfileSettings()" class="accent-gradient px-8 py-3 rounded-xl font-bold text-sm mt-4">Save Changes</button>
                         </div>
                     `;
                     break;
@@ -1292,6 +1295,7 @@
                     `;
                     break;
                 case 'id-verification':
+                    const isLevel2 = roles.performer.verificationLevel === 2;
                     content = `
                         <h2 class="text-3xl font-bold mb-2">Identity Verification</h2>
                         <p class="text-dash-secondary mb-8">We verify all human taskers to maintain 100% engagement quality.</p>
@@ -1301,10 +1305,10 @@
                                 <p class="text-xs text-dash-secondary mb-4">Phone number verified via OTP. Access to standard tasks.</p>
                                 <p class="text-sm font-bold">+234 810 **** 221</p>
                             </div>
-                            <div class="p-6 bg-[var(--bg-card)] border border-[#6a26da] rounded-2xl relative overflow-hidden">
-                                <div class="flex justify-between items-center mb-4"><h4 class="font-bold">Level 2: Elite</h4><span class="text-[10px] font-bold text-[#6a26da] bg-[#6a26da]/10 px-2 py-1 rounded-lg uppercase">Action Required</span></div>
+                            <div class="p-6 bg-[var(--bg-card)] border ${isLevel2 ? 'border-green-500' : 'border-[#6a26da]'} rounded-2xl relative overflow-hidden">
+                                <div class="flex justify-between items-center mb-4"><h4 class="font-bold">Level 2: Elite</h4><span class="text-[10px] font-bold ${isLevel2 ? 'text-green-500 bg-green-500/10' : 'text-[#6a26da] bg-[#6a26da]/10'} px-2 py-1 rounded-lg uppercase">${isLevel2 ? 'Verified' : 'Action Required'}</span></div>
                                 <p class="text-xs text-dash-secondary mb-4">Upload ID + Liveness selfie. Access to high-paying "Viral Engine" tasks.</p>
-                                <button class="accent-gradient w-full py-2.5 rounded-xl text-xs font-bold">Start Verification</button>
+                                ${isLevel2 ? '<p class="text-sm font-bold text-green-500"><i class="fa-solid fa-circle-check"></i> Documents Approved</p>' : '<button onclick="simulateIDV()" class="accent-gradient w-full py-2.5 rounded-xl text-xs font-bold">Start Verification</button>'}
                             </div>
                         </div>
                     `;
@@ -1316,28 +1320,29 @@
                         <div class="space-y-8">
                             <div class="max-w-xl"><h4 class="font-bold mb-4">Change Password</h4>
                                 <div class="space-y-3">
-                                    <input type="password" placeholder="Current Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]">
-                                    <input type="password" placeholder="New Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]">
-                                    <button class="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-bold">Update Password</button>
+                                    <input type="password" id="cur-pass" placeholder="Current Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]">
+                                    <input type="password" id="new-pass" placeholder="New Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]">
+                                    <button onclick="updatePassword()" class="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-bold">Update Password</button>
                                 </div>
                             </div>
                             <div><h4 class="font-bold mb-4">Active Sessions</h4>
-                                <div class="p-4 bg-dash-secondary/50 border border-dash rounded-2xl flex items-center justify-between">
+                                <div id="session-card" class="p-4 bg-dash-secondary/50 border border-dash rounded-2xl flex items-center justify-between">
                                     <div class="flex items-center gap-3"><i class="fa-solid fa-mobile-screen-button text-2xl text-dash-secondary"></i><div><p class="text-sm font-bold">iPhone 15 Pro • Lagos, NG</p><p class="text-[10px] text-green-500 uppercase font-bold">Current Device</p></div></div>
-                                    <button class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Logout</button>
+                                    <button onclick="terminateSession()" class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Logout</button>
                                 </div>
                             </div>
                         </div>
                     `;
                     break;
                 case 'notifications':
+                    const prefs = roles.performer.notificationPrefs;
                     content = `
                         <h2 class="text-3xl font-bold mb-2">Notifications</h2>
                         <p class="text-dash-secondary mb-8">Choose how you want to be alerted about task updates.</p>
                         <div class="space-y-6 max-w-xl">
-                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Email Alerts</p><p class="text-xs text-dash-secondary">Summary of tasks and payouts</p></div><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
-                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">In-App Push</p><p class="text-xs text-dash-secondary">Real-time task claims and review status</p></div><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
-                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Telegram Bot</p><p class="text-xs text-dash-secondary">Instant alerts for High-Pay gigs</p></div><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Email Alerts</p><p class="text-xs text-dash-secondary">Summary of tasks and payouts</p></div><label class="switch"><input type="checkbox" ${prefs.email ? 'checked' : ''} onchange="togglePref('email')"><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">In-App Push</p><p class="text-xs text-dash-secondary">Real-time task claims and review status</p></div><label class="switch"><input type="checkbox" ${prefs.push ? 'checked' : ''} onchange="togglePref('push')"><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Telegram Bot</p><p class="text-xs text-dash-secondary">Instant alerts for High-Pay gigs</p></div><label class="switch"><input type="checkbox" ${prefs.telegram ? 'checked' : ''} onchange="togglePref('telegram')"><span class="slider"></span></label></div>
                         </div>
                     `;
                     break;
@@ -1346,9 +1351,9 @@
                         <h2 class="text-3xl font-bold mb-2">Support Desk</h2>
                         <p class="text-dash-secondary mb-8">Need help? We typically respond within 15 minutes.</p>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                            <div class="p-6 bg-[#6a26da]/10 border border-[#6a26da]/30 rounded-2xl text-center cursor-pointer hover:bg-[#6a26da]/20 transition"><i class="fa-solid fa-ticket text-xl text-[#6a26da] mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Open Ticket</p></div>
-                            <div class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl text-center cursor-pointer hover:bg-dash-secondary transition"><i class="fa-solid fa-book-open text-xl text-dash-secondary mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Knowledge Base</p></div>
-                            <div class="p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center cursor-pointer hover:bg-green-500/20 transition"><i class="fa-brands fa-whatsapp text-xl text-green-500 mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Live Chat</p></div>
+                            <div onclick="alert('Support Ticket System Initialized. Please describe your issue.')" class="p-6 bg-[#6a26da]/10 border border-[#6a26da]/30 rounded-2xl text-center cursor-pointer hover:bg-[#6a26da]/20 transition"><i class="fa-solid fa-ticket text-xl text-[#6a26da] mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Open Ticket</p></div>
+                            <div onclick="window.open('https://pidimarketing.com/guides', '_blank')" class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl text-center cursor-pointer hover:bg-dash-secondary transition"><i class="fa-solid fa-book-open text-xl text-dash-secondary mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Knowledge Base</p></div>
+                            <div onclick="alert('Connecting to WhatsApp Live Support...')" class="p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center cursor-pointer hover:bg-green-500/20 transition"><i class="fa-brands fa-whatsapp text-xl text-green-500 mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Live Chat</p></div>
                         </div>
                         <h4 class="font-bold mb-4 text-sm uppercase tracking-widest text-dash-secondary">Quick FAQ</h4>
                         <div class="space-y-2">
@@ -1360,6 +1365,44 @@
             }
 
             area.innerHTML = content;
+        }
+
+        // --- SETTINGS HANDLERS ---
+        function saveProfileSettings() {
+            const name = document.querySelector('input[value="Prince Dike"]')?.value;
+            if (name) alert(`Profile for ${name} has been updated successfully!`);
+            else alert('Profile updated!');
+        }
+
+        function simulateIDV() {
+            alert("Redirecting to Level 2 Verification Interface...\n\nPlease prepare your NIN/Driver's License and a clear camera for the liveness check.");
+            setTimeout(() => {
+                roles.performer.verificationLevel = 2;
+                roles.performer.reputationScore = 100;
+                alert("Elite Verification Successful! You now have access to Viral Engine tasks.");
+                switchSettingsView('id-verification');
+                updateWalletDisplay();
+            }, 3000);
+        }
+
+        function updatePassword() {
+            const cur = document.getElementById('cur-pass').value;
+            const newP = document.getElementById('new-pass').value;
+            if(!cur || !newP) return alert("Please fill in both password fields.");
+            alert("Security check passed. Your password has been updated.");
+            document.getElementById('cur-pass').value = '';
+            document.getElementById('new-pass').value = '';
+        }
+
+        function terminateSession() {
+            if(confirm("Are you sure you want to log out of this device?")) {
+                document.getElementById('session-card').style.opacity = '0.5';
+                alert("Session terminated. This device will be logged out on the next refresh.");
+            }
+        }
+
+        function togglePref(key) {
+            roles.performer.notificationPrefs[key] = !roles.performer.notificationPrefs[key];
         }
 
         function handleLogout() {
