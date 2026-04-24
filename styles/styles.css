@@ -812,7 +812,7 @@ ul { list-style: none; }
   position: relative;
   width: 100%;
   display: grid; /* Use grid for columnar layout */
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Better wrapping logic */
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Reduced min-width for smaller cards */
   gap: 0; /* Columns are joined together */
   margin-bottom: 40px;
 }
@@ -823,21 +823,21 @@ ul { list-style: none; }
   align-items: center;
   justify-content: center; /* Center content within each column */
   gap: 15px;
-  font-size: 1rem;
+  font-size: 0.85rem; /* Smaller font size */
   font-weight: 700;
   color: #1a1a1a;
   white-space: normal; /* Allow text to wrap if column is too narrow */
   text-align: center;
   opacity: 0.7;
-  padding: 20px 10px; /* Padding within each column */
+  padding: 12px 10px; /* Reduced vertical padding */
   height: 100%; /* Ensure items fill their grid cell height */
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .logo-item i,
 .logo-item svg {
-    width: 28px; /* Larger icons */
-    height: 28px;
+    width: 20px; /* Smaller icons */
+    height: 20px;
     stroke-width: 1.5px;
 }
 
@@ -879,11 +879,11 @@ ul { list-style: none; }
 /* Responsive adjustments for the new grid layout */
 @media (max-width: 1024px) {
   .client-logos { 
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
     padding: 20px 0;
   }
-  .logo-item { font-size: 0.9rem; padding: 15px 5px; }
-  .logo-item i, .logo-item svg { width: 22px; height: 22px; }
+  .logo-item { font-size: 0.8rem; padding: 10px 5px; }
+  .logo-item i, .logo-item svg { width: 18px; height: 18px; }
 }
 @media (max-width: 768px) {
   /* 1. Force the parent section to allow edge-to-edge content */
@@ -916,7 +916,7 @@ ul { list-style: none; }
     /* This border creates the thin line between the cards */
     border: 0.5px solid rgba(0,0,0,0.05) !important; 
     box-sizing: border-box; /* Ensures border doesn't add width */
-    padding: 35px 15px !important;
+    padding: 20px 10px !important; /* Significantly reduced mobile padding */
     display: flex;
     flex-direction: column;
     gap: 10px;
