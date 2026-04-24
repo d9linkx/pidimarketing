@@ -218,6 +218,16 @@ ul { list-style: none; }
 }
 .nav-wrapper { display: flex; justify-content: space-between; align-items: center; position: relative; }
 .brand-logo { font-size: 1.2rem; color: #424242; display: flex; align-items: center; gap: 10px; z-index: 10; }
+.brand-logo img {
+    height: 50px !important;
+    width: auto !important;
+    margin-top: -5px !important;
+    margin-bottom: -5px !important;
+}
+.footer-logo img {
+    height: 50px !important;
+    width: auto !important;
+}
 .accent-text { color: var(--accent); }
 
 /* --- DESKTOP NAVIGATION --- */
