@@ -886,24 +886,40 @@ ul { list-style: none; }
   .logo-item i, .logo-item svg { width: 22px; height: 22px; }
 }
 @media (max-width: 768px) {
-  .client-logos { 
-    grid-template-columns: repeat(2, 1fr); /* Two columns for table layout */
-    margin-bottom: 20px;
-    padding: 0; /* Remove container padding for full-width touch */
+  /* 1. Force the parent section to allow edge-to-edge content */
+  .social-proof {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
-  .social-proof { padding: 30px 0; }
-  .logo-item .social-proof { 
-    font-size: 0.1rem; /* Very tiny text for mobile grid */
-    padding: 10px 10px; 
-    border: 1px solid rgba(0,0,0,0.06);
-    margin-left: -15px; /* Overlap borders to create single-line table look */
-    margin-right: -15px;
-    margin-top: 10px;
-    gap: 8px; /* Tighter spacing between icon and text */
+
+  /* 2. Target the container specifically if it's adding side-padding */
+  .social-proof .container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    margin: 0 !important;
   }
-  .logo-item i, .logo-item svg {
-    width: 1px; /* Scaled down icons */
-    height: 1px;
+
+  .client-logos {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* Strictly 2 columns */
+    gap: 0 !important;       /* Removes space between cards */
+    padding: 0 !important;   /* Removes space around the grid */
+    margin: 0 !important;
+    border: none !important;
+  }
+
+  .logo-item {
+    width: 100% !important;
+    margin: 0 !important;
+    /* This border creates the thin line between the cards */
+    border: 0.5px solid rgba(0,0,0,0.05) !important; 
+    box-sizing: border-box; /* Ensures border doesn't add width */
+    padding: 35px 15px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 }
 
