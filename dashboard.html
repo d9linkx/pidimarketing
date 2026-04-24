@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIDI Dashboard | Bento Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+
+        :root {
+            --bg-body: #050505;
+            --bg-card: #111111;
+            --border-dash: #222222;
+            --text-primary: #ffffff;
+            --text-secondary: #9ca3af;
+            --nav-bg: #111111;
+            --btn-secondary: #222222;
+        }
+
+        body.light-mode {
+            --bg-body: #f4f7f6;
+            --bg-card: #ffffff;
+            --border-dash: #e2e8f0;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --nav-bg: #edf2f7;
+            --btn-secondary: #e2e8f0;
+        }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-primary); 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+        
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            gap: 1.5rem;
+        }
+
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dash);
+            border-radius: 24px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            min-width: 0; /* Prevents grid blowout */
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        .bento-card:hover { border-color: #6a26da; }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) { /* Tablet */
+            .bento-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 640px) { /* Mobile */
+            body { padding: 1rem; }
+            .bento-grid { grid-template-columns: 1fr; }
+            .col-span-2, .col-span-3, .row-span-2 { grid-column: span 1 !important; grid-row: span 1 !important; }
+            
+            /* Shrink large text to fit mobile cards */
+            #main-value { font-size: clamp(2.5rem, 12vw, 4rem); }
+            #main-stat-label { font-size: 1.75rem; }
+            
+            header { text-align: left; align-items: flex-start; }
+            header .text-right { text-align: left; }
+        }
+
+        .accent-gradient { 
+            background: linear-gradient(135deg, #6a26da 0%, #a366ff 100%); 
+            color: white !important; 
+        }
+        .nav-container { background-color: var(--nav-bg); border-color: var(--border-dash); }
+        .border-dash { border-color: var(--border-dash) !important; }
+        .text-dash-secondary { color: var(--text-secondary) !important; }
+        .bg-dash-secondary { background-color: var(--btn-secondary); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="flex justify-between items-center mb-8 gap-4">
+        <a href="dashboard.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src="assets/pidi.png" alt="PIDI Logo" class="h-12 w-auto">
+                <span class="text-xl font-bold">PIDI Tasks</span>
+        </a>
+        
+        <nav class="nav-container p-1 rounded-2xl border hidden lg:flex gap-1">
+            <button onclick="switchRole('creator')" class="px-4 py-2 rounded-xl text-sm font-semibold transition active-btn" id="btn-creator">Creator</button>
+            <button onclick="switchRole('performer')" class="px-4 py-2 rounded-xl text-sm font-semibold text-dash-secondary" id="btn-performer">Performer</button>
+            <button onclick="switchRole('admin')" class="px-4 py-2 rounded-xl text-sm font-semibold text-dash-secondary" id="btn-admin">Admin</button>
+        </nav>
+
+        <div class="flex items-center gap-2 md:gap-4">
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition" id="theme-toggle">
+                <i class="fa-solid fa-moon" id="theme-icon"></i>
+            </button>
+            <div class="text-right hidden md:block">
+                <p class="text-xs text-gray-500">Welcome back,</p>
+                <p class="text-sm font-bold">Prince Dike</p>
+            </div>
+            <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-10 h-10 md:w-12 md:h-12 rounded-2xl border-2 border-[#222]">
+
+            <!-- Hamburger Button -->
+            <button onclick="toggleMobileMenu()" class="lg:hidden w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition">
+                <i class="fa-solid fa-bars" id="menu-icon"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm">
+            <div class="absolute right-0 top-0 h-full w-72 bg-[var(--bg-card)] border-l border-[var(--border-dash)] p-6 shadow-2xl flex flex-col transition-transform duration-300 transform translate-x-full overflow-y-auto" id="mobile-menu-panel" style="background-color: var(--bg-card); border-color: var(--border-dash);">
+                <div class="flex justify-between items-center mb-8">
+                    <span class="font-bold">Dashboard Menu</span>
+                    <button onclick="toggleMobileMenu()" class="text-2xl">&times;</button>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-4 mb-1">Switch View</p>
+                    <button onclick="switchRole('creator')" class="mobile-nav-btn w-full text-left p-4 rounded-xl font-semibold transition" data-role="creator">Creator Mode</button>
+                    <button onclick="switchRole('performer')" class="mobile-nav-btn w-full text-left p-4 rounded-xl font-semibold transition" data-role="performer">Performer Mode</button>
+                    <button onclick="switchRole('admin')" class="mobile-nav-btn w-full text-left p-4 rounded-xl font-semibold transition" data-role="admin">Admin Mode</button>
+                    
+                    <div class="my-4 border-t border-dash"></div>
+                    
+                    <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-4 mb-1">Account Management</p>
+                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                        <i class="fa-solid fa-user-gear w-5"></i> Profile Settings
+                    </a>
+                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                        <i class="fa-solid fa-building-columns w-5"></i> Bank Account
+                    </a>
+                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                        <i class="fa-solid fa-id-card-clip w-5"></i> ID Verification
+                    </a>
+                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                        <i class="fa-solid fa-bell w-5"></i> Notification Prefs
+                    </a>
+                    <a href="#" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                        <i class="fa-solid fa-shield-halved w-5"></i> Login & Security
+                    </a>
+                    
+                    <div class="my-4 border-t border-dash"></div>
+                    
+                    <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-4 mb-1">Help & Support</p>
+                    <a href="contact.html" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
+                        <i class="fa-solid fa-circle-question w-5"></i> Support Desk
+                    </a>
+                    <button onclick="handleLogout()" class="flex items-center gap-3 p-4 rounded-xl text-red-500 hover:bg-red-500/10 transition mt-2 text-left w-full">
+                        <i class="fa-solid fa-right-from-bracket w-5"></i> Sign Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="bento-grid">
+        
+        <div class="bento-card col-span-2 row-span-2 accent-gradient flex flex-col justify-between overflow-hidden relative group">
+            <div class="relative z-10">
+                <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Revenue Hub</span>
+                <h2 class="text-4xl font-bold mt-4 leading-tight" id="main-stat-label">Active Campaigns</h2>
+                <p class="text-white/80 mt-2 max-w-xs" id="main-sub-label">Your strategic growth is currently pacing at 114% of monthly target.</p>
+            </div>
+            <div class="relative z-10 mt-8">
+                <h3 class="text-6xl font-bold tracking-tighter" id="main-value">12</h3>
+                <button class="mt-4 bg-white text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition">
+                    <i class="fa-solid fa-plus"></i> <span id="main-cta">New Campaign</span>
+                </button>
+            </div>
+            <i class="fa-solid fa-chart-line absolute -bottom-10 -right-10 text-[200px] text-white/10 rotate-12 group-hover:rotate-0 transition-all duration-500"></i>
+        </div>
+
+        <div class="bento-card col-span-1 flex flex-col justify-between">
+            <div>
+                <p class="text-dash-secondary text-sm font-semibold uppercase">Wallet Balance</p>
+                <p class="text-3xl font-bold mt-1">₦420,500</p>
+            </div>
+            <div class="mt-4 flex gap-2">
+                <button class="flex-1 bg-dash-secondary py-2 rounded-xl text-xs font-bold hover:opacity-80">Withdraw</button>
+                <button class="flex-1 bg-white text-black py-2 rounded-xl text-xs font-bold hover:bg-gray-200">History</button>
+            </div>
+        </div>
+
+        <div class="bento-card col-span-1 row-span-2 overflow-y-auto max-h-[500px]">
+            <h3 class="font-bold mb-4 flex justify-between">
+                Live Feed <span class="text-green-500 text-xs mt-1">● Live</span>
+            </h3>
+            <div class="space-y-4" id="feed-container">
+                <div class="border-b border-dash pb-3">
+                    <p class="text-xs text-dash-secondary">2 mins ago</p>
+                    <p class="text-sm">Kemi's Hair: 10 new comments verified.</p>
+                </div>
+                <div class="border-b border-dash pb-3">
+                    <p class="text-xs text-dash-secondary">15 mins ago</p>
+                    <p class="text-sm">Payout processed: ₦15,000 to Chidi.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bento-card col-span-1">
+            <p class="text-dash-secondary text-sm font-semibold uppercase">Engagement Score</p>
+            <div class="flex items-end gap-2 mt-2">
+                <span class="text-3xl font-bold">98.2%</span>
+                <span class="text-green-500 text-xs font-bold mb-1"><i class="fa-solid fa-arrow-up"></i> 4%</span>
+            </div>
+            <div class="w-full bg-dash-secondary h-1.5 mt-4 rounded-full overflow-hidden">
+                <div class="bg-[#6a26da] h-full w-[98%]"></div>
+            </div>
+        </div>
+
+        <div class="bento-card col-span-3">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Active Management</h3>
+                <a href="#" class="text-xs text-dash-secondary font-bold underline hover:text-[#6a26da]">View All</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-dash-secondary border-b border-dash">
+                            <th class="pb-3 font-semibold">Campaign/Task</th>
+                            <th class="pb-3 font-semibold">Status</th>
+                            <th class="pb-3 font-semibold">Metrics</th>
+                            <th class="pb-3 font-semibold text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active-list">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const roles = {
+            creator: {
+                label: "Active Campaigns",
+                sub: "Your strategic growth is pacing at 114% of target.",
+                value: "12",
+                cta: "New Campaign",
+                items: [
+                    { name: "Hair Vendor Trust", status: "Active", metric: "24/50 comments" },
+                    { name: "Ibadan Real Estate", status: "Pending", metric: "15/100 shares" }
+                ]
+            },
+            performer: {
+                label: "Available Gigs",
+                sub: "You have 14 new tasks waiting in your vicinity.",
+                value: "₦14.5k",
+                cta: "Browse Tasks",
+                items: [
+                    { name: "Comment on iPhone Ad", status: "High Pay", metric: "₦150" },
+                    { name: "TikTok Share Challenge", status: "Fast", metric: "₦200" }
+                ]
+            },
+            admin: {
+                label: "Platform Volume",
+                sub: "Total system load: 84%. All nodes operational.",
+                value: "4.2M",
+                cta: "Manage Users",
+                items: [
+                    { name: "Global Payouts", status: "Queued", metric: "450 users" },
+                    { name: "Flagged Content", status: "Urgent", metric: "12 reports" }
+                ]
+            }
+        };
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = document.getElementById('mobile-menu-panel');
+            const icon = document.getElementById('menu-icon');
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+                icon.classList.replace('fa-bars', 'fa-xmark');
+            } else {
+                panel.classList.add('translate-x-full');
+                icon.classList.replace('fa-xmark', 'fa-bars');
+                setTimeout(() => menu.classList.add('hidden'), 300);
+            }
+        }
+
+        function switchRole(role) {
+            // Update Desktop UI buttons
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('bg-white', 'text-black', 'active-btn');
+                b.classList.add('text-dash-secondary');
+            });
+            const activeBtn = document.getElementById(`btn-${role}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'text-black', 'active-btn');
+                activeBtn.classList.remove('text-dash-secondary');
+            }
+
+            // Update Mobile UI buttons
+            document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+                b.classList.remove('accent-gradient', 'text-white');
+                b.classList.add('text-dash-secondary');
+            });
+            const activeMobileBtn = document.querySelector(`.mobile-nav-btn[data-role="${role}"]`);
+            if (activeMobileBtn) {
+                activeMobileBtn.classList.add('accent-gradient', 'text-white');
+                activeMobileBtn.classList.remove('text-dash-secondary');
+            }
+
+            // Close mobile menu if open
+            const menu = document.getElementById('mobile-menu');
+            if (menu && !menu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+
+            // Update Content
+            const data = roles[role];
+            document.getElementById('main-stat-label').innerText = data.label;
+            document.getElementById('main-sub-label').innerText = data.sub;
+            document.getElementById('main-value').innerText = data.value;
+            document.getElementById('main-cta').innerText = data.cta;
+
+            // Update List
+            const list = document.getElementById('active-list');
+            list.innerHTML = data.items.map(item => `
+                <tr class="border-b border-dash">
+                    <td class="py-4 font-bold">${item.name}</td>
+                    <td class="py-4"><span class="bg-dash-secondary px-2 py-1 rounded-lg text-[10px] uppercase font-bold">${item.status}</span></td>
+                    <td class="py-4 text-dash-secondary">${item.metric}</td>
+                    <td class="py-4 text-right"><button class="hover:text-[#6a26da] text-dash-secondary"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.querySelector('#theme-icon');
+            if (document.body.classList.contains('light-mode')) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+        }
+
+        function handleLogout() {
+            console.log("Clearing session and logging out...");
+            window.location.href = 'index.html';
+        }
+
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+            updateThemeIcon();
+        }
+
+        // Initialize with Creator view
+        switchRole('creator');
+    </script>
+</body>
+</html>

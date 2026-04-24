@@ -157,6 +157,29 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
+    // --- 10. AUTH & DASHBOARD REDIRECTS ---
+    const checkSession = async () => {
+        if (typeof supabase !== 'undefined') {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                // Update Earn links to point to Dashboard
+                document.querySelectorAll('a[href="earn.html"]').forEach(link => {
+                    link.href = 'dashboard.html?view=earner';
+                });
+                // Update Grow links
+                document.querySelectorAll('a[href="grow.html"]').forEach(link => {
+                    link.href = 'dashboard.html?view=grow';
+                });
+            }
+        }
+    };
+    checkSession();
+
+    window.handleLogout = async () => {
+        await supabase.auth.signOut();
+        window.location.href = 'index.html';
+    };
+
 });
 
 
