@@ -823,21 +823,21 @@ ul { list-style: none; }
   align-items: center;
   justify-content: center; /* Center content within each column */
   gap: 15px;
-  font-size: 0.85rem; /* Smaller font size */
+  font-size: 1rem; /* Restored larger font size for desktop */
   font-weight: 700;
   color: #1a1a1a;
   white-space: normal; /* Allow text to wrap if column is too narrow */
   text-align: center;
   opacity: 0.7;
-  padding: 12px 10px; /* Reduced vertical padding */
+  padding: 20px 15px; /* Restored larger padding for desktop */
   height: 100%; /* Ensure items fill their grid cell height */
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .logo-item i,
 .logo-item svg {
-    width: 20px; /* Smaller icons */
-    height: 20px;
+    width: 24px; /* Restored larger icons for desktop */
+    height: 24px;
     stroke-width: 1.5px;
 }
 
@@ -882,8 +882,8 @@ ul { list-style: none; }
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
     padding: 20px 0;
   }
-  .logo-item { font-size: 0.8rem; padding: 10px 5px; }
-  .logo-item i, .logo-item svg { width: 18px; height: 18px; }
+  .logo-item { font-size: 0.9rem; padding: 15px 10px; } /* Restored larger font and padding for tablet */
+  .logo-item i, .logo-item svg { width: 20px; height: 20px; } /* Restored larger icons for tablet */
 }
 @media (max-width: 768px) {
   /* 1. Force the parent section to allow edge-to-edge content */
@@ -916,10 +916,16 @@ ul { list-style: none; }
     /* This border creates the thin line between the cards */
     border: 0.5px solid rgba(0,0,0,0.05) !important; 
     box-sizing: border-box; /* Ensures border doesn't add width */
-    padding: 20px 10px !important; /* Significantly reduced mobile padding */
+    padding: 12px 8px !important; /* Reduced padding for smaller size */
+    font-size: 0.75rem !important; /* Smaller text on mobile */
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px; /* Tighter gap between icon and text */
+  }
+
+  .logo-item i, .logo-item svg {
+    width: 16px !important; /* Smaller icons on mobile */
+    height: 16px !important;
   }
 }
 
