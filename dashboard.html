@@ -104,11 +104,43 @@
             <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition" id="theme-toggle">
                 <i class="fa-solid fa-moon" id="theme-icon"></i>
             </button>
-            <div class="text-right hidden md:block">
-                <p class="text-xs text-gray-500">Welcome back,</p>
-                <p class="text-sm font-bold">Prince Dike</p>
+            
+            <!-- Desktop Profile Dropdown -->
+            <div class="relative hidden md:block group">
+                <button class="flex items-center gap-3 hover:opacity-80 transition-opacity focus:outline-none">
+                    <div class="text-right">
+                        <p class="text-[10px] text-dash-secondary uppercase font-bold tracking-tight">Verified User</p>
+                        <p class="text-sm font-bold">Prince Dike</p>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-11 h-11 rounded-2xl border-2 border-dash">
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div class="absolute right-0 mt-2 w-64 bg-[var(--bg-card)] border border-[var(--border-dash)] rounded-2xl shadow-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[110]">
+                    <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account Management</p>
+                    <div class="flex flex-col gap-1">
+                        <a href="#" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                            <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
+                        </a>
+                        <a href="#" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                            <i class="fa-solid fa-building-columns w-4 text-center"></i> Bank Account
+                        </a>
+                        <a href="#" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                            <i class="fa-solid fa-id-card-clip w-4 text-center"></i> ID Verification
+                        </a>
+                        <div class="my-2 border-t border-dash"></div>
+                        <a href="contact.html" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                            <i class="fa-solid fa-circle-question w-4 text-center"></i> Support Desk
+                        </a>
+                        <button onclick="handleLogout()" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-red-500 hover:bg-red-500/10 transition mt-1 w-full text-left font-semibold">
+                            <i class="fa-solid fa-right-from-bracket w-4 text-center"></i> Sign Out
+                        </button>
+                    </div>
+                </div>
             </div>
-            <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-10 h-10 md:w-12 md:h-12 rounded-2xl border-2 border-[#222]">
+
+            <!-- Mobile Avatar (Visible only on mobile) -->
+            <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-10 h-10 rounded-xl border-2 border-dash md:hidden">
 
             <!-- Hamburger Button -->
             <button onclick="toggleMobileMenu()" class="lg:hidden w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition">
