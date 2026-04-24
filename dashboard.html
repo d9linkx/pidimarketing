@@ -95,7 +95,7 @@
 
     <header class="flex justify-between items-center mb-8 gap-4">
         <a href="dashboard.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img src="assets/pidi.png" alt="PIDI Logo" class="h-12 w-auto">
+            <img id="logo-img" src="assets/pidiblack.png" alt="PIDI Logo" class="h-12 w-auto">
                 <span class="text-xl font-bold">PIDI Tasks</span>
         </a>
         
@@ -716,6 +716,7 @@
             const isLight = document.body.classList.contains('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
             updateThemeIcon();
+            updateLogo();
         }
 
         function updateThemeIcon() {
@@ -725,6 +726,14 @@
             } else {
                 icon.classList.replace('fa-sun', 'fa-moon');
             }
+        }
+
+        function updateLogo() {
+            const logo = document.getElementById('logo-img');
+            if (!logo) return;
+            logo.src = document.body.classList.contains('light-mode') 
+                ? 'assets/pidi.png' 
+                : 'assets/pidiblack.png';
         }
 
         // --- PHASE 4: SAAS INTELLIGENCE & AUTO-RETENTION ---
@@ -1434,10 +1443,12 @@
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
             updateThemeIcon();
+            updateLogo();
         }
 
         // Initialize with Performer view for testing this phase
         switchRole('performer');
+        updateLogo();
     </script>
 </body>
 </html>

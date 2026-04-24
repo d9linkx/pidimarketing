@@ -35,93 +35,21 @@
         .border-dash { border-color: var(--border-dash) !important; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-    <nav class="main-nav sticky-nav">
-        <div class="container nav-wrapper">
-            <a href="index.html" class="brand-logo">
-                <img src="assets/pidi.png" alt="PIDI Marketing Logo" height="50" style="margin-top: -5px; margin-bottom: -5px;">
-                <span></span>
-            </a>
-
-            <div class="nav-center">
-                <ul class="desktop-nav">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="services.html">Services</a></li>
-                    <li class="has-dropdown">
-                        <a href="#">Resources <span class="chevron-down"></span></a>
-                        <div class="dropdown-cluster mini">
-                            <a href="blog.html">Blog</a>
-                            <a href="#">Case Studies</a>
-                            <a href="#">Marketing Guides</a>
-                        </div>
-                    </li>
-                    <li class="has-dropdown">
-                        <a href="#">Tools <span class="chevron-down"></span></a>
-                        <div class="dropdown-cluster mini">
-                            <a href="grow.html">Grow Your Brand</a>
-                            <a href="earn.html">Earn by Engaging</a>
-                        </div>
-                    </li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="company.html">Company</a></li>
-                </ul>
-            </div>
-            
-            <div class="nav-right">
-                <a href="contact.html" class="nav-cta-btn">
-                    Book a Call
-                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="7" y1="17" x2="17" y2="7"></line>
-                        <polyline points="7 7 17 7 17 17"></polyline>
-                    </svg>
-                </a>
-                <button id="menu-trigger" class="menu-btn" aria-label="Open Navigation Menu">
-                    <span class="menu-label"></span>
-                    <div class="hamburger-icon">
-                        <span class="line top"></span>
-                        <span class="line middle"></span>
-                        <span class="line bottom"></span>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <div id="side-menu" class="menu-overlay">
-        <div class="menu-header container">
-            <a href="index.html" class="brand-logo">
-                <img src="assets/pidi.png" alt="PIDI Marketing Logo" height="70" style="margin-top: -10px; margin-bottom: -10px;">
-                <span></span>
-            </a>
-            <button id="close-menu" class="close-btn" aria-label="Close Menu">
-                &times; CLOSE
+    <header class="flex justify-between items-center mb-8 gap-4">
+        <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img id="logo-img" src="assets/pidiblack.png" alt="PIDI Logo" class="h-12 w-auto">
+            <h1 class="text-2xl font-bold tracking-tight">PIDI Console</h1>
+        </a>
+        <div class="flex items-center gap-2 md:gap-4">
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition" id="theme-toggle">
+                <i class="fa-solid fa-moon" id="theme-icon"></i>
             </button>
         </div>
-        <div class="menu-body container">
-            <div class="menu-columns">
-                <div class="menu-section">
-                    <h4 class="menu-title">Navigation</h4>
-                    <ul class="menu-links">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                        <li><a href="company.html">Company</a></li>
-                        <li><a href="services.html">Services</a></li>
-                        <li><a href="blog.html">Blog</a></li>
-                    </ul>
-                </div>
-                <div class="menu-section">
-                    <h4 class="menu-title">Tools</h4>
-                    <ul class="menu-links">
-                        <li><a href="grow.html">Grow Your Brand</a></li>
-                        <li><a href="earn.html">Earn by Engaging</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+    </header>
 
-    <main class="max-w-md mx-auto mt-20" style="margin-top: 150px;">
+    <main class="max-w-md mx-auto mt-10">
         <div class="bento-card">
             <div class="mb-10">
                 <h2 class="text-3xl font-bold tracking-tight">Welcome back</h2>
@@ -167,6 +95,15 @@
             const isLight = document.body.classList.contains('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
             updateThemeIcon();
+            updateLogo();
+        }
+
+        function updateLogo() {
+            const logo = document.getElementById('logo-img');
+            if (!logo) return;
+            logo.src = document.body.classList.contains('light-mode') 
+                ? 'assets/pidi.png' 
+                : 'assets/pidiblack.png';
         }
 
         function updateThemeIcon() {
@@ -181,7 +118,10 @@
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
             updateThemeIcon();
+            updateLogo();
         }
+
+        updateLogo();
     </script>
 </body>
 </html>
