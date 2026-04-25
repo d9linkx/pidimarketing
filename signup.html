@@ -52,6 +52,7 @@
 
     <main class="max-w-md mx-auto mt-12 md:mt-24" id="signup-main">
         <div class="bento-card">
+            <div id="signup-message" class="hidden p-3 rounded-xl text-sm mb-4 text-center"></div>
             <div class="mb-8">
                 <h2 class="text-3xl font-bold tracking-tight">Create your account</h2>
                 <p class="text-dash-secondary mt-2">Join the future of performance marketing.</p>
@@ -99,6 +100,44 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
+        // Helper function for displaying messages
+        const displayAuthMessage = (elementId, message, type = 'info') => {
+            const msgDiv = document.getElementById(elementId);
+            if (!msgDiv) return;
+
+            msgDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-blue-100', 'text-blue-800');
+            msgDiv.classList.add('p-3', 'rounded-xl', 'text-sm', 'mb-4', 'text-center'); // Ensure base styling
+
+            if (type === 'success') {
+                msgDiv.classList.add('bg-green-100', 'text-green-800');
+            } else if (type === 'error') {
+                msgDiv.classList.add('bg-red-100', 'text-red-800');
+            } else { // info/loading
+                msgDiv.classList.add('bg-blue-100', 'text-blue-800');
+            }
+            msgDiv.innerHTML = message;
+            msgDiv.classList.remove('hidden');
+        };
+
+        const clearAuthMessage = (elementId) => {
+            const msgDiv = document.getElementById(elementId);
+            if (msgDiv) {
+                msgDiv.classList.add('hidden');
+                msgDiv.innerHTML = '';
+            }
+        };
+
+        const setButtonLoading = (button, isLoading, originalText) => {
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> ${originalText}`;
+                button.dataset.originalText = originalText; // Store original text
+            } else {
+                button.disabled = false;
+                button.innerHTML = button.dataset.originalText || originalText; // Restore original text
+            }
+        };
+
         const selectRole = (role) => {
             document.getElementById('role-creator').classList.toggle('active-role', role === 'creator');
             document.getElementById('role-creator').classList.toggle('text-dash-secondary', role !== 'creator');
@@ -111,10 +150,15 @@
 
         async function handleSignup(e) {
             e.preventDefault();
+            clearAuthMessage('signup-message'); // Clear previous messages
             const fullName = document.getElementById('signup-fullname').value;
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
             const role = document.getElementById('selected-role').value;
+            const submitButton = e.target.querySelector('button[type="submit"]');
+
+            setButtonLoading(submitButton, true, 'Create Console Account');
+            displayAuthMessage('signup-message', 'Creating account...', 'info');
 
             const { data, error } = await supabase.auth.signUp({
                 email: email,
@@ -127,10 +171,12 @@
                 }
             });
 
+            setButtonLoading(submitButton, false, 'Create Console Account'); // Re-enable button
+
             if (error) {
-                alert(error.message);
+                displayAuthMessage('signup-message', `Registration failed: ${error.message}. Please try again.`, 'error');
             } else {
-                alert('Account created successfully! Please check your email to confirm your account.');
+                displayAuthMessage('signup-message', 'Account created successfully! Please check your email to confirm your account, then return to the login page.', 'success');
                 // After email confirmation, user will be redirected to dashboard.html
                 // For immediate redirection (e.g., if email confirmation is off), use:
                 // window.location.href = `dashboard.html?view=${role}`;
