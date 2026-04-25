@@ -4,6 +4,8 @@
  * Combined: Side Drawer, Top Bar, Sticky Nav, Exit Modal, & Cookies
  */
 
+import { supabase } from '../supabaseClient.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. GLOBAL SELECTORS ---
@@ -24,11 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.querySelector('.close-modal');
     const cookieBanner = document.querySelector('.cookie-banner');
 
-    import { supabase } from './supabaseClient.js';
+    let toggleMenu;
 
     // --- 2. MENU DRAWER LOGIC ---
     if (menuTrigger && sideMenu) {
-        const toggleMenu = (open) => {
+        toggleMenu = (open) => {
             sideMenu.classList.toggle('is-open', open);
             menuTrigger.classList.toggle('is-active', open);
             
@@ -88,12 +90,19 @@ document.addEventListener('DOMContentLoaded', () => {
             sideMenu.classList.remove('is-open');
             menuTrigger.classList.remove('is-active');
             body.classList.remove('menu-open');
+            // Use the consistent toggleMenu function for closing
+            toggleMenu(false);
         }
 
         // Close Lang Dropdown if clicking outside
         if (langDropdown?.classList.contains('show') && !langSelector.contains(e.target)) {
             langSelector.classList.remove('is-open');
             langDropdown.classList.remove('show');
+        }
+
+        // Close User Dropdown if clicking outside
+        if (userDropdown?.classList.contains('show') && !userDropdown.contains(e.target) && !userBtn.contains(e.target)) {
+            userDropdown.classList.remove('show');
         }
     });
 
@@ -103,7 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
             sideMenu?.classList.remove('is-open');
             menuTrigger?.classList.remove('is-active');
             body.classList.remove('menu-open');
+            // Also close user dropdown and lang dropdown on escape
             langDropdown?.classList.remove('show');
+            userDropdown?.classList.remove('show');
         }
     });
 
@@ -118,16 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             userDropdown.classList.toggle('show');
             // Update user info in dropdown if needed
             checkSession();
-        });
-
-        document.addEventListener('click', (e) => {
-            if (userDropdown.classList.contains('show') && !userDropdown.contains(e.target) && !userBtn.contains(e.target)) {
-                userDropdown.classList.remove('show');
-            }
-            // Close mobile menu if open and clicked outside
-            if (sideMenu?.classList.contains('is-open') && !sideMenu.contains(e.target) && !menuTrigger.contains(e.target)) {
-                toggleMenu(false);
-            }
         });
     }
 
