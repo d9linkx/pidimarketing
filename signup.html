@@ -130,7 +130,7 @@
         const setButtonLoading = (button, isLoading, originalText) => {
             if (isLoading) {
                 button.disabled = true;
-                button.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> ${originalText}`;
+                button.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...`;
                 button.dataset.originalText = originalText; // Store original text
             } else {
                 button.disabled = false;
@@ -174,9 +174,9 @@
             setButtonLoading(submitButton, false, 'Create Console Account'); // Re-enable button
 
             if (error) {
-                displayAuthMessage('signup-message', `Registration failed: ${error.message}. Please try again.`, 'error');
+                displayAuthMessage('signup-message', `Signup Error: ${error.message}. Please check your details and try again or contact support if the issue persists.`, 'error');
             } else {
-                displayAuthMessage('signup-message', 'Account created successfully! Please check your email to confirm your account, then return to the login page.', 'success');
+                displayAuthMessage('signup-message', 'Workspace Created! Please check your email inbox to confirm your account. Once confirmed, you can return to the login page.', 'success');
                 // After email confirmation, user will be redirected to dashboard.html
                 // For immediate redirection (e.g., if email confirmation is off), use:
                 // window.location.href = `dashboard.html?view=${role}`;

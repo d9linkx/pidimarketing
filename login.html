@@ -87,20 +87,65 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
+        // Helper function for displaying messages
+        const displayAuthMessage = (elementId, message, type = 'info') => {
+            const msgDiv = document.getElementById(elementId);
+            if (!msgDiv) return;
+
+            msgDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-blue-100', 'text-blue-800');
+            msgDiv.classList.add('p-3', 'rounded-xl', 'text-sm', 'mb-4', 'text-center'); 
+
+            if (type === 'success') {
+                msgDiv.classList.add('bg-green-100', 'text-green-800');
+            } else if (type === 'error') {
+                msgDiv.classList.add('bg-red-100', 'text-red-800');
+            } else { 
+                msgDiv.classList.add('bg-blue-100', 'text-blue-800');
+            }
+            msgDiv.innerHTML = message;
+            msgDiv.classList.remove('hidden');
+        };
+
+        const clearAuthMessage = (elementId) => {
+            const msgDiv = document.getElementById(elementId);
+            if (msgDiv) {
+                msgDiv.classList.add('hidden');
+                msgDiv.innerHTML = '';
+            }
+        };
+
+        const setButtonLoading = (button, isLoading, originalText) => {
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...`;
+                button.dataset.originalText = originalText;
+            } else {
+                button.disabled = false;
+                button.innerHTML = button.dataset.originalText || originalText;
+            }
+        };
+
         async function handleLogin(e) {
             e.preventDefault();
+            clearAuthMessage('login-message');
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
+            const submitButton = e.target.querySelector('button[type="submit"]');
 
             const { error } = await supabase.auth.signInWithPassword({
                 email: email,
                 password: password,
             });
 
+            setButtonLoading(submitButton, false, 'Log In to Console');
+
             if (error) {
-                alert(error.message);
+                displayAuthMessage('login-message', `Access Denied: ${error.message}. Please check your credentials or reset your password if you've forgotten it.`, 'error');
             } else {
-                window.location.href = 'dashboard.html';
+                displayAuthMessage('login-message', 'Success! Account found. You are being logged in...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
             }
         }
 
