@@ -150,7 +150,7 @@
             </div>
 
             <!-- Mobile Avatar (Visible only on mobile) -->
-            <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-10 h-10 rounded-xl border-2 border-dash md:hidden">
+            <img onclick="openSettings('profile')" src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-10 h-10 rounded-xl border-2 border-dash md:hidden cursor-pointer" alt="Mobile Avatar">
 
             <!-- Hamburger Button -->
             <button onclick="toggleMobileMenu()" class="lg:hidden w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition">
@@ -535,7 +535,7 @@
             <h3 class="text-2xl font-bold mb-2">Sign Out?</h3>
             <p class="text-dash-secondary text-sm mb-8">Are you sure you want to log out? Your active campaigns and pending tasks will be saved.</p>
             <div class="flex flex-col gap-3">
-                <button onclick="confirmSignout()" class="w-full bg-red-500 text-white py-4 rounded-2xl font-bold text-sm hover:bg-red-600 transition shadow-lg shadow-red-500/20">Sign Out Now</button>
+                <button onclick="processLogout()" class="w-full bg-red-500 text-white py-4 rounded-2xl font-bold text-sm hover:bg-red-600 transition shadow-lg shadow-red-500/20">Sign Out Now</button>
                 <button onclick="closeSignoutModal()" class="w-full bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Stay Logged In</button>
             </div>
         </div>
@@ -647,20 +647,16 @@
             }
 
             // Update Content
-            // Fetch user data from Supabase if available, otherwise use default roles data
-            const { data: { user } } = await supabase.auth.getUser();
-            let userData = roles[role];
+            const { data: authData } = await supabase.auth.getUser();
+            const user = authData?.user;
+            const data = roles[role];
 
             if (user && user.user_metadata && user.user_metadata.user_role === role) {
-                // If user is logged in and their role matches, use their specific data if available
-                // For this example, we'll just use the default roles data, but in a real app
-                // you'd fetch/update this from a database based on the user's actual data.
-                // For now, we'll just ensure the name is correct.
-                userData.label = userData.label.replace('Prince Dike', user.user_metadata.full_name || 'User');
+                data.label = data.label.replace('Prince Dike', user.user_metadata.full_name || 'User');
             }
-            document.getElementById('main-stat-label').innerText = userData.label;
-            document.getElementById('main-sub-label').innerText = userData.sub;
-            document.getElementById('main-value').innerText = userData.value;
+            document.getElementById('main-stat-label').innerText = data.label;
+            document.getElementById('main-sub-label').innerText = data.sub;
+            document.getElementById('main-value').innerText = data.value;
             
             // Update wallet display if performer role
             if (role === 'performer') updateWalletDisplay();
@@ -674,11 +670,12 @@
                     ctaBtn.classList.toggle('bg-green-500', data.isSubscriptionActive);
                     ctaBtn.classList.toggle('text-white', data.isSubscriptionActive);
                 }
-                checkMilestones(userData.totalGrowthMetric);
+                checkMilestones(data.totalGrowthMetric);
             }
 
             // Update List
             const list = document.getElementById('active-list');
+            list.innerHTML = ''; // Clear existing list to prevent duplication on switch
 
             // SaaS Phase 4: Admin Revenue Dashboard Card
             if (role === 'admin') {
@@ -686,21 +683,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                         <div class="p-4 bg-dash-secondary rounded-2xl border border-dash">
                             <p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">Gross Billing</p>
-                            <p class="text-xl font-bold">₦${userData.grossRevenue.toLocaleString()}</p>
+                            <p class="text-xl font-bold">₦${data.grossRevenue.toLocaleString()}</p>
                         </div>
                         <div class="p-4 bg-dash-secondary rounded-2xl border border-dash">
                             <p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">Tasker Payouts</p>
-                            <p class="text-xl font-bold text-red-500">₦${userData.totalPayouts.toLocaleString()}</p>
+                            <p class="text-xl font-bold text-red-500">₦${data.totalPayouts.toLocaleString()}</p>
                         </div>
                     </div>
                     
                     <div class="flex gap-4 mb-6 border-b border-dash">
-                        <button onclick="setAdminTab('verify')" id="tab-verify" class="pb-3 text-xs font-bold ${userData.currentTab === 'verify' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">VERIFICATIONS</button>
-                        <button onclick="setAdminTab('payouts')" id="tab-payouts" class="pb-3 text-xs font-bold ${userData.currentTab === 'payouts' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">PAYOUT QUEUE (${userData.withdrawalRequests.length})</button>
+                        <button onclick="setAdminTab('verify')" id="tab-verify" class="pb-3 text-xs font-bold ${data.currentTab === 'verify' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">VERIFICATIONS</button>
+                        <button onclick="setAdminTab('payouts')" id="tab-payouts" class="pb-3 text-xs font-bold ${data.currentTab === 'payouts' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">PAYOUT QUEUE (${data.withdrawalRequests.length})</button>
                     </div>
 
                     <h4 class="font-bold mb-4">Pending Verifications</h4>
-                ` + list.innerHTML;
+                `;
             }
 
             list.innerHTML += data.items.map(item => `
@@ -842,7 +839,7 @@
                 return;
             }
 
-            // Logic Ledger: Allocation
+            // Logic Ledger: Allocation of Funds
             roles.creator.availableBalance -= totalCost;
             roles.creator.allocatedFunds += totalCost;
             
@@ -855,9 +852,14 @@
             
             // Pushing to Performer's available gigs
             roles.performer.items.unshift({
+                id: 'task-' + Date.now(),
+                platform: selectedPlatform,
                 name: `${selectedPlatform.toUpperCase()} Engagement`,
-                status: "High Pay",
-                metric: `₦150`
+                reward: 150,
+                requirement: document.getElementById('task-instructions').value || "10+ word comment",
+                targetUrl: url,
+                brandInfo: "Newly Launched Campaign",
+                status: "available"
             });
 
             alert("Campaign Launched Successfully! Your task is now live in the performer marketplace.");
@@ -1434,17 +1436,15 @@
             document.getElementById('signout-overlay').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
-        window.confirmSignout = confirmSignout; // Expose to global scope
-        function closeSignoutModal() {
-            document.getElementById('signout-overlay').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
 
-        function confirmSignout() {
-            // Create Toast Container if it doesn't exist
+        async function processLogout() {
+            // Logic Ledger: Perform actual sign out via Supabase
+            await supabase.auth.signOut();
+
+            // Create Toast Container
             let toast = document.createElement('div');
             toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-3 rounded-2xl shadow-2xl z-[500] font-bold text-sm transition-all transform translate-y-20';
-            toast.innerText = 'See you soon, Prince! Logging out...';
+            toast.innerText = 'See you soon! Logging out...';
             document.body.appendChild(toast);
 
             // Animate In
@@ -1456,14 +1456,59 @@
             }, 2000);
         }
 
+        function closeSignoutModal() {
+            document.getElementById('signout-overlay').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // --- GLOBAL EXPOSURE (Required for module scripts to work with HTML onclick) ---
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.switchRole = switchRole;
+        window.toggleTheme = toggleTheme;
+        window.openSettings = openSettings;
+        window.closeSettings = closeSettings;
+        window.confirmSignout = confirmSignout;
+        window.closeSignoutModal = closeSignoutModal;
+        window.processLogout = processLogout;
+        window.openCampaignWizard = openCampaignWizard;
+        window.closeCampaignWizard = closeCampaignWizard;
+        window.selectPlatform = selectPlatform;
+        window.updateCalculation = updateCalculation;
+        window.nextStep = nextStep;
+        window.prevStep = prevStep;
+        window.finishCreation = finishCreation;
+        window.openDepositModal = openDepositModal;
+        window.closeDepositModal = closeDepositModal;
+        window.processDeposit = processDeposit;
+        window.openWithdrawalModal = openWithdrawalModal;
+        window.closeWithdrawModal = closeWithdrawModal;
+        window.verifyAndSaveBank = verifyAndSaveBank;
+        window.processWithdrawal = processWithdrawal;
+        window.claimTask = claimTask;
+        window.cancelTaskClaim = cancelTaskClaim;
+        window.submitProof = submitProof;
+        window.setAdminTab = setAdminTab;
+        window.approvePayout = approvePayout;
+        window.approveTask = approveTask;
+        window.rejectTask = rejectTask;
+        window.closeExecutionWorkspace = closeExecutionWorkspace;
+        window.switchSettingsView = switchSettingsView;
+        window.saveProfileSettings = saveProfileSettings;
+        window.simulateIDV = simulateIDV;
+        window.updatePassword = updatePassword;
+        window.terminateSession = terminateSession;
+        window.togglePref = togglePref;
+
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
             updateThemeIcon();
             updateLogo();
         }
 
-        // Initialize with Performer view for testing this phase
-        switchRole('performer');
+        // Initialize view based on URL parameters or default to performer
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialRole = urlParams.get('view') || 'performer';
+        switchRole(initialRole);
         updateLogo();
     </script>
 </body>
