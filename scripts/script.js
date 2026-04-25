@@ -1,4 +1,5 @@
 /**
+ * /Users/mac/Desktop/PIDI/scripts/script.js
  * V Do Marketing - Unified Interactive Engine
  * Combined: Side Drawer, Top Bar, Sticky Nav, Exit Modal, & Cookies
  */
@@ -22,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const exitModal = document.getElementById('exit-modal');
     const closeModalBtn = document.querySelector('.close-modal');
     const cookieBanner = document.querySelector('.cookie-banner');
+
+    import { supabase } from './supabaseClient.js';
 
     // --- 2. MENU DRAWER LOGIC ---
     if (menuTrigger && sideMenu) {
@@ -105,19 +108,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 11. USER DROPDOWN LOGIC ---
-    const userBtn = document.querySelector('.user-avatar-btn');
-    const userDropdown = document.querySelector('.user-dropdown');
+    const userBtn = document.querySelector('.user-profile-nav .user-avatar-btn');
+    const userDropdown = document.querySelector('.user-profile-nav .user-dropdown');
 
     if (userBtn && userDropdown) {
         userBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             userDropdown.classList.toggle('show');
+            // Update user info in dropdown if needed
+            checkSession();
         });
 
         document.addEventListener('click', (e) => {
             if (userDropdown.classList.contains('show') && !userDropdown.contains(e.target) && !userBtn.contains(e.target)) {
                 userDropdown.classList.remove('show');
+            }
+            // Close mobile menu if open and clicked outside
+            if (sideMenu?.classList.contains('is-open') && !sideMenu.contains(e.target) && !menuTrigger.contains(e.target)) {
+                toggleMenu(false);
             }
         });
     }
@@ -176,22 +185,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 10. AUTH & DASHBOARD REDIRECTS ---
-    const checkSession = async () => {
-        if (typeof supabase !== 'undefined') {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                // Update Earn links to point to Dashboard
-                document.querySelectorAll('a[href="earn.html"]').forEach(link => {
-                    link.href = 'dashboard.html?view=earner';
-                });
-                // Update Grow links
-                document.querySelectorAll('a[href="grow.html"]').forEach(link => {
-                    link.href = 'dashboard.html?view=grow';
-                });
+    async function checkSession() {
+        const { data: { session } } = await supabase.auth.getSession();
+        const userProfileNav = document.querySelector('.user-profile-nav');
+        const loginLink = document.querySelector('.user-dropdown a[href="login.html"]');
+        const dashboardLink = document.querySelector('.user-dropdown a[href="dashboard.html"]');
+        const logoutButton = document.querySelector('.user-dropdown a[href="dashboard.html?logout=true"]');
+
+        if (session) {
+            // User is logged in
+            const user = session.user;
+            const userName = user.user_metadata.full_name || user.email;
+            const userRole = user.user_metadata.user_role || 'creator'; // Default role
+
+            // Update profile display
+            if (userProfileNav) {
+                userProfileNav.querySelector('img').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=6a26da&color=fff`;
+                // You might want to display the name somewhere in the nav too
             }
+
+            // Update dropdown links
+            if (loginLink) loginLink.style.display = 'none';
+            if (dashboardLink) dashboardLink.style.display = 'flex'; // Show dashboard link
+            if (logoutButton) {
+                logoutButton.style.display = 'flex';
+                logoutButton.onclick = handleLogout; // Attach logout function
+            }
+
+            // Update Earn/Grow links to point to dashboard with specific views
+            document.querySelectorAll('a[href="earn.html"]').forEach(link => {
+                link.href = `dashboard.html?view=performer`;
+            });
+            document.querySelectorAll('a[href="grow.html"]').forEach(link => {
+                link.href = `dashboard.html?view=creator`;
+            });
+        } else {
+            // User is not logged in
+            if (loginLink) loginLink.style.display = 'flex';
+            if (dashboardLink) dashboardLink.style.display = 'none';
+            if (logoutButton) logoutButton.style.display = 'none';
         }
-    };
-    checkSession();
+    }
+    checkSession(); // Run on page load
 
     window.handleLogout = async () => {
         await supabase.auth.signOut();

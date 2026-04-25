@@ -142,7 +142,7 @@
                         <a href="#" onclick="openSettings('support')" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                             <i class="fa-solid fa-circle-question w-4 text-center"></i> Support Desk
                         </a>
-                        <button onclick="handleLogout()" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-red-500 hover:bg-red-500/10 transition mt-1 w-full text-left font-semibold">
+                        <button onclick="confirmSignout()" class="flex items-center gap-3 p-2.5 rounded-xl text-sm text-red-500 hover:bg-red-500/10 transition mt-1 w-full text-left font-semibold">
                             <i class="fa-solid fa-right-from-bracket w-4 text-center"></i> Sign Out
                         </button>
                     </div>
@@ -196,7 +196,7 @@
                     <a href="#" onclick="openSettings('support')" class="flex items-center gap-3 p-4 rounded-xl text-dash-secondary hover:bg-dash-secondary transition">
                         <i class="fa-solid fa-circle-question w-5"></i> Support Desk
                     </a>
-                    <button onclick="handleLogout()" class="flex items-center gap-3 p-4 rounded-xl text-red-500 hover:bg-red-500/10 transition mt-2 text-left w-full">
+                    <button onclick="confirmSignout()" class="flex items-center gap-3 p-4 rounded-xl text-red-500 hover:bg-red-500/10 transition mt-2 text-left w-full">
                         <i class="fa-solid fa-right-from-bracket w-5"></i> Sign Out
                     </button>
                 </div>
@@ -541,7 +541,7 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
         let roles = {
             creator: {
                 label: "Active Campaigns",
@@ -599,6 +599,8 @@
             }
         };
 
+        import { supabase } from './supabaseClient.js';
+
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
             const panel = document.getElementById('mobile-menu-panel');
@@ -615,7 +617,7 @@
             }
         }
 
-        function switchRole(role) {
+        async function switchRole(role) {
             // Update Desktop UI buttons
             document.querySelectorAll('nav button').forEach(b => {
                 b.classList.remove('bg-white', 'text-black', 'active-btn');
@@ -645,10 +647,20 @@
             }
 
             // Update Content
-            const data = roles[role];
-            document.getElementById('main-stat-label').innerText = data.label;
-            document.getElementById('main-sub-label').innerText = data.sub;
-            document.getElementById('main-value').innerText = data.value;
+            // Fetch user data from Supabase if available, otherwise use default roles data
+            const { data: { user } } = await supabase.auth.getUser();
+            let userData = roles[role];
+
+            if (user && user.user_metadata && user.user_metadata.user_role === role) {
+                // If user is logged in and their role matches, use their specific data if available
+                // For this example, we'll just use the default roles data, but in a real app
+                // you'd fetch/update this from a database based on the user's actual data.
+                // For now, we'll just ensure the name is correct.
+                userData.label = userData.label.replace('Prince Dike', user.user_metadata.full_name || 'User');
+            }
+            document.getElementById('main-stat-label').innerText = userData.label;
+            document.getElementById('main-sub-label').innerText = userData.sub;
+            document.getElementById('main-value').innerText = userData.value;
             
             // Update wallet display if performer role
             if (role === 'performer') updateWalletDisplay();
@@ -662,7 +674,7 @@
                     ctaBtn.classList.toggle('bg-green-500', data.isSubscriptionActive);
                     ctaBtn.classList.toggle('text-white', data.isSubscriptionActive);
                 }
-                checkMilestones(data.totalGrowthMetric);
+                checkMilestones(userData.totalGrowthMetric);
             }
 
             // Update List
@@ -674,17 +686,17 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                         <div class="p-4 bg-dash-secondary rounded-2xl border border-dash">
                             <p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">Gross Billing</p>
-                            <p class="text-xl font-bold">₦${data.grossRevenue.toLocaleString()}</p>
+                            <p class="text-xl font-bold">₦${userData.grossRevenue.toLocaleString()}</p>
                         </div>
                         <div class="p-4 bg-dash-secondary rounded-2xl border border-dash">
                             <p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">Tasker Payouts</p>
-                            <p class="text-xl font-bold text-red-500">₦${data.totalPayouts.toLocaleString()}</p>
+                            <p class="text-xl font-bold text-red-500">₦${userData.totalPayouts.toLocaleString()}</p>
                         </div>
                     </div>
                     
                     <div class="flex gap-4 mb-6 border-b border-dash">
-                        <button onclick="setAdminTab('verify')" id="tab-verify" class="pb-3 text-xs font-bold ${data.currentTab === 'verify' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">VERIFICATIONS</button>
-                        <button onclick="setAdminTab('payouts')" id="tab-payouts" class="pb-3 text-xs font-bold ${data.currentTab === 'payouts' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">PAYOUT QUEUE (${data.withdrawalRequests.length})</button>
+                        <button onclick="setAdminTab('verify')" id="tab-verify" class="pb-3 text-xs font-bold ${userData.currentTab === 'verify' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">VERIFICATIONS</button>
+                        <button onclick="setAdminTab('payouts')" id="tab-payouts" class="pb-3 text-xs font-bold ${userData.currentTab === 'payouts' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">PAYOUT QUEUE (${userData.withdrawalRequests.length})</button>
                     </div>
 
                     <h4 class="font-bold mb-4">Pending Verifications</h4>
@@ -692,7 +704,7 @@
             }
 
             list.innerHTML += data.items.map(item => `
-                <tr class="border-b border-dash">
+                <tr class="border-b border-dash task-item">
                     <td class="py-4 font-bold">${item.name}</td>
                     <td class="py-4"><span class="bg-dash-secondary px-2 py-1 rounded-lg text-[10px] uppercase font-bold">${item.status}</span></td>
                     <td class="py-4 text-dash-secondary">${item.metric}</td>
@@ -708,7 +720,11 @@
                 withdrawBtn.disabled = roles.performer.totalBalance < 2000;
             }
             // Render verification queue if admin
-            if (role === 'admin') renderAdminQueue();
+            if (role === 'admin') {
+                renderAdminQueue();
+                // Update admin gross revenue and payouts
+                document.getElementById('main-value').innerText = `₦${roles.admin.netProfit.toLocaleString()}`;
+            }
         }
 
         function toggleTheme() {
@@ -1414,11 +1430,11 @@
             roles.performer.notificationPrefs[key] = !roles.performer.notificationPrefs[key];
         }
 
-        function handleLogout() {
+        function confirmSignout() {
             document.getElementById('signout-overlay').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
-
+        window.confirmSignout = confirmSignout; // Expose to global scope
         function closeSignoutModal() {
             document.getElementById('signout-overlay').classList.add('hidden');
             document.body.style.overflow = 'auto';
