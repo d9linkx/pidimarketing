@@ -541,6 +541,22 @@
         </div>
     </div>
 
+    <!-- Active Task Warning Overlay -->
+    <div id="active-task-warning-overlay" class="hidden fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card max-w-sm text-center p-10 relative">
+            <div class="w-16 h-16 bg-[#6a26da]/10 text-[#6a26da] rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-hourglass-half text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">Active Task</h3>
+            <p class="text-dash-secondary text-sm mb-8">You have a task in progress. You must finish or cancel it before starting a new one.</p>
+            <div class="flex flex-col gap-3">
+                <button onclick="window.openActiveTask()" class="w-full accent-gradient text-white py-4 rounded-2xl font-bold text-sm hover:scale-[1.02] transition shadow-lg">Return to Workspace</button>
+                <button onclick="window.cancelActiveTaskFromWarning()" class="w-full bg-red-500 text-white py-4 rounded-2xl font-bold text-sm hover:bg-red-600 transition">Cancel Current Task</button>
+                <button onclick="window.closeActiveTaskWarning()" class="w-full bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Back to Feed</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         let roles = {
             creator: {
@@ -945,7 +961,8 @@
             taskFeed.innerHTML = ''; // Clear previous tasks
 
             const filteredTasks = roles.performer.items.filter(task => {
-                if (task.status !== 'available') return false; // Only show available tasks
+                // SaaS Phase 5: Show available OR the currently active task so user can resume
+                if (task.status !== 'available' && task.id !== roles.performer.activeTask) return false;
                 if (filter === 'all') return true;
                 if (filter === 'high-pay') return task.reward >= 250; // Example threshold for high pay
                 return task.platform === filter;
@@ -957,8 +974,9 @@
             }
 
             filteredTasks.forEach(task => {
+                const isClaimed = task.id === roles.performer.activeTask;
                 const row = document.createElement('tr');
-                row.classList.add('border-b', 'border-dash');
+                row.classList.add('border-b', 'border-dash', 'task-item');
                 row.innerHTML = `
                     <td class="py-4 font-bold flex items-center gap-3">
                         <i class="fa-brands fa-${task.platform} text-xl text-dash-secondary"></i>
@@ -967,7 +985,9 @@
                     <td class="py-4 text-dash-secondary">${task.requirement}</td>
                     <td class="py-4 text-green-500 font-bold">₦${task.reward}</td>
                     <td class="py-4 text-right">
-                        <button onclick="claimTask('${task.id}')" class="btn-orange px-4 py-2 rounded-xl text-xs font-bold hover:opacity-80" id="claim-btn-${task.id}">START TASK</button>
+                        <button onclick="claimTask('${task.id}')" 
+                                class="${isClaimed ? 'bg-dash-secondary text-dash-secondary' : 'btn-orange'} px-4 py-2 rounded-xl text-xs font-bold hover:opacity-80" 
+                                id="claim-btn-${task.id}">${isClaimed ? 'TASK CLAIMED' : 'START TASK'}</button>
                     </td>
                 `;
                 taskFeed.appendChild(row);
@@ -980,22 +1000,23 @@
 
             // Prevent claiming if another task is active
             if (claimedTask) {
-                alert("You already have an active task. Please complete or cancel it first.");
+                if (claimedTask.id === taskId) {
+                    openExecutionWorkspace(claimedTask);
+                } else {
+                    document.getElementById('active-task-warning-overlay').classList.remove('hidden');
+                }
                 return;
             }
+
+            // New task start: clear previous proof inputs
+            document.getElementById('proof-username').value = '';
+            document.getElementById('proof-comment').value = '';
+            document.getElementById('proof-screenshot').value = '';
 
             claimedTask = task;
             task.status = 'claimed';
             roles.performer.activeTask = taskId;
-
-            // Disable all other claim buttons
-            document.querySelectorAll('.task-item button').forEach(btn => btn.disabled = true);
-            const currentClaimBtn = document.getElementById(`claim-btn-${taskId}`);
-            if (currentClaimBtn) {
-                currentClaimBtn.textContent = "TASK CLAIMED";
-                currentClaimBtn.classList.remove('btn-orange');
-                currentClaimBtn.classList.add('bg-dash-secondary', 'text-dash-secondary');
-            }
+            switchRole('performer'); // Refresh feed UI for button state
 
             // Open execution workspace
             openExecutionWorkspace(task);
@@ -1020,9 +1041,6 @@
             document.getElementById('go-to-post-btn').href = task.targetUrl;
             document.getElementById('exec-task-requirement').innerText = task.requirement;
             document.getElementById('exec-brand-info').innerText = task.brandInfo;
-            document.getElementById('proof-username').value = '';
-            document.getElementById('proof-comment').value = '';
-            document.getElementById('proof-screenshot').value = '';
             document.getElementById('execution-workspace-overlay').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
@@ -1038,6 +1056,20 @@
             document.getElementById('task-timer').innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
+        function openActiveTask() {
+            closeActiveTaskWarning();
+            if (claimedTask) openExecutionWorkspace(claimedTask);
+        }
+
+        function closeActiveTaskWarning() {
+            document.getElementById('active-task-warning-overlay').classList.add('hidden');
+        }
+
+        function cancelActiveTaskFromWarning() {
+            closeActiveTaskWarning();
+            cancelTaskClaim();
+        }
+
         function cancelTaskClaim(fromTimer = false) {
             if (claimedTask) {
                 claimedTask.status = 'available'; // Release the task
@@ -1046,8 +1078,11 @@
                 clearInterval(taskTimerInterval);
                 taskTimerInterval = null;
                 closeExecutionWorkspace();
-                switchRole('performer'); // Refresh performer view
-                if (!fromTimer) alert("Task claim cancelled.");
+                
+                const activeBtn = document.querySelector('nav button.active-btn');
+                if (activeBtn && activeBtn.id === 'btn-performer') switchRole('performer');
+                
+                if (!fromTimer) console.log("Task claim cancelled.");
             }
         }
 
@@ -1486,6 +1521,9 @@
         window.processWithdrawal = processWithdrawal;
         window.claimTask = claimTask;
         window.cancelTaskClaim = cancelTaskClaim;
+        window.openActiveTask = openActiveTask;
+        window.closeActiveTaskWarning = closeActiveTaskWarning;
+        window.cancelActiveTaskFromWarning = cancelActiveTaskFromWarning;
         window.submitProof = submitProof;
         window.setAdminTab = setAdminTab;
         window.approvePayout = approvePayout;

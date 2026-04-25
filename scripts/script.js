@@ -26,7 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.querySelector('.close-modal');
     const cookieBanner = document.querySelector('.cookie-banner');
 
-    let toggleMenu;
+    // User Dropdown Selectors
+    const userBtn = document.querySelector('.user-profile-nav .user-avatar-btn');
+    const userDropdown = document.querySelector('.user-profile-nav .user-dropdown');
+
+    let toggleMenu = () => {};
 
     // --- 2. MENU DRAWER LOGIC ---
     if (menuTrigger && sideMenu) {
@@ -119,9 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 11. USER DROPDOWN LOGIC ---
-    const userBtn = document.querySelector('.user-profile-nav .user-avatar-btn');
-    const userDropdown = document.querySelector('.user-profile-nav .user-dropdown');
-
     if (userBtn && userDropdown) {
         userBtn.addEventListener('click', (e) => {
             e.preventDefault();
