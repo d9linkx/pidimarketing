@@ -71,7 +71,12 @@
 
                 <div>
                     <label for="signup-password" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Password</label>
-                    <input type="password" id="signup-password" placeholder="••••••••" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da] transition">
+                    <div class="relative">
+                        <input type="password" id="signup-password" placeholder="••••••••" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 pr-12 text-sm focus:outline-none focus:border-[#6a26da] transition">
+                        <button type="button" onclick="togglePassword('signup-password')" class="absolute right-4 top-1/2 -translate-y-1/2 text-dash-secondary hover:text-[#6a26da] transition focus:outline-none">
+                            <i class="fa-solid fa-eye" id="toggle-icon-signup-password"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div>
@@ -130,7 +135,7 @@
         const setButtonLoading = (button, isLoading, originalText) => {
             if (isLoading) {
                 button.disabled = true;
-                button.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...`;
+                button.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> ${originalText}`;
                 button.dataset.originalText = originalText; // Store original text
             } else {
                 button.disabled = false;
@@ -174,9 +179,9 @@
             setButtonLoading(submitButton, false, 'Create Console Account'); // Re-enable button
 
             if (error) {
-                displayAuthMessage('signup-message', `Signup Error: ${error.message}. Please check your details and try again or contact support if the issue persists.`, 'error');
+                displayAuthMessage('signup-message', `Registration failed: ${error.message}. Please try again.`, 'error');
             } else {
-                displayAuthMessage('signup-message', 'Workspace Created! Please check your email inbox to confirm your account. Once confirmed, you can return to the login page.', 'success');
+                displayAuthMessage('signup-message', 'Account created successfully! Please check your email to confirm your account, then return to the login page.', 'success');
                 // After email confirmation, user will be redirected to dashboard.html
                 // For immediate redirection (e.g., if email confirmation is off), use:
                 // window.location.href = `dashboard.html?view=${role}`;
@@ -208,6 +213,18 @@
             icon.classList.toggle('fa-sun', document.body.classList.contains('light-mode'));
         }
 
+        const togglePassword = (id) => {
+            const input = document.getElementById(id);
+            const icon = document.getElementById('toggle-icon-' + id);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        };
+
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
             updateThemeIcon();
@@ -219,6 +236,7 @@
         window.selectRole = selectRole;
         window.handleSignup = handleSignup;
         window.toggleTheme = toggleTheme;
+        window.togglePassword = togglePassword;
     </script>
 </body>
 </html>
