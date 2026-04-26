@@ -869,7 +869,7 @@ ul { list-style: none; }
   position: relative;
   width: 100%;
   display: grid; /* Use grid for columnar layout */
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Reduced min-width for smaller cards */
+  grid-template-columns: repeat(6, 1fr); /* Forces exactly 6 columns per row on desktop */
   gap: 0; /* Columns are joined together */
   margin-bottom: 40px;
 }
@@ -886,7 +886,7 @@ ul { list-style: none; }
   white-space: normal; /* Allow text to wrap if column is too narrow */
   text-align: center;
   opacity: 0.7;
-  padding: 20px 15px; /* Restored larger padding for desktop */
+  padding: 10px 8px; /* Compressed padding for desktop cards */
   height: 100%; /* Ensure items fill their grid cell height */
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
