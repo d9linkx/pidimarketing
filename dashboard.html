@@ -353,17 +353,56 @@
 
             <!-- Step 4: Payment -->
             <div id="step-4" class="wizard-step hidden space-y-6">
-                <h3 class="text-2xl font-bold">Secure Checkout</h3>
-                <div class="p-8 border-2 border-dashed border-dash rounded-3xl text-center space-y-4">
-                    <img src="https://checkout.paystack.com/static/media/paystack-logo.3f19318b.svg" class="h-6 mx-auto opacity-50 grayscale" alt="Paystack">
-                    <p class="text-sm text-dash-secondary">You are about to lock <span class="font-bold text-[var(--text-primary)]" id="final-cost">₦1,000</span> in escrow.</p>
-                    <div class="py-4 px-6 bg-dash-secondary rounded-2xl flex items-center justify-between text-left">
-                        <div>
-                            <p class="text-[10px] font-bold text-dash-secondary uppercase">Order Summary</p>
-                            <p class="text-xs font-bold" id="summary-text">10 Instagram Comments</p>
+                <div id="payment-details-view" class="space-y-6">
+                    <h3 class="text-2xl font-bold">Direct Bank Payment</h3>
+                    <div class="p-8 border-2 border-dashed border-dash rounded-3xl text-center space-y-6">
+                        <p class="text-sm text-dash-secondary">Please make a direct payment of <span class="font-bold text-[var(--text-primary)]" id="final-cost">₦1,000</span> to the account below. Your campaign will launch immediately upon verification.</p>
+                        
+                        <div class="bg-dash-secondary p-6 rounded-2xl text-left space-y-4 border border-dash">
+                            <div class="flex justify-between items-center">
+                                <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Account Number</p>
+                                <button onclick="navigator.clipboard.writeText('3000487237'); alert('Account number copied!')" class="text-[10px] font-bold text-[#6a26da] hover:underline">COPY</button>
+                            </div>
+                            <p class="text-3xl font-bold tracking-tighter">3000487237</p>
+                            <div class="grid grid-cols-2 gap-4 pt-2 border-t border-dash">
+                                <div>
+                                    <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest">Bank</p>
+                                    <p class="text-xs font-bold">KUDA MFB</p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest">Name</p>
+                                    <p class="text-xs font-bold">Prince Chidera Dike</p>
+                                </div>
+                            </div>
                         </div>
-                        <i class="fa-solid fa-shield-halved text-green-500"></i>
+
+                        <div class="py-4 px-6 bg-dash-secondary/50 rounded-2xl flex items-center justify-between text-left border border-dash">
+                            <div>
+                                <p class="text-[10px] font-bold text-dash-secondary uppercase">Order Summary</p>
+                                <p class="text-xs font-bold" id="summary-text">10 Instagram Comments</p>
+                            </div>
+                            <i class="fa-solid fa-receipt text-[#6a26da]"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] text-dash-secondary italic">Payments are processed manually by our compliance team.</p>
+                            <button onclick="toggleRefundPolicy(true)" class="text-[11px] text-[#6a26da] font-bold hover:underline mt-2">View Refund Policy</button>
+                        </div>
                     </div>
+                </div>
+
+                <div id="refund-policy-view" class="hidden space-y-6">
+                    <h3 class="text-2xl font-bold">Refund Policy</h3>
+                    <div class="bg-dash-secondary p-6 rounded-2xl text-sm leading-relaxed text-dash-secondary max-h-[350px] overflow-y-auto border border-dash">
+                        <p class="mb-4 text-[var(--text-primary)] font-bold">Terms of Service & Refund Eligibility</p>
+                        <p class="mb-4">At PIDI Marketing, we strive to ensure 100% satisfaction for every campaign launched. However, because we initiate real-time human engagement immediately upon payment verification, our refund policy is strictly structured to protect both our performers and our clients.</p>
+                        <p class="mb-4">1. Non-Performance: If your campaign fails to reach the target quantity of engagements within the specified timeframe (standard 72 hours unless otherwise stated), you are eligible for a pro-rated refund for the unfulfilled portion of the campaign.</p>
+                        <p class="mb-4">2. Quality Standards: Every engagement is verified by our AI "Bot-Killer" and manual audit team. If you find engagements that do not meet our "Rule of 10 Words" or quality guidelines, please report them within 24 hours for a credit replacement or partial refund.</p>
+                        <p class="mb-4">3. Direct Payment: Please note that payments made via bank transfer are for specific service delivery. Once performers are assigned and tasks are claimed, the funds are committed to the workforce pool to ensure fair compensation for our human taskers.</p>
+                        <p class="mb-4">4. Cancellation: Campaigns can be paused at any time, but funds already distributed to performers for completed tasks cannot be reversed. Remaining balances can be applied to new campaigns or refunded upon request.</p>
+                        <p>5. Support: To request a review of your campaign, please contact the Support Desk with your Transaction ID. Our team typically resolves all claims within 48 hours. We value the trust you place in our network and ensure that every Naira spent contributes directly to your brand's growth through genuine human interaction. By proceeding with this transfer, you acknowledge that PIDI Marketing acts as a facilitator for verified attention and that results depend on the quality of the target content provided.</p>
+                    </div>
+                    <button onclick="toggleRefundPolicy(false)" class="w-full bg-white text-black py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Back to Payment</button>
                 </div>
             </div>
 
@@ -371,7 +410,7 @@
             <div class="mt-10 flex gap-3">
                 <button onclick="prevStep()" id="prev-btn" class="hidden flex-1 bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Back</button>
                 <button onclick="nextStep()" id="next-btn" class="flex-[2] accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Continue</button>
-                <button onclick="finishCreation()" id="finish-btn" class="hidden flex-[2] bg-green-500 text-white py-4 rounded-2xl font-bold text-sm shadow-lg hover:bg-green-600 transition">Complete Payment</button>
+                <button onclick="finishCreation()" id="finish-btn" class="hidden flex-[2] bg-green-500 text-white py-4 rounded-2xl font-bold text-sm shadow-lg hover:bg-green-600 transition">I've Made the Transfer</button>
             </div>
         </div>
     </div>
@@ -855,6 +894,13 @@
             document.getElementById('wizard-overlay').classList.add('hidden');
             document.body.style.overflow = 'auto';
             resetWizard();
+        }
+
+        window.toggleRefundPolicy = function(show) {
+            document.getElementById('payment-details-view').classList.toggle('hidden', show);
+            document.getElementById('refund-policy-view').classList.toggle('hidden', !show);
+            // Hide main wizard buttons when policy is open to prevent step skips
+            document.querySelector('#wizard-overlay .mt-10').classList.toggle('hidden', show);
         }
 
         function selectPlatform(plt) {
