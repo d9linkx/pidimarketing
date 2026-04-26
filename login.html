@@ -92,10 +92,26 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
+        const displayAuthMessage = (elementId, message, type = 'info') => {
+            const msgDiv = document.getElementById(elementId);
+            if (!msgDiv) return;
+            msgDiv.className = `p-3 rounded-xl text-sm mb-4 text-center ${type === 'success' ? 'bg-green-100 text-green-800' : type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
+            msgDiv.innerHTML = message;
+            msgDiv.classList.remove('hidden');
+        };
+
+        const setButtonLoading = (button, isLoading, originalText) => {
+            button.disabled = isLoading;
+            button.innerHTML = isLoading ? `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Logging in...` : originalText;
+        };
+
         async function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+            const email = document.getElementById('login-email').valuewvalue;
+            const submitButton = e.target.querySelector('button[type="submit"]');
+
+            setButtonLoading(submitButton, true, 'Login');
+            document.getElementById('login-message').classList.add('hidden');
 
             const { error } = await supabase.auth.signInWithPassword({
                 email: email,
@@ -103,7 +119,7 @@
             });
 
             if (error) {
-                alert(error.message);
+                displayAitButton, false, 'Login');
             } else {
                 window.location.href = 'dashboard.html';
             }

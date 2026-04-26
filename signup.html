@@ -70,6 +70,15 @@
                 </div>
 
                 <div>
+                    <label class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Primary Mode</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="selectRole('creator')" id="role-creator" class="p-3 rounded-xl border border-dash text-sm font-bold transition hover:border-[#6a26da] active-role">Creator</button>
+                        <button type="button" onclick="selectRole('performer')" id="role-performer" class="p-3 rounded-xl border border-dash text-sm font-bold transition hover:border-[#6a26da] text-dash-secondary">Performer</button>
+                    </div>
+                    <input type="hidden" id="selected-role" value="creator">
+                </div>
+
+                <div>
                     <label for="signup-password" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Password</label>
                     <div class="relative">
                         <input type="password" id="signup-password" placeholder="••••••••" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 pr-12 text-sm focus:outline-none focus:border-[#6a26da] transition">
@@ -154,11 +163,11 @@
             const role = document.getElementById('selected-role').value;
             const submitButton = e.target.querySelector('button[type="submit"]');
 
-            setButtonLoading(submitButton, true, 'Create Console Account');
+            setButtonLoading(submitButton, true, 'Create Account');
             displayAuthMessage('signup-message', 'Creating account...', 'info');
 
             const { data, error } = await supabase.auth.signUp({
-                email: email,
+                email: email.trim(),
                 password: password,
                 options: {
                     data: {
@@ -168,13 +177,32 @@
                 }
             });
 
-            setButtonLoading(submitButton, false, 'Create Console Account'); // Re-enable button
+            setButtonLoading(submitButton, false, 'Create Account'); 
 
             if (error) {
                 displayAuthMessage('signup-message', `Registration failed: ${error.message}. Please try again.`, 'error');
             } else {
-                displayAuthMessage('signup-message', 'Account created successfully! Please check your email to confirm your account, then return to the login page.', 'success');
-                // After email confirmation, user will be redirected to dashboard.html
+                // Explicitly create the profile record in the profiles table
+                if (data.user) {
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert([
+                            { 
+                                id: data.user.id, 
+                                full_name: fullName, 
+                                email: email.trim(),
+                                user_role: role,
+                                balance: 0,
+                                pending_balance: 0,
+                                reputation_score: 80, // Default starting score
+                                allocated_funds: 0
+                            }
+                        ]);
+                    
+                    if (profileError) console.error("Profile Creation Error:", profileError);
+                }
+
+                displayAuthMessage('signup-message', 'Account created! Please check your email to confirm, then return to log in.', 'success');
                 // For immediate redirection (e.g., if email confirmation is off), use:
                 // window.location.href = `dashboard.html?view=${role}`;
             }
