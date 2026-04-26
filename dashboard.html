@@ -558,6 +558,10 @@
     </div>
 
     <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // --- GLOBAL STATE ---
+        let currentRole = 'creator';
         let roles = {
             creator: {
                 label: "Active Campaigns",
@@ -615,20 +619,36 @@
             }
         };
 
-        import { supabase } from './supabaseClient.js';
+        const ROLE_CONFIG = {
+            creator: {
+                label: "Grow Your Brand",
+                sub: "Your strategic growth is currently pacing at 114% of monthly target.",
+                cta: "New Campaign"
+            },
+            performer: {
+                label: "Available Gigs",
+                sub: "You have 14 new tasks waiting in your vicinity.",
+                cta: "Browse Tasks"
+            },
+            admin: {
+                label: "System Overview",
+                sub: "Operating account liquidity: 94%.",
+                cta: "Payout Queue"
+            }
+        };
 
-        // Global user object to hold real data
         let currentUser = {
+            id: null,
             fullName: "Loading...",
             email: "",
             avatar: ""
         };
 
-        function toggleMobileMenu() {
+        window.toggleMobileMenu = function() {
             const menu = document.getElementById('mobile-menu');
             const panel = document.getElementById('mobile-menu-panel');
             const icon = document.getElementById('menu-icon');
-            
+
             if (menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
                 setTimeout(() => panel.classList.remove('translate-x-full'), 10);
@@ -649,6 +669,7 @@
             }
 
             // Map real Supabase data to our local state
+            currentUser.id = user.id;
             currentUser.fullName = user.user_metadata.full_name || 'User';
             currentUser.email = user.email;
             currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.fullName)}&background=6a26da&color=fff`;
@@ -663,7 +684,9 @@
             switchRole(initialRole);
         }
 
-        async function switchRole(role) {
+        window.switchRole = async function(role) {
+            currentRole = role;
+
             // Update Desktop UI buttons
             document.querySelectorAll('nav button').forEach(b => {
                 b.classList.remove('bg-white', 'text-black', 'active-btn');
@@ -704,29 +727,33 @@
             const list = document.getElementById('active-list');
             list.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-dash-secondary">Fetching real-time data...</td></tr>';
 
-            if (role === 'creator') {
-                const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
-                document.getElementById('main-value').innerText = campaigns?.length || 0;
-                renderTable(campaigns.map(c => ({ name: c.target_url, status: c.status, metric: `${c.current_count}/${c.goal_count}` })));
-                
-                // Update Engagement Score for Creator (Campaign Completion Rate)
-                if (campaigns?.length > 0) {
-                    const totalGoals = campaigns.reduce((acc, c) => acc + c.goal_count, 0);
-                    const totalCurrent = campaigns.reduce((acc, c) => acc + c.current_count, 0);
-                    const avgCompletion = Math.round((totalCurrent / totalGoals) * 100) || 0;
-                    updateEngagementUI(avgCompletion);
+            try {
+                if (role === 'creator') {
+                    const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
+                    document.getElementById('main-value').innerText = campaigns?.length || 0;
+                    renderTable(campaigns?.map(c => ({ name: c.target_url, status: c.status, metric: `${c.current_count}/${c.goal_count}` })) || []);
+                    
+                    if (campaigns?.length > 0) {
+                        const totalGoals = campaigns.reduce((acc, c) => acc + c.goal_count, 0);
+                        const totalCurrent = campaigns.reduce((acc, c) => acc + c.current_count, 0);
+                        const avgCompletion = Math.round((totalCurrent / totalGoals) * 100) || 0;
+                        updateEngagementUI(avgCompletion);
+                    } else {
+                        updateEngagementUI(0);
+                    }
+                } else if (role === 'performer') {
+                    const { data: tasks } = await supabase.from('campaigns').select('*').eq('status', 'active');
+                    document.getElementById('main-value').innerText = `₦${((tasks?.length || 0) * 150).toLocaleString()}`;
+                    renderTable(tasks?.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦150 Reward', id: t.id, isTask: true })) || []);
+                    updateEngagementUI(roles.performer.reputationScore || 0);
                 } else {
-                    updateEngagementUI(0);
+                    const { data: subs } = await supabase.from('submissions').select('*, campaigns(target_url)').eq('status', 'under_review');
+                    document.getElementById('main-value').innerText = subs?.length || 0;
+                    renderTable(subs?.map(s => ({ name: s.proof_username, status: s.status, metric: s.reward })) || []);
                 }
-            } else if (role === 'performer') {
-                const { data: tasks } = await supabase.from('campaigns').select('*').eq('status', 'active');
-                document.getElementById('main-value').innerText = `₦${(tasks?.length * 150).toLocaleString()}`;
-                renderTable(tasks.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦150 Reward', id: t.id, isTask: true })));
-                updateEngagementUI(currentUser.reputation_score || 0);
-            } else {
-                const { data: subs } = await supabase.from('submissions').select('*, campaigns(target_url)').eq('status', 'under_review');
-                document.getElementById('main-value').innerText = subs?.length || 0;
-                renderTable(subs.map(s => ({ name: s.proof_username, status: s.status, metric: s.reward })));
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                renderTable([]); // Fallback
             }
         }
 
@@ -739,7 +766,7 @@
 
         function renderTable(items) {
             const list = document.getElementById('active-list');
-            if (!items.length) {
+            if (!items || !items.length) {
                 list.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-dash-secondary">No records found.</td></tr>';
                 return;
             }
@@ -773,31 +800,7 @@
             `).join('');
         }
 
-        function updateWalletDisplay() {
-            if (!currentUser) return;
-            const isCreator = currentRole === 'creator';
-            document.getElementById('total-balance').innerText = `₦${currentUser.balance.toLocaleString()}`;
-            document.getElementById('pending-balance').innerText = `₦${isCreator ? currentUser.allocated_funds : currentUser.pending_balance}`;
-            document.getElementById('pending-balance-label').innerText = isCreator ? "Allocated:" : "Pending:";
-            document.getElementById('trust-indicator').innerText = isCreator ? "Ad Health: 100%" : `Reputation: ${currentUser.reputation_score}%`;
-        }
-
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const panel = document.getElementById('mobile-menu-panel');
-            const icon = document.getElementById('menu-icon');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                setTimeout(() => panel.classList.remove('translate-x-full'), 10);
-                icon.classList.replace('fa-bars', 'fa-xmark');
-            } else {
-                panel.classList.add('translate-x-full');
-                icon.classList.replace('fa-xmark', 'fa-bars');
-                setTimeout(() => menu.classList.add('hidden'), 300);
-            }
-        }
-
-        function toggleTheme() {
+        window.toggleTheme = function() {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
@@ -805,7 +808,7 @@
             updateLogo();
         }
 
-        function updateThemeIcon() {
+        window.updateThemeIcon = function() {
             const icon = document.querySelector('#theme-icon');
             if (document.body.classList.contains('light-mode')) {
                 icon.classList.replace('fa-moon', 'fa-sun');
@@ -814,7 +817,7 @@
             }
         }
 
-        function updateLogo() {
+        window.updateLogo = function() {
             const logo = document.getElementById('logo-img');
             if (!logo) return;
             logo.src = document.body.classList.contains('light-mode') 
@@ -838,17 +841,16 @@
         // --- CAMPAIGN WIZARD LOGIC ---
         let currentStep = 1;
         let selectedPlatform = 'instagram';
-        let claimedTask = null; // Stores the currently claimed task object
-        let taskTimerInterval = null; // Stores the interval ID for the task timer
-        let taskCountdownSeconds = 0; // Stores the remaining seconds for the task
+        let claimedTask = null;
+        let taskTimerInterval = null;
+        let taskCountdownSeconds = 0;
 
-
-        function openCampaignWizard() {
+        window.openCampaignWizard = function() {
             document.getElementById('wizard-overlay').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
 
-        function closeCampaignWizard() {
+        window.closeCampaignWizard = function() {
             document.getElementById('wizard-overlay').classList.add('hidden');
             document.body.style.overflow = 'auto';
             resetWizard();
@@ -1310,12 +1312,8 @@
             renderAdminQueue();
         }
 
-        function updateWalletDisplay() {
-            const roleBtn = document.querySelector('nav button.active-btn');
-            if (!roleBtn) return;
-            const role = roleBtn.id.replace('btn-', '');
-
-            if (role === 'performer') {
+        window.updateWalletDisplay = function() {
+            if (currentRole === 'performer') {
                 document.getElementById('total-balance').innerText = `₦${roles.performer.totalBalance.toLocaleString()}`;
                 document.getElementById('pending-balance').innerText = `₦${roles.performer.pendingBalance.toLocaleString()}`;
                 document.getElementById('pending-balance-label').innerText = "Pending: ";
@@ -1323,7 +1321,7 @@
                 if(roles.performer.reputationScore >= 95) document.getElementById('trust-indicator').innerHTML += " <span class='text-[#6a26da]'>[ELITE]</span>";
                 document.getElementById('wallet-action-btn').innerText = "Withdraw";
                 document.getElementById('wallet-action-btn').disabled = roles.performer.totalBalance < 2000;
-            } else if (role === 'creator') {
+            } else if (currentRole === 'creator') {
                 document.getElementById('total-balance').innerText = `₦${roles.creator.availableBalance.toLocaleString()}`;
                 document.getElementById('pending-balance').innerText = `₦${roles.creator.allocatedFunds.toLocaleString()}`;
                 document.getElementById('pending-balance-label').innerText = "Allocated: ";
@@ -1559,41 +1557,6 @@
             document.getElementById('signout-overlay').classList.add('hidden');
             document.body.style.overflow = 'auto';
         }
-
-        // --- GLOBAL EXPOSURE (Required for module scripts to work with HTML onclick) ---
-        window.toggleMobileMenu = toggleMobileMenu;
-        window.switchRole = switchRole;
-        window.toggleTheme = toggleTheme;
-        window.openSettings = openSettings;
-        window.closeSettings = closeSettings;
-        window.confirmSignout = confirmSignout;
-        window.closeSignoutModal = closeSignoutModal;
-        window.processLogout = processLogout;
-        window.openCampaignWizard = openCampaignWizard;
-        window.closeCampaignWizard = closeCampaignWizard;
-        window.selectPlatform = selectPlatform;
-        window.updateCalculation = updateCalculation;
-        window.nextStep = nextStep;
-        window.prevStep = prevStep;
-        window.finishCreation = finishCreation;
-        window.openDepositModal = openDepositModal;
-        window.closeDepositModal = closeDepositModal;
-        window.processDeposit = processDeposit;
-        window.openWithdrawalModal = openWithdrawalModal;
-        window.closeWithdrawModal = closeWithdrawModal;
-        window.verifyAndSaveBank = verifyAndSaveBank;
-        window.processWithdrawal = processWithdrawal;
-        window.claimTask = claimTask;
-        window.cancelTaskClaim = cancelTaskClaim;
-        window.openActiveTask = openActiveTask;
-        window.closeActiveTaskWarning = closeActiveTaskWarning;
-        window.cancelActiveTaskFromWarning = cancelActiveTaskFromWarning;
-        window.submitProof = submitProof;
-        window.setAdminTab = setAdminTab;
-        window.approvePayout = approvePayout;
-        window.approveTask = approveTask;
-        window.rejectTask = rejectTask;
-        window.closeExecutionWorkspace = closeExecutionWorkspace;
         window.switchSettingsView = switchSettingsView;
         window.saveProfileSettings = saveProfileSettings;
         window.simulateIDV = simulateIDV;
