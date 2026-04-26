@@ -853,7 +853,8 @@
             try {
                 if (role === 'creator') {
                     const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
-                    document.getElementById('main-value').innerText = campaigns?.length || 0;
+                    roles.creator.items = campaigns || [];
+                    document.getElementById('main-value').innerText = roles.creator.items.length;
                     renderTable(campaigns?.map(c => ({ name: c.target_url, status: c.status, metric: `${c.current_count}/${c.goal_count}` })) || []);
                     
                     if (campaigns?.length > 0) {
@@ -870,8 +871,9 @@
                         .select('*')
                         .eq('status', 'active')
                         .neq('creator_id', currentUser.id);
-                document.getElementById('main-value').innerText = `₦${((tasks?.length || 0) * 70).toLocaleString()}`;
-                renderTable(tasks?.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦70 Reward', id: t.id, isTask: true })) || []);
+                    roles.performer.items = tasks || [];
+                    document.getElementById('main-value').innerText = `₦${(roles.performer.items.length * 70).toLocaleString()}`;
+                    renderTable(roles.performer.items.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦70 Reward', id: t.id, isTask: true })) || []);
                     updateEngagementUI(roles.performer.reputationScore || 0);
                 }
             } catch (err) {

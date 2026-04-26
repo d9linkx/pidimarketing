@@ -107,11 +107,13 @@
 
         async function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('login-email').valuewvalue;
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
             const submitButton = e.target.querySelector('button[type="submit"]');
 
             setButtonLoading(submitButton, true, 'Login');
-            document.getElementById('login-message').classList.add('hidden');
+            const msgDiv = document.getElementById('login-message');
+            if (msgDiv) msgDiv.classList.add('hidden');
 
             const { error } = await supabase.auth.signInWithPassword({
                 email: email,
@@ -119,7 +121,8 @@
             });
 
             if (error) {
-                displayAitButton, false, 'Login');
+                displayAuthMessage('login-message', error.message, 'error');
+                setButtonLoading(submitButton, false, 'Login');
             } else {
                 window.location.href = 'dashboard.html';
             }

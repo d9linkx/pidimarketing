@@ -180,26 +180,23 @@
             setButtonLoading(submitButton, false, 'Create Account'); 
 
             if (error) {
-                displayAuthMessage('signup-message', `Registration failed: ${error.message}. Please try again.`, 'error');
+                // If you see "Database error saving new user", check your Supabase triggers
+                displayAuthMessage('signup-message', `Registration failed: ${error.message}`, 'error');
             } else {
-                // Explicitly create the profile record in the profiles table
+                // Optional: Manual profile creation if no trigger exists
                 if (data.user) {
-                    const { error: profileError } = await supabase
+                    await supabase
                         .from('profiles')
-                        .insert([
-                            { 
-                                id: data.user.id, 
-                                full_name: fullName, 
-                                email: email.trim(),
-                                user_role: role,
-                                balance: 0,
-                                pending_balance: 0,
-                                reputation_score: 80, // Default starting score
-                                allocated_funds: 0
-                            }
-                        ]);
-                    
-                    if (profileError) console.error("Profile Creation Error:", profileError);
+                        .upsert({ 
+                            id: data.user.id, 
+                            full_name: fullName, 
+                            email: email.trim(),
+                            user_role: role,
+                            balance: 0,
+                            pending_balance: 0,
+                            reputation_score: 80,
+                            allocated_funds: 0
+                        });
                 }
 
                 displayAuthMessage('signup-message', 'Account created! Please check your email to confirm, then return to log in.', 'success');
