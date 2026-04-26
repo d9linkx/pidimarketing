@@ -715,6 +715,7 @@
 
             // Update Labels from config
             const config = ROLE_CONFIG[role];
+            if (role === 'creator') checkMilestones(roles.creator.totalGrowthMetric);
             document.getElementById('main-stat-label').innerText = config.label;
             document.getElementById('main-sub-label').innerText = config.sub;
             document.getElementById('main-cta').innerText = config.cta;
@@ -1557,6 +1558,41 @@
             document.getElementById('signout-overlay').classList.add('hidden');
             document.body.style.overflow = 'auto';
         }
+
+        // --- GLOBAL EXPOSURE (Required for module scoping) ---
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.switchRole = switchRole;
+        window.toggleTheme = toggleTheme;
+        window.openSettings = openSettings;
+        window.closeSettings = closeSettings;
+        window.confirmSignout = confirmSignout;
+        window.closeSignoutModal = closeSignoutModal;
+        window.processLogout = processLogout;
+        window.openCampaignWizard = openCampaignWizard;
+        window.closeCampaignWizard = closeCampaignWizard;
+        window.selectPlatform = selectPlatform;
+        window.updateCalculation = updateCalculation;
+        window.nextStep = nextStep;
+        window.prevStep = prevStep;
+        window.finishCreation = finishCreation;
+        window.openDepositModal = openDepositModal;
+        window.closeDepositModal = closeDepositModal;
+        window.processDeposit = processDeposit;
+        window.openWithdrawalModal = openWithdrawalModal;
+        window.closeWithdrawModal = closeWithdrawModal;
+        window.verifyAndSaveBank = verifyAndSaveBank;
+        window.processWithdrawal = processWithdrawal;
+        window.claimTask = claimTask;
+        window.cancelTaskClaim = cancelTaskClaim;
+        window.openActiveTask = openActiveTask;
+        window.closeActiveTaskWarning = closeActiveTaskWarning;
+        window.cancelActiveTaskFromWarning = cancelActiveTaskFromWarning;
+        window.submitProof = submitProof;
+        window.setAdminTab = setAdminTab;
+        window.approvePayout = approvePayout;
+        window.approveTask = approveTask;
+        window.rejectTask = rejectTask;
+        window.closeExecutionWorkspace = closeExecutionWorkspace;
         window.switchSettingsView = switchSettingsView;
         window.saveProfileSettings = saveProfileSettings;
         window.simulateIDV = simulateIDV;
