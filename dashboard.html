@@ -120,9 +120,9 @@
                 <button class="flex items-center gap-3 hover:opacity-80 transition-opacity focus:outline-none">
                     <div class="text-right">
                         <p class="text-[10px] text-dash-secondary uppercase font-bold tracking-tight">Verified User</p>
-                        <p class="text-sm font-bold">Prince Dike</p>
+                        <p class="text-sm font-bold user-name-display">Loading...</p>
                     </div>
-                    <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-11 h-11 rounded-2xl border-2 border-dash" alt="User Avatar">
+                    <img src="" class="w-11 h-11 rounded-2xl border-2 border-dash user-avatar-display" alt="User Avatar">
                 </button>
                 
                 <!-- Dropdown Menu -->
@@ -150,7 +150,7 @@
             </div>
 
             <!-- Mobile Avatar (Visible only on mobile) -->
-            <img onclick="openSettings('profile')" src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-10 h-10 rounded-xl border-2 border-dash md:hidden cursor-pointer" alt="Mobile Avatar">
+            <img onclick="openSettings('profile')" src="" class="w-10 h-10 rounded-xl border-2 border-dash md:hidden cursor-pointer user-avatar-display" alt="Mobile Avatar">
 
             <!-- Hamburger Button -->
             <button onclick="toggleMobileMenu()" class="lg:hidden w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition">
@@ -617,6 +617,13 @@
 
         import { supabase } from './supabaseClient.js';
 
+        // Global user object to hold real data
+        let currentUser = {
+            fullName: "Loading...",
+            email: "",
+            avatar: ""
+        };
+
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
             const panel = document.getElementById('mobile-menu-panel');
@@ -631,6 +638,29 @@
                 icon.classList.replace('fa-xmark', 'fa-bars');
                 setTimeout(() => menu.classList.add('hidden'), 300);
             }
+        }
+
+        async function initializeUser() {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            
+            if (error || !user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Map real Supabase data to our local state
+            currentUser.fullName = user.user_metadata.full_name || 'User';
+            currentUser.email = user.email;
+            currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.fullName)}&background=6a26da&color=fff`;
+
+            // Update Identity in DOM
+            document.querySelectorAll('.user-name-display').forEach(el => el.innerText = currentUser.fullName);
+            document.querySelectorAll('.user-avatar-display').forEach(img => img.src = currentUser.avatar);
+
+            // Initialize View based on query param OR user's stored role preference
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialRole = urlParams.get('view') || user.user_metadata.user_role || 'performer';
+            switchRole(initialRole);
         }
 
         async function switchRole(role) {
@@ -656,87 +686,114 @@
                 activeMobileBtn.classList.remove('text-dash-secondary');
             }
 
-            // Close mobile menu if open
+            // Keep Menu logic: Close mobile menu if open
             const menu = document.getElementById('mobile-menu');
-            if (menu && !menu.classList.contains('hidden')) {
-                toggleMobileMenu();
-            }
+            if (menu && !menu.classList.contains('hidden')) toggleMobileMenu();
 
-            // Update Content
-            const { data: authData } = await supabase.auth.getUser();
-            const user = authData?.user;
-            const data = roles[role];
+            // Update Labels from config
+            const config = ROLE_CONFIG[role];
+            document.getElementById('main-stat-label').innerText = config.label;
+            document.getElementById('main-sub-label').innerText = config.sub;
+            document.getElementById('main-cta').innerText = config.cta;
 
-            if (user && user.user_metadata && user.user_metadata.user_role === role) {
-                data.label = data.label.replace('Prince Dike', user.user_metadata.full_name || 'User');
-            }
-            document.getElementById('main-stat-label').innerText = data.label;
-            document.getElementById('main-sub-label').innerText = data.sub;
-            document.getElementById('main-value').innerText = data.value;
-            
-            // Update wallet display if performer role
-            if (role === 'performer') updateWalletDisplay();
+            updateWalletDisplay();
+            fetchRoleData(role);
+        }
 
-            document.getElementById('main-cta').innerText = data.cta;
-            
-            // SaaS Phase 4: Handle Creator Autopilot Toggle Visuals
-            if (role === 'creator') {
-                const ctaBtn = document.querySelector('.accent-gradient button');
-                if (ctaBtn) {
-                    ctaBtn.classList.toggle('bg-green-500', data.isSubscriptionActive);
-                    ctaBtn.classList.toggle('text-white', data.isSubscriptionActive);
-                }
-                checkMilestones(data.totalGrowthMetric);
-            }
-
-            // Update List
+        async function fetchRoleData(role) {
             const list = document.getElementById('active-list');
-            list.innerHTML = ''; // Clear existing list to prevent duplication on switch
+            list.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-dash-secondary">Fetching real-time data...</td></tr>';
 
-            // SaaS Phase 4: Admin Revenue Dashboard Card
-            if (role === 'admin') {
-                list.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div class="p-4 bg-dash-secondary rounded-2xl border border-dash">
-                            <p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">Gross Billing</p>
-                            <p class="text-xl font-bold">₦${data.grossRevenue.toLocaleString()}</p>
-                        </div>
-                        <div class="p-4 bg-dash-secondary rounded-2xl border border-dash">
-                            <p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">Tasker Payouts</p>
-                            <p class="text-xl font-bold text-red-500">₦${data.totalPayouts.toLocaleString()}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-4 mb-6 border-b border-dash">
-                        <button onclick="setAdminTab('verify')" id="tab-verify" class="pb-3 text-xs font-bold ${data.currentTab === 'verify' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">VERIFICATIONS</button>
-                        <button onclick="setAdminTab('payouts')" id="tab-payouts" class="pb-3 text-xs font-bold ${data.currentTab === 'payouts' ? 'border-b-2 border-[#6a26da]' : 'text-dash-secondary'}">PAYOUT QUEUE (${data.withdrawalRequests.length})</button>
-                    </div>
-
-                    <h4 class="font-bold mb-4">Pending Verifications</h4>
-                `;
+            if (role === 'creator') {
+                const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
+                document.getElementById('main-value').innerText = campaigns?.length || 0;
+                renderTable(campaigns.map(c => ({ name: c.target_url, status: c.status, metric: `${c.current_count}/${c.goal_count}` })));
+                
+                // Update Engagement Score for Creator (Campaign Completion Rate)
+                if (campaigns?.length > 0) {
+                    const totalGoals = campaigns.reduce((acc, c) => acc + c.goal_count, 0);
+                    const totalCurrent = campaigns.reduce((acc, c) => acc + c.current_count, 0);
+                    const avgCompletion = Math.round((totalCurrent / totalGoals) * 100) || 0;
+                    updateEngagementUI(avgCompletion);
+                } else {
+                    updateEngagementUI(0);
+                }
+            } else if (role === 'performer') {
+                const { data: tasks } = await supabase.from('campaigns').select('*').eq('status', 'active');
+                document.getElementById('main-value').innerText = `₦${(tasks?.length * 150).toLocaleString()}`;
+                renderTable(tasks.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦150 Reward', id: t.id, isTask: true })));
+                updateEngagementUI(currentUser.reputation_score || 0);
+            } else {
+                const { data: subs } = await supabase.from('submissions').select('*, campaigns(target_url)').eq('status', 'under_review');
+                document.getElementById('main-value').innerText = subs?.length || 0;
+                renderTable(subs.map(s => ({ name: s.proof_username, status: s.status, metric: s.reward })));
             }
+        }
 
-            list.innerHTML += data.items.map(item => `
+        function updateEngagementUI(score) {
+            const valueEl = document.getElementById('engagement-score-value');
+            const barEl = document.getElementById('engagement-progress-bar');
+            if (valueEl) valueEl.innerText = `${score}%`;
+            if (barEl) barEl.style.width = `${score}%`;
+        }
+
+        function renderTable(items) {
+            const list = document.getElementById('active-list');
+            if (!items.length) {
+                list.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-dash-secondary">No records found.</td></tr>';
+                return;
+            }
+            list.innerHTML = items.map(item => `
                 <tr class="border-b border-dash task-item">
-                    <td class="py-4 font-bold">${item.name}</td>
+                    <td class="py-4 font-bold">
+                        ${item.isTask ? 
+                            `<button onclick="claimTask('${item.id}')" class="text-[#6a26da] hover:underline">${item.name}</button>` : 
+                            item.name
+                        }
+                    </td>
                     <td class="py-4"><span class="bg-dash-secondary px-2 py-1 rounded-lg text-[10px] uppercase font-bold">${item.status}</span></td>
                     <td class="py-4 text-dash-secondary">${item.metric}</td>
                     <td class="py-4 text-right"><button class="hover:text-[#6a26da] text-dash-secondary"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
                 </tr>
-            `).join(''); 
+            `).join('');
+        }
 
-            // Render performer tasks if role is performer
-            if (role === 'performer') {
-                renderPerformerTasks();
-                const withdrawBtn = document.getElementById('wallet-action-btn');
-                withdrawBtn.onclick = openWithdrawalModal;
-                withdrawBtn.disabled = roles.performer.totalBalance < 2000;
+        async function refreshActivityFeed() {
+            const { data } = await supabase.from('activity_feed').select('*').order('created_at', { ascending: false }).limit(5);
+            const container = document.getElementById('feed-container');
+            if (!data?.length) {
+                container.innerHTML = '<p class="text-xs text-dash-secondary py-4 text-center">No recent activity found.</p>';
+                return;
             }
-            // Render verification queue if admin
-            if (role === 'admin') {
-                renderAdminQueue();
-                // Update admin gross revenue and payouts
-                document.getElementById('main-value').innerText = `₦${roles.admin.netProfit.toLocaleString()}`;
+            container.innerHTML = data.map(item => `
+                <div class="border-b border-dash pb-3">
+                    <p class="text-xs text-dash-secondary">${new Date(item.created_at).toLocaleTimeString()}</p>
+                    <p class="text-sm">${item.message}</p>
+                </div>
+            `).join('');
+        }
+
+        function updateWalletDisplay() {
+            if (!currentUser) return;
+            const isCreator = currentRole === 'creator';
+            document.getElementById('total-balance').innerText = `₦${currentUser.balance.toLocaleString()}`;
+            document.getElementById('pending-balance').innerText = `₦${isCreator ? currentUser.allocated_funds : currentUser.pending_balance}`;
+            document.getElementById('pending-balance-label').innerText = isCreator ? "Allocated:" : "Pending:";
+            document.getElementById('trust-indicator').innerText = isCreator ? "Ad Health: 100%" : `Reputation: ${currentUser.reputation_score}%`;
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = document.getElementById('mobile-menu-panel');
+            const icon = document.getElementById('menu-icon');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+                icon.classList.replace('fa-bars', 'fa-xmark');
+            } else {
+                panel.classList.add('translate-x-full');
+                icon.classList.replace('fa-xmark', 'fa-bars');
+                setTimeout(() => menu.classList.add('hidden'), 300);
             }
         }
 
@@ -1310,18 +1367,18 @@
                         <div class="space-y-6 max-w-xl">
                             <div class="flex items-center gap-6 mb-8">
                                 <div class="relative group cursor-pointer">
-                                    <img src="https://ui-avatars.com/api/?name=Prince+Dike&background=6a26da&color=fff" class="w-24 h-24 rounded-3xl border-4 border-dash">
+                                    <img src="${currentUser.avatar}" class="w-24 h-24 rounded-3xl border-4 border-dash">
                                     <div class="absolute inset-0 bg-black/40 rounded-3xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-camera text-white"></i></div>
                                 </div>
                                 <div>
                                     <button class="bg-dash-secondary px-4 py-2 rounded-xl text-xs font-bold mb-2">Change Avatar</button>
-                                    <div class="flex items-center gap-2 text-[10px] font-bold text-green-500 uppercase tracking-widest"><i class="fa-solid fa-circle-check"></i> Verified Profile</div>
+                                    <div class="flex items-center gap-2 text-[10px] font-bold text-green-500 uppercase tracking-widest"><i class="fa-solid fa-circle-check"></i> Verified ${currentRole}</div>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 gap-5">
-                                <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Full Legal Name</label><input type="text" value="Prince Dike" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
+                                <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Full Legal Name</label><input type="text" id="set-full-name" value="${currentUser.fullName}" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
                                 ${currentRole === 'creator' ? `
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Business Name</label><input type="text" value="PIDI Marketing" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
+                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Business Name</label><input type="text" value="${currentUser.fullName}'s Brand" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
                                     <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Website URL</label><input type="url" value="https://pidimarketing.com" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
                                 ` : `
                                     <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Social Handles (Instagram, X)</label><input type="text" value="@princedike, @pidihq" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da]"></div>
@@ -1431,9 +1488,16 @@
 
         // --- SETTINGS HANDLERS ---
         function saveProfileSettings() {
-            const name = document.querySelector('input[value="Prince Dike"]')?.value;
-            if (name) alert(`Profile for ${name} has been updated successfully!`);
-            else alert('Profile updated!');
+            const name = document.getElementById('set-full-name')?.value;
+            if (name) {
+                currentUser.fullName = name;
+                currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6a26da&color=fff`;
+                
+                document.querySelectorAll('.user-name-display').forEach(el => el.innerText = name);
+                document.querySelectorAll('.user-avatar-display').forEach(img => img.src = currentUser.avatar);
+                
+                alert(`Profile updated successfully!`);
+            }
         }
 
         function simulateIDV() {
@@ -1543,10 +1607,8 @@
             updateLogo();
         }
 
-        // Initialize view based on URL parameters or default to performer
-        const urlParams = new URLSearchParams(window.location.search);
-        const initialRole = urlParams.get('view') || 'performer';
-        switchRole(initialRole);
+        // Kick off user initialization
+        initializeUser();
         updateLogo();
     </script>
 </body>
