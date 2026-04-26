@@ -782,6 +782,13 @@
                 roles.creator.allocatedFunds = profile.allocated_funds || 0;
             }
 
+            // Real-time task updates subscription
+            supabase.channel('tasks-realtime')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'campaigns' }, () => {
+                    fetchRoleData(currentRole);
+                })
+                .subscribe();
+
             // Initialize dynamic components
             refreshActivityFeed();
 
@@ -858,7 +865,11 @@
                         updateEngagementUI(0);
                     }
                 } else if (role === 'performer') {
-                    const { data: tasks } = await supabase.from('campaigns').select('*').eq('status', 'active');
+                    const { data: tasks } = await supabase
+                        .from('campaigns')
+                        .select('*')
+                        .eq('status', 'active')
+                        .neq('creator_id', currentUser.id);
                 document.getElementById('main-value').innerText = `₦${((tasks?.length || 0) * 70).toLocaleString()}`;
                 renderTable(tasks?.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦70 Reward', id: t.id, isTask: true })) || []);
                     updateEngagementUI(roles.performer.reputationScore || 0);
@@ -1118,7 +1129,7 @@
                         instructions: instructions,
                         payment_proof_url: proofUrl,
                         total_cost: totalCost,
-                        status: 'pending_verification'
+                        status: 'active'
                     }]);
 
                 if (dbError) throw dbError;
