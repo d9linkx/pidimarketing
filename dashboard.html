@@ -102,7 +102,6 @@
         <nav class="nav-container p-1 rounded-2xl border hidden lg:flex gap-1">
             <button onclick="switchRole('creator')" class="px-4 py-2 rounded-xl text-sm font-semibold transition active-btn" id="btn-creator">Creator</button>
             <button onclick="switchRole('performer')" class="px-4 py-2 rounded-xl text-sm font-semibold text-dash-secondary" id="btn-performer">Performer</button>
-            <button onclick="switchRole('admin')" class="px-4 py-2 rounded-xl text-sm font-semibold text-dash-secondary" id="btn-admin">Admin</button>
         </nav>
 
         <div class="flex items-center gap-2 md:gap-4">
@@ -169,7 +168,6 @@
                     <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-4 mb-1">Switch View</p>
                     <button onclick="switchRole('creator')" class="mobile-nav-btn w-full text-left p-4 rounded-xl font-semibold transition" data-role="creator">Creator Mode</button>
                     <button onclick="switchRole('performer')" class="mobile-nav-btn w-full text-left p-4 rounded-xl font-semibold transition" data-role="performer">Performer Mode</button>
-                    <button onclick="switchRole('admin')" class="mobile-nav-btn w-full text-left p-4 rounded-xl font-semibold transition" data-role="admin">Admin Mode</button>
 
                     <div class="my-4 border-t border-dash"></div>
                     
@@ -214,7 +212,7 @@
             </div>
             <div class="relative z-10 mt-8">
                 <h3 class="text-6xl font-bold tracking-tighter" id="main-value">Launch</h3>
-                <button onclick="openCampaignWizard()" class="mt-4 bg-white text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition">
+                <button id="main-cta-btn" class="mt-4 bg-white text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition">
                     <i class="fa-solid fa-plus"></i> <span id="main-cta">New Campaign</span>
                 </button>
             </div>
@@ -239,14 +237,6 @@
                 Live Feed <span class="text-green-500 text-xs mt-1">● Live</span>
             </h3>
             <div class="space-y-4" id="feed-container">
-                <div class="border-b border-dash pb-3">
-                    <p class="text-xs text-dash-secondary">2 mins ago</p>
-                    <p class="text-sm">Kemi's Hair: 10 new comments verified.</p>
-                </div>
-                <div class="border-b border-dash pb-3">
-                    <p class="text-xs text-dash-secondary">15 mins ago</p>
-                    <p class="text-sm">Payout processed: ₦15,000 to Chidi.</p>
-                </div>
             </div>
         </div> 
 
@@ -263,7 +253,7 @@
 
         <div class="bento-card col-span-3">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Active Management</h3>
+                <h3 class="text-xl font-bold">Task Management</h3>
                 <a href="#" class="text-xs text-dash-secondary font-bold underline hover:text-[#6a26da]">View All</a>
             </div>
             <div class="overflow-x-auto">
@@ -697,36 +687,26 @@
         let selectedBank = null;
         let roles = {
             creator: {
-                label: "Active Campaigns",
-                sub: "Your strategic growth is pacing at 114% of target.",
-                value: "4",
+                label: "Campaigns",
+                sub: "Loading analytics...",
+                value: "0",
                 cta: "Engagement Autopilot: OFF",
                 isSubscriptionActive: false,
-                totalGrowthMetric: 280, // % growth since joining
-                availableBalance: 125000, // Pre-funded for demo
+                totalGrowthMetric: 0,
+                availableBalance: 0,
                 allocatedFunds: 0,
-                items: [
-                    { name: "Hair Vendor Trust", status: "Active", metric: "24/50 comments", rawValue: 24 },
-                    { name: "Ibadan Real Estate", status: "Pending", metric: "15/100 shares" }
-                ] 
+                items: [] 
             },
             performer: {
                 label: "Available Gigs",
-                sub: "You have 14 new tasks waiting in your vicinity.",
-                value: "₦480", // Total estimated earnings from available tasks
+                sub: "Loading marketplace...",
+                value: "₦0",
                 cta: "Browse Tasks",
-                items: [
-                    { id: 'task-001', platform: 'instagram', name: "Instagram: Like & Comment (Ten words)", reward: 70, requirement: "10+ word comment", targetUrl: "https://www.instagram.com/p/C4s_u_4x_y_/?img_index=1", brandInfo: "Kemi's Hair: A luxury hair brand targeting young, fashion-conscious women.", status: "available" },
-                    { id: 'task-002', platform: 'youtube', name: "YouTube: High Retention Watch (3 Mins)", reward: 80, requirement: "Watch 3 mins, leave a relevant comment", targetUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", brandInfo: "Tech Insights: A channel reviewing the latest gadgets and software.", status: "available" },
-                    { id: 'task-003', platform: 'google', name: "Google: Search & Brand Interaction", reward: 90, requirement: "Search 'PIDI Marketing', click website, browse 2 pages", targetUrl: "https://www.google.com/search?q=PIDI+Marketing", brandInfo: "PIDI Marketing: Our own brand, seeking genuine search engagement.", status: "available" },
-                    { id: 'task-004', platform: 'tiktok', name: "TikTok: Duet & Share", reward: 100, requirement: "Create a duet with the target video and share to your story", targetUrl: "https://www.tiktok.com/@tiktok/video/7348421060907107626", brandInfo: "Viral Trends Co: A new agency specializing in viral content.", status: "available" },
-                    { id: 'task-005', platform: 'instagram', name: "Instagram: Story Reshare", reward: 50, requirement: "Reshare the target story to your own story", targetUrl: "https://www.instagram.com/stories/instagram/3327654321098765432/", brandInfo: "Fashionista Boutique: Promoting their new spring collection.", status: "available" },
-                    { id: 'task-006', platform: 'linkedin', name: "LinkedIn: Like & Comment", reward: 90, requirement: "Like and leave a professional comment (20+ words)", targetUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7176543210987654321/", brandInfo: "TalentConnect: A recruitment firm sharing industry insights.", status: "available" },
-                ],
-                totalBalance: 5000,
+                items: [],
+                totalBalance: 0,
                 pendingBalance: 0,
-                activeTask: null, // Stores the ID of the currently claimed task
-                reputationScore: 100,
+                activeTask: null,
+                reputationScore: 0,
                 isElite: false,
                 fakeProofCount: 0,
                 verificationLevel: 1,
@@ -734,39 +714,21 @@
                 bankDetails: null,
                 taskTimer: null, // Stores the interval ID for the timer
             },
-            admin: {
-                currentTab: 'orders', // 'orders', 'verify', 'payouts'
-                totalRevenue: 450000,
-                activeTasks: 142,
-                pendingOrdersCount: 0,
-                withdrawalRequests: [],
-                pendingSubmissions: [],
-                orders: [] // Loaded from Supabase
-                orders: [], // Loaded from Supabase
-                auditLogs: [
-                    { event: "System Startup", user: "Root", time: "2024-03-20 08:00" },
-                    { event: "Liquidity Check", user: "Admin", time: "2024-03-20 10:15" },
-                    { event: "Withdrawal Batch #42", user: "Admin", time: "2024-03-20 12:00" }
-                ]
-            }
         };
 
         const ROLE_CONFIG = {
             creator: {
                 label: "Grow Your Brand",
                 sub: "Your strategic growth is currently pacing at 114% of monthly target.",
-                cta: "New Campaign"
+                cta: "New Campaign",
+                icon: "fa-plus"
             },
             performer: {
                 label: "Available Gigs",
                 sub: "You have 14 new tasks waiting in your vicinity.",
-                cta: "Browse Tasks"
+                cta: "Browse Tasks",
+                icon: "fa-magnifying-glass"
             },
-            admin: {
-                label: "Engine Room",
-                sub: "Connecting High-Ticket Creators with High-Velocity Performers.",
-                cta: "Generate Report"
-            }
         };
 
         let currentUser = {
@@ -810,6 +772,19 @@
             document.querySelectorAll('.user-name-display').forEach(el => el.innerText = currentUser.fullName);
             document.querySelectorAll('.user-avatar-display').forEach(img => img.src = currentUser.avatar);
 
+            // Fetch real user data from profiles table
+            const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+            if (profile) {
+                roles.performer.totalBalance = profile.balance || 0;
+                roles.performer.pendingBalance = profile.pending_balance || 0;
+                roles.performer.reputationScore = profile.reputation_score || 0;
+                roles.creator.availableBalance = profile.balance || 0;
+                roles.creator.allocatedFunds = profile.allocated_funds || 0;
+            }
+
+            // Initialize dynamic components
+            refreshActivityFeed();
+
             // Initialize View based on query param OR user's stored role preference
             const urlParams = new URLSearchParams(window.location.search);
             const initialRole = urlParams.get('view') || user.user_metadata.user_role || 'performer';
@@ -852,12 +827,13 @@
             document.getElementById('main-sub-label').innerText = config.sub;
             document.getElementById('main-cta').innerText = config.cta;
             
-            // Apply Admin Visual State
-            document.querySelector('.bento-grid').classList.toggle('admin-engine-active', role === 'admin');
-            
-            // Update CTA Action
-            const mainCta = document.getElementById('main-cta').parentElement;
-            mainCta.onclick = role === 'admin' ? () => window.generateReport() : () => window.openCampaignWizard();
+            // Update CTA Icon and Action
+            const mainCtaBtn = document.getElementById('main-cta-btn');
+            const iconEl = mainCtaBtn.querySelector('i');
+            if (iconEl) iconEl.className = `fa-solid ${config.icon}`;
+
+            if (role === 'performer') mainCtaBtn.onclick = () => window.scrollToTasks();
+            else mainCtaBtn.onclick = () => window.openCampaignWizard();
 
             updateWalletDisplay();
             fetchRoleData(role);
@@ -886,18 +862,6 @@
                 document.getElementById('main-value').innerText = `₦${((tasks?.length || 0) * 70).toLocaleString()}`;
                 renderTable(tasks?.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦70 Reward', id: t.id, isTask: true })) || []);
                     updateEngagementUI(roles.performer.reputationScore || 0);
-                } else {
-                // --- ADMIN ENGINE ROOM LOGIC ---
-                const { data: pendingOrders } = await supabase.from('campaigns').select('*').eq('status', 'pending_verification');
-                const { data: submissions } = await supabase.from('submissions').select('*, campaigns(*)').eq('status', 'under_review');
-                
-                roles.admin.orders = pendingOrders || [];
-                roles.admin.pendingSubmissions = submissions || [];
-                roles.admin.pendingOrdersCount = roles.admin.orders.length;
-
-                document.getElementById('main-value').innerText = `₦${(roles.admin.totalRevenue / 1000).toFixed(1)}k`;
-                renderAdminQueue();
-                window.renderAdminQueue();
                 }
             } catch (err) {
                 console.error("Fetch Error:", err);
@@ -912,15 +876,15 @@
             if (barEl) barEl.style.width = `${score}%`;
         }
 
+        window.scrollToTasks = function() {
+            const table = document.querySelector('.bento-grid .col-span-3');
+            if (table) table.scrollIntoView({ behavior: 'smooth' });
+        }
+
         function renderTable(items) {
             const container = document.querySelector('.bento-grid .col-span-3');
             const list = document.getElementById('active-list');
             
-            // Reset Admin Tabs if they exist
-            const existingTabs = document.getElementById('admin-tabs');
-            if (existingTabs) existingTabs.remove();
-            container.querySelector('h3').innerText = "Active Management";
-
             if (!items || !items.length) {
                 list.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-dash-secondary">No records found.</td></tr>';
                 return;
@@ -1276,14 +1240,6 @@
             roles.performer.pendingBalance += amt;
             
             roles.performer.bankDetails = { account: acc, bank: selectedBank, otherBankName: otherBankName, verifiedName: currentUser.fullName.toUpperCase() };
-
-            roles.admin.withdrawalRequests.push({
-                id: 'payout-' + Date.now(),
-                user: currentUser.fullName,
-                amount: amt,
-                bank: bankName,
-                acc: acc
-            });
             
             alert(`Withdrawal request received for ₦${amt.toLocaleString()}. Payouts are processed every Tuesday and Friday.`);
             amtInput.value = '';
@@ -1449,14 +1405,6 @@
                 // Direct API Verification (Simulated)
                 console.log(`Phase 4: API pinged ${claimedTask.platform}. Handle ${username} verified.`);
                 
-                // 90/10 Split Logic
-                roles.performer.totalBalance += claimedTask.reward;
-                roles.admin.grossRevenue += (claimedTask.reward * 10);
-                
-                // Financial Split
-                const pidiShare = claimedTask.reward * 9;
-                roles.admin.netProfit += pidiShare;
-                roles.admin.totalPayouts += claimedTask.reward;
                 
                 alert("SaaS Instant Pay: Comment verified via API. Funds added to your Available Balance!");
             } else {
@@ -1471,7 +1419,6 @@
                     targetUrl: claimedTask.targetUrl,
                     timestamp: new Date().toISOString()
                 };
-                roles.admin.pendingSubmissions.push(submission);
                 roles.performer.pendingBalance += claimedTask.reward;
                 alert("Proof submitted! Manual verification required for your current Trust Score.");
             }
@@ -1484,254 +1431,6 @@
             
             closeExecutionWorkspace();
             switchRole('performer'); // Refresh performer view
-        }
-
-        // --- ADMIN ENGINE ROOM LOGIC ---
-        window.setAdminTab = function(tab) {
-            roles.admin.currentTab = tab;
-            window.renderAdminQueue();
-        }
-
-        window.renderAdminQueue = function() {
-            const container = document.querySelector('.bento-grid .col-span-3');
-            const list = document.getElementById('active-list');
-            const titleEl = container.querySelector('h3');
-
-            // Inject Tabs for Admin
-            if (!document.getElementById('admin-tabs')) {
-                const tabs = document.createElement('div');
-                tabs.id = 'admin-tabs';
-                tabs.className = 'flex gap-2 mb-6 bg-dash-secondary/50 p-1 rounded-2xl w-fit';
-                tabs.innerHTML = `
-                    <button onclick="setAdminTab('orders')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition ${roles.admin.currentTab === 'orders' ? 'bg-white text-black' : 'text-dash-secondary'}">Orders Feed</button>
-                    <button onclick="setAdminTab('verify')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition ${roles.admin.currentTab === 'verify' ? 'bg-white text-black' : 'text-dash-secondary'}">Verification Hub</button>
-                    <button onclick="setAdminTab('payouts')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition ${roles.admin.currentTab === 'payouts' ? 'bg-white text-black' : 'text-dash-secondary'}">Withdrawal Vault</button>
-                    <button onclick="setAdminTab('audit')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition ${roles.admin.currentTab === 'audit' ? 'bg-white text-black' : 'text-dash-secondary'}">System Audit</button>
-                `;
-                titleEl.innerText = "Engine Command";
-                container.insertBefore(tabs, container.querySelector('.overflow-x-auto'));
-            } else {
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    const isMatch = btn.innerText.toLowerCase().includes(roles.admin.currentTab === 'verify' ? 'verification' : roles.admin.currentTab);
-                    btn.className = `tab-btn px-4 py-2 rounded-xl text-xs font-bold transition ${isMatch ? 'bg-white text-black' : 'text-dash-secondary'}`;
-                });
-            }
-            
-            if (roles.admin.currentTab === 'payouts') {
-                list.innerHTML = roles.admin.withdrawalRequests.length === 0 
-                    ? `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">Payout queue is empty.</td></tr>`
-                    : roles.admin.withdrawalRequests.map(req => `
-                    <tr class="border-b border-dash">
-                        <td class="py-4 font-bold"><p>${req.user}</p><p class="text-[10px] text-dash-secondary">${req.bank} • ${req.acc}</p></td>
-                        <td class="py-4"><span class="bg-blue-500/10 text-blue-500 px-2 py-1 rounded-lg text-[10px] uppercase font-bold">Request Pending</span></td>
-                        <td class="py-4 text-green-500 font-bold">₦${req.amount.toLocaleString()}</td>
-                        <td class="py-4 text-right"><button onclick="approvePayout('${req.id}')" class="bg-white text-black px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-[#6a26da] hover:text-white transition">CONFIRM PAYMENT</button></td>
-                    </tr>`).join('');
-            } else if (roles.admin.currentTab === 'orders') {
-                list.innerHTML = roles.admin.orders.length === 0
-                    ? `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">No unprocessed brand requests.</td></tr>`
-                    : roles.admin.orders.map(order => `
-                    <tr class="border-b border-dash">
-                        <td class="py-4 font-bold"><p class="text-xs text-dash-secondary">${order.platform.toUpperCase()}</p><p class="truncate max-w-[150px]">${order.target_url}</p></td>
-                        <td class="py-4"><span class="bg-orange-500/10 text-orange-500 px-2 py-1 rounded-lg text-[10px] uppercase font-bold">Pending Payment</span></td>
-                        <td class="py-4 text-dash-secondary">₦${order.total_cost.toLocaleString()}</td>
-                        <td class="py-4 text-right"><button onclick="window.verifyReceipt('${order.id}')" class="bg-dash-secondary px-4 py-2 rounded-xl text-[10px] font-bold hover:text-[#6a26da]">VERIFY RECEIPT</button></td>
-                    </tr>`).join('');
-            } else if (roles.admin.currentTab === 'audit') {
-                list.innerHTML = roles.admin.auditLogs.map(log => `
-                    <tr class="border-b border-dash">
-                        <td class="py-4 font-bold">${log.event}</td>
-                        <td class="py-4"><span class="text-dash-secondary text-xs">${log.user}</span></td>
-                        <td class="py-4 text-dash-secondary text-xs">${log.time}</td>
-                        <td class="py-4 text-right"><i class="fa-solid fa-clock-rotate-left text-dash-secondary"></i></td>
-                    </tr>`).join('');
-            } else {
-                list.innerHTML = roles.admin.pendingSubmissions.length === 0
-                    ? `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">Verification queue is clean.</td></tr>`
-                    : roles.admin.pendingSubmissions.map(sub => `
-                    <tr class="border-b border-dash">
-                        <td class="py-4 font-bold"><p class="text-xs text-dash-secondary">${sub.campaigns?.platform?.toUpperCase() || 'TASK'}</p><p>${sub.proof_username}</p></td>
-                        <td class="py-4"><span class="bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded-lg text-[10px] uppercase font-bold">Pending Review</span></td>
-                        <td class="py-4 text-green-500 font-bold">₦${sub.reward}</td>
-                        <td class="py-4 text-right">
-                            <div class="flex gap-2 justify-end">
-                                <button onclick="window.reviewSubmission('${sub.id}')" class="bg-dash-secondary px-3 py-1.5 rounded-lg text-[10px] font-bold hover:text-[#6a26da]">REVIEW</button>
-                                <button onclick="approveTask('${sub.id}')" class="bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">APPROVE</button>
-                                <button onclick="rejectTask('${sub.id}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">REJECT</button>
-                            </div>
-                        </td>
-                    </tr>`).join('');
-            }
-        }
-
-        window.verifyReceipt = async function(orderId) {
-            const order = roles.admin.orders.find(o => o.id === orderId);
-            if (!order) return;
-            
-            if (confirm(`VERIFY ORDER RECEIPT\n\nCreator ID: ${order.creator_id}\nAmount: ₦${order.total_cost.toLocaleString()}\n\nClick OK to view receipt and confirm.`)) {
-                window.open(order.payment_proof_url, '_blank');
-                if (confirm("Confirm payment received and ACTIVATE campaign?")) {
-                    const { error } = await supabase.from('campaigns').update({ status: 'active' }).eq('id', orderId);
-                    if (error) alert(error.message);
-                    else {
-                        roles.admin.totalRevenue += order.total_cost;
-                        roles.admin.auditLogs.unshift({ event: "Campaign Activated", user: "Admin", time: new Date().toLocaleString() });
-                        alert("Campaign Live! Pushed to Performers.");
-                        switchRole('admin');
-                    }
-                }
-            }
-        }
-
-        window.reviewSubmission = function(subId) {
-            const sub = roles.admin.pendingSubmissions.find(s => s.id === subId);
-            if (!sub) return;
-            alert(`QUALITY CHECK\n\nHandle: ${sub.proof_username}\nComment: "${sub.proof_text}"\n\nTarget Post: ${sub.campaigns.target_url}`);
-        }
-
-        window.generateReport = function() {
-            const gross = roles.admin.totalRevenue;
-            const payouts = roles.admin.totalRevenue * 0.7; // Simulated 70% payout
-            const report = `
-                PLATFORM HEALTH REPORT
-                -----------------------
-                Total Ecosystem Revenue: ₦${gross.toLocaleString()}
-                Projected Total Payouts: ₦${payouts.toLocaleString()}
-                Active Marketplace Tasks: ${roles.admin.activeTasks}
-                Net Platform Profit: ₦${(gross - payouts).toLocaleString()}
-                
-                Status: OPTIMAL VELOCITY
-            `;
-            alert(report);
-            roles.admin.auditLogs.unshift({ event: "Report Generated", user: "Admin", time: new Date().toLocaleString() });
-        }
-
-        window.openAuditLogs = function() {
-            if (currentRole !== 'admin') {
-                switchRole('admin');
-                setTimeout(() => window.setAdminTab('audit'), 100);
-            } else {
-                window.setAdminTab('audit');
-            }
-        }
-
-        // --- PHASE 3: ADMIN VERIFICATION & PAYOUTS ---
-        function setAdminTab(tab) {
-            roles.admin.currentTab = tab;
-            switchRole('admin');
-        }
-
-        function renderAdminQueue() {
-            const list = document.getElementById('active-list');
-            
-            if (roles.admin.currentTab === 'payouts') {
-                if (roles.admin.withdrawalRequests.length === 0) {
-                    list.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">Payout queue is empty.</td></tr>`;
-                    return;
-                }
-                list.innerHTML = roles.admin.withdrawalRequests.map(req => `
-                    <tr class="border-b border-dash">
-                        <td class="py-4 font-bold">
-                            <p>${req.user}</p>
-                            <p class="text-[10px] text-dash-secondary">${req.bank} • ${req.acc}</p>
-                        </td>
-                        <td class="py-4"><span class="bg-blue-500/10 text-blue-500 px-2 py-1 rounded-lg text-[10px] uppercase font-bold">Payout Ready</span></td>
-                        <td class="py-4 text-green-500 font-bold">₦${req.amount.toLocaleString()}</td>
-                        <td class="py-4 text-right">
-                            <button onclick="approvePayout('${req.id}')" class="accent-gradient text-white px-4 py-2 rounded-xl text-[10px] font-bold">PROCESS TRANSFER</button>
-                        </td>
-                    </tr>
-                `).join('');
-                return;
-            }
-
-            if (roles.admin.pendingSubmissions.length === 0) {
-                list.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">Verification queue is clean.</td></tr>`;
-                return;
-            }
-            list.innerHTML = roles.admin.pendingSubmissions.map(sub => `
-                <tr class="border-b border-dash">
-                    <td class="py-4 font-bold">
-                        <p class="text-xs text-dash-secondary">${sub.taskName}</p>
-                        <p>${sub.performerHandle}</p>
-                    </td>
-                    <td class="py-4"><span class="bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded-lg text-[10px] uppercase font-bold">Pending Review</span></td>
-                    <td class="py-4 text-green-500 font-bold">₦${sub.reward}</td>
-                    <td class="py-4 text-right">
-                        <div class="flex gap-2 justify-end">
-                            <button onclick="approveTask('${sub.id}')" class="bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">APPROVE</button>
-                            <button onclick="rejectTask('${sub.id}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">REJECT</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function approvePayout(reqId) {
-            const req = roles.admin.withdrawalRequests.find(r => r.id === reqId);
-            if (!req) return;
-
-            // Verification Process: Check details before final approval
-            if (!confirm(`Verify & Process Payout:\n\nUser: ${req.user}\nAmount: ₦${req.amount.toLocaleString()}\nBank: ${req.bank}\nAccount: ${req.acc}`)) {
-                return;
-            }
-
-            // Logical Ledger: Finalize Payout
-            roles.performer.pendingBalance -= req.amount;
-            roles.admin.totalPayouts += req.amount;
-
-            // Remove from Admin Queue
-            const index = roles.admin.withdrawalRequests.indexOf(req);
-            roles.admin.withdrawalRequests.splice(index, 1);
-            
-            alert("Payout Successfully Processed! Funds released to performer via Transfer API.");
-            updateWalletDisplay();
-            if (currentRole === 'admin') fetchRoleData('admin');
-        }
-
-        function approveTask(subId) {
-            const subIndex = roles.admin.pendingSubmissions.findIndex(s => s.id === subId);
-            const sub = roles.admin.pendingSubmissions[subIndex];
-
-            // Logical Ledger: 90/10 Split
-            const totalInteractionCost = sub.reward * 10;
-            roles.performer.totalBalance += sub.reward;
-            roles.performer.pendingBalance -= sub.reward;
-            
-            roles.admin.grossRevenue += totalInteractionCost;
-            const pidiShare = sub.reward * 9; // Assuming reward is 10%
-            roles.admin.revenueLog += pidiShare;
-            roles.admin.value = `₦${(roles.admin.revenueLog / 1000).toFixed(1)}k`;
-
-            // Real-time Creator Reporting: Deduct from Allocated
-            roles.creator.allocatedFunds -= totalInteractionCost;
-
-            // Update Live Feed for Creator
-            const feed = document.getElementById('feed-container');
-            const notice = document.createElement('div');
-            notice.className = "border-b border-dash pb-3";
-            notice.innerHTML = `<p class="text-xs text-green-500 font-bold">VERIFIED</p><p class="text-sm">High-quality comment added to campaign.</p>`;
-            feed.prepend(notice);
-
-            // Remove and Refresh
-            roles.admin.pendingSubmissions.splice(subIndex, 1);
-            alert("Task approved. Funds distributed.");
-            renderAdminQueue();
-        }
-
-        function rejectTask(subId) {
-            const subIndex = roles.admin.pendingSubmissions.findIndex(s => s.id === subId);
-            const sub = roles.admin.pendingSubmissions[subIndex];
-
-            roles.performer.pendingBalance -= sub.reward;
-            
-            // Reopen the task slot for others
-            const originalTask = roles.performer.items.find(t => t.id === sub.taskId);
-            if (originalTask) originalTask.status = 'available';
-
-            roles.admin.pendingSubmissions.splice(subIndex, 1);
-            alert("Task rejected. Performer notified and slot reopened.");
-            renderAdminQueue();
         }
 
         window.updateWalletDisplay = function() {
@@ -1752,16 +1451,6 @@
                 document.getElementById('trust-indicator').innerText = "Ad Account Health: Excellent";
                 walletBtn.innerText = "Deposit";
                 walletBtn.onclick = () => window.openCampaignWizard();
-                walletBtn.disabled = false;
-            } else if (currentRole === 'admin') {
-                document.getElementById('total-balance').innerText = roles.admin.activeTasks;
-                document.querySelector('.bento-card:nth-child(2) .text-dash-secondary').innerText = "Ecosystem Active Tasks";
-                document.getElementById('pending-balance').innerText = `₦${roles.admin.totalRevenue.toLocaleString()}`;
-                document.getElementById('pending-balance-label').innerText = "Total Platform Revenue: ";
-                document.getElementById('trust-indicator').innerText = "System Status: Operational";
-                walletBtn.innerText = "Audit Logs";
-                walletBtn.onclick = () => alert("Opening System Audit Logs...");
-                walletBtn.onclick = () => window.openAuditLogs();
                 walletBtn.disabled = false;
             }
         }
@@ -2029,10 +1718,6 @@
         window.closeActiveTaskWarning = closeActiveTaskWarning;
         window.cancelActiveTaskFromWarning = cancelActiveTaskFromWarning;
         window.submitProof = submitProof;
-        window.setAdminTab = setAdminTab;
-        window.approvePayout = approvePayout;
-        window.approveTask = approveTask;
-        window.rejectTask = rejectTask;
         window.closeExecutionWorkspace = closeExecutionWorkspace;
         window.switchSettingsView = switchSettingsView;
         window.saveProfileSettings = saveProfileSettings;
