@@ -300,8 +300,8 @@
                     <div class="step-node" id="node-4">4</div>
                 </div>
                 <div class="text-right">
-                    <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Current Step</p>
-                    <p class="text-sm font-bold" id="step-title">Campaign Goal</p>
+                    <p class="text-[6px] font-bold text-dash-secondary uppercase tracking-widest">Current Step</p>
+                    <p class="text-[6px] font-bold" id="step-title">Campaign Goal</p>
                 </div>
             </div>
 
@@ -312,9 +312,9 @@
                     <div>
                         <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Select Platform</label>
                         <div class="grid grid-cols-3 gap-3">
-                            <button onclick="selectPlatform('instagram')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[#6a26da] transition text-center active" id="plt-instagram"><i class="fa-brands fa-instagram text-xl mb-2"></i><p class="text-xs font-bold">Instagram</p></button>
-                            <button onclick="selectPlatform('google')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[#6a26da] transition text-center" id="plt-google"><i class="fa-brands fa-google text-xl mb-2"></i><p class="text-xs font-bold">Google</p></button>
-                            <button onclick="selectPlatform('tiktok')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[#6a26da] transition text-center" id="plt-tiktok"><i class="fa-brands fa-tiktok text-xl mb-2"></i><p class="text-xs font-bold">TikTok</p></button>
+                            <button onclick="selectPlatform('instagram')" class="platform-btn p-4 rounded-2xl border border-[#6a26da] bg-[#6a26da]/5 transition text-center active" id="plt-instagram"><i class="fa-brands fa-instagram text-xl mb-2"></i><p class="text-[9px] font-bold">Instagram</p></button>
+                            <button onclick="selectPlatform('google')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[#6a26da] transition text-center" id="plt-google"><i class="fa-brands fa-google text-xl mb-2"></i><p class="text-[9px] font-bold">Google</p></button>
+                            <button onclick="selectPlatform('tiktok')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[#6a26da] transition text-center" id="plt-tiktok"><i class="fa-brands fa-tiktok text-xl mb-2"></i><p class="text-[9px] font-bold">TikTok</p></button>
                         </div>
                     </div>
                     <div>
@@ -329,13 +329,13 @@
                 <h3 class="text-2xl font-bold">Set your target</h3>
                 <div class="p-6 bg-dash-secondary rounded-2xl border border-dash">
                     <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-4">Quantity of Engagements</label>
-                    <input type="range" id="goal-range" min="10" max="1000" step="10" value="50" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#6a26da]" oninput="updateCalculation()">
+                    <input type="range" id="goal-range" min="10" max="1000" step="10" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#6a26da]" oninput="updateCalculation()">
                     <div class="flex justify-between mt-4">
-                        <span class="text-3xl font-bold" id="goal-val">50</span>
-                        <span class="text-3xl font-bold text-[#6a26da]" id="cost-val">₦7,500</span>
+                        <span class="text-3xl font-bold" id="goal-val">10</span>
+                        <span class="text-3xl font-bold text-[#6a26da]" id="cost-val">₦1,000</span>
                     </div>
                 </div>
-                <p class="text-xs text-dash-secondary italic">* Price calculated at ₦150 per high-quality human interaction.</p>
+                <p class="text-xs text-dash-secondary italic">* Price calculated at ₦100 per high-quality human interaction.</p>
             </div>
 
             <!-- Step 3: Instructions -->
@@ -356,11 +356,11 @@
                 <h3 class="text-2xl font-bold">Secure Checkout</h3>
                 <div class="p-8 border-2 border-dashed border-dash rounded-3xl text-center space-y-4">
                     <img src="https://checkout.paystack.com/static/media/paystack-logo.3f19318b.svg" class="h-6 mx-auto opacity-50 grayscale" alt="Paystack">
-                    <p class="text-sm text-dash-secondary">You are about to lock <span class="font-bold text-[var(--text-primary)]" id="final-cost">₦7,500</span> in escrow.</p>
+                    <p class="text-sm text-dash-secondary">You are about to lock <span class="font-bold text-[var(--text-primary)]" id="final-cost">₦1,000</span> in escrow.</p>
                     <div class="py-4 px-6 bg-dash-secondary rounded-2xl flex items-center justify-between text-left">
                         <div>
                             <p class="text-[10px] font-bold text-dash-secondary uppercase">Order Summary</p>
-                            <p class="text-xs font-bold" id="summary-text">50 Instagram Comments</p>
+                            <p class="text-xs font-bold" id="summary-text">10 Instagram Comments</p>
                         </div>
                         <i class="fa-solid fa-shield-halved text-green-500"></i>
                     </div>
@@ -580,15 +580,15 @@
             performer: {
                 label: "Available Gigs",
                 sub: "You have 14 new tasks waiting in your vicinity.",
-                value: "₦1,250", // Total estimated earnings from available tasks
+                value: "₦480", // Total estimated earnings from available tasks
                 cta: "Browse Tasks",
                 items: [
-                    { id: 'task-001', platform: 'instagram', name: "Instagram: Like & Comment (Ten words)", reward: 150, requirement: "10+ word comment", targetUrl: "https://www.instagram.com/p/C4s_u_4x_y_/?img_index=1", brandInfo: "Kemi's Hair: A luxury hair brand targeting young, fashion-conscious women.", status: "available" },
-                    { id: 'task-002', platform: 'youtube', name: "YouTube: High Retention Watch (3 Mins)", reward: 200, requirement: "Watch 3 mins, leave a relevant comment", targetUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", brandInfo: "Tech Insights: A channel reviewing the latest gadgets and software.", status: "available" },
-                    { id: 'task-003', platform: 'google', name: "Google: Search & Brand Interaction", reward: 250, requirement: "Search 'PIDI Marketing', click website, browse 2 pages", targetUrl: "https://www.google.com/search?q=PIDI+Marketing", brandInfo: "PIDI Marketing: Our own brand, seeking genuine search engagement.", status: "available" },
-                    { id: 'task-004', platform: 'tiktok', name: "TikTok: Duet & Share", reward: 300, requirement: "Create a duet with the target video and share to your story", targetUrl: "https://www.tiktok.com/@tiktok/video/7348421060907107626", brandInfo: "Viral Trends Co: A new agency specializing in viral content.", status: "available" },
-                    { id: 'task-005', platform: 'instagram', name: "Instagram: Story Reshare", reward: 100, requirement: "Reshare the target story to your own story", targetUrl: "https://www.instagram.com/stories/instagram/3327654321098765432/", brandInfo: "Fashionista Boutique: Promoting their new spring collection.", status: "available" },
-                    { id: 'task-006', platform: 'linkedin', name: "LinkedIn: Like & Comment", reward: 200, requirement: "Like and leave a professional comment (20+ words)", targetUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7176543210987654321/", brandInfo: "TalentConnect: A recruitment firm sharing industry insights.", status: "available" },
+                    { id: 'task-001', platform: 'instagram', name: "Instagram: Like & Comment (Ten words)", reward: 70, requirement: "10+ word comment", targetUrl: "https://www.instagram.com/p/C4s_u_4x_y_/?img_index=1", brandInfo: "Kemi's Hair: A luxury hair brand targeting young, fashion-conscious women.", status: "available" },
+                    { id: 'task-002', platform: 'youtube', name: "YouTube: High Retention Watch (3 Mins)", reward: 80, requirement: "Watch 3 mins, leave a relevant comment", targetUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", brandInfo: "Tech Insights: A channel reviewing the latest gadgets and software.", status: "available" },
+                    { id: 'task-003', platform: 'google', name: "Google: Search & Brand Interaction", reward: 90, requirement: "Search 'PIDI Marketing', click website, browse 2 pages", targetUrl: "https://www.google.com/search?q=PIDI+Marketing", brandInfo: "PIDI Marketing: Our own brand, seeking genuine search engagement.", status: "available" },
+                    { id: 'task-004', platform: 'tiktok', name: "TikTok: Duet & Share", reward: 100, requirement: "Create a duet with the target video and share to your story", targetUrl: "https://www.tiktok.com/@tiktok/video/7348421060907107626", brandInfo: "Viral Trends Co: A new agency specializing in viral content.", status: "available" },
+                    { id: 'task-005', platform: 'instagram', name: "Instagram: Story Reshare", reward: 50, requirement: "Reshare the target story to your own story", targetUrl: "https://www.instagram.com/stories/instagram/3327654321098765432/", brandInfo: "Fashionista Boutique: Promoting their new spring collection.", status: "available" },
+                    { id: 'task-006', platform: 'linkedin', name: "LinkedIn: Like & Comment", reward: 90, requirement: "Like and leave a professional comment (20+ words)", targetUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7176543210987654321/", brandInfo: "TalentConnect: A recruitment firm sharing industry insights.", status: "available" },
                 ],
                 totalBalance: 0,
                 pendingBalance: 0,
@@ -744,8 +744,8 @@
                     }
                 } else if (role === 'performer') {
                     const { data: tasks } = await supabase.from('campaigns').select('*').eq('status', 'active');
-                    document.getElementById('main-value').innerText = `₦${((tasks?.length || 0) * 150).toLocaleString()}`;
-                    renderTable(tasks?.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦150 Reward', id: t.id, isTask: true })) || []);
+                document.getElementById('main-value').innerText = `₦${((tasks?.length || 0) * 70).toLocaleString()}`;
+                renderTable(tasks?.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦70 Reward', id: t.id, isTask: true })) || []);
                     updateEngagementUI(roles.performer.reputationScore || 0);
                 } else {
                     const { data: subs } = await supabase.from('submissions').select('*, campaigns(target_url)').eq('status', 'under_review');
@@ -859,13 +859,21 @@
 
         function selectPlatform(plt) {
             selectedPlatform = plt;
-            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active', 'border-[#6a26da]'));
-            document.getElementById(`plt-${plt}`).classList.add('active', 'border-[#6a26da]');
+            document.querySelectorAll('.platform-btn').forEach(b => {
+                b.classList.remove('active', 'border-[#6a26da]', 'bg-[#6a26da]/5');
+                b.classList.add('border-dash'); // Restore default border
+            });
+            const activeBtn = document.getElementById(`plt-${plt}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'border-[#6a26da]', 'bg-[#6a26da]/5');
+                activeBtn.classList.remove('border-dash'); // Remove conflicting !important border
+            }
+            updateCalculation(); // Update the summary text immediately
         }
 
         function updateCalculation() {
             const qty = document.getElementById('goal-range').value;
-            const cost = qty * 1500; // Creator pays 10x performer reward
+            const cost = qty * 100; // ₦100 per high-quality human engagement
             document.getElementById('goal-val').innerText = qty;
             document.getElementById('cost-val').innerText = `₦${cost.toLocaleString()}`;
             document.getElementById('final-cost').innerText = `₦${cost.toLocaleString()}`;
@@ -905,7 +913,7 @@
         function finishCreation() {
             const qty = document.getElementById('goal-range').value;
             const url = document.getElementById('target-url').value || "New Project";
-            const totalCost = qty * 1500;
+            const totalCost = qty * 100;
 
             // Wallet Flow: Check Available Balance
             if (roles.creator.availableBalance < totalCost) {
@@ -931,7 +939,7 @@
                 id: 'task-' + Date.now(),
                 platform: selectedPlatform,
                 name: `${selectedPlatform.toUpperCase()} Engagement`,
-                reward: 150,
+                reward: 70,
                 requirement: document.getElementById('task-instructions').value || "10+ word comment",
                 targetUrl: url,
                 brandInfo: "Newly Launched Campaign",
