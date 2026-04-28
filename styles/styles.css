@@ -1565,6 +1565,41 @@ ul { list-style: none; }
 }
 
 
+.badge {
+  display: inline-block;
+  background: #282828;        /* Solid dark background for high contrast */
+  color: #d5d2ff;             /* Crisp white text */
+  padding: 6px 14px;          /* Balanced internal spacing */
+  border-radius: 100px;       /* Perfect "pill" shape */
+  font-size: 0.7rem;          /* Small but legible */
+  font-weight: 700;           /* Bold enough to stand out */
+  text-transform: uppercase;  /* Standard for badges/labels */
+  letter-spacing: 0.05em;     /* Extra breathing room between letters */
+  margin-bottom: 18px;        /* Spacing from the description below */
+  width: fit-content;         /* Ensures background only wraps the text */
+  transition: all 0.3s ease;  /* Smooth color shift on hover */
+}
+
+/* Light background version for dark cards (The Authority Pro) */
+.dark-card .badge {
+  background: #ffffff1a; /* Subtle glassmorphism */
+  color: #d5d2ff;
+  backdrop-filter: blur(4px);            /* Slight blur for that "pro" look */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Make it slightly more prominent on the middle card */
+.blue-card .badge {
+  background: #1f1f1f;
+  color: #d5d2ff;
+}
+
+/* Interactive state: when you hover the card, the badge pops slightly */
+.price-card:hover .badge {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 :root {
   --radius: 16px;
   --bg-yellow: #f4e899;
@@ -2533,6 +2568,40 @@ summary::-webkit-details-marker {
     gap: 20px;
     text-align: center;
   }
+}
+
+
+.price-tag {
+    display: flex;
+    align-items: baseline; /* Keeps currency, amount, and period on the same line */
+    gap: 4px;              /* Tight spacing between currency and numbers */
+    margin-top: auto;      /* Pushes the price to the bottom of the card */
+    margin-bottom: 25px;
+}
+
+.price-tag h1 {
+    font-size: 3.5rem;     /* Large, readable price */
+    font-weight: 600;      /* Extra bold for emphasis */
+    letter-spacing: -2px;  /* Tight kerning for a modern look */
+    line-height: 1;
+    margin: 0;
+}
+
+.price-tag span {
+    font-size: 1rem;       /* Smaller '/post' text */
+    font-weight: 500;
+    opacity: 0.7;          /* Slightly faded so it doesn't compete with the price */
+    margin-left: 2px;
+}
+
+/* Ensure the currency symbol (if separate) looks consistent */
+.price-tag h1::before {
+    /* If you don't have the symbol in your H1, you can add it here or 
+       just let the H1 handle the ₦ symbol from your HTML */
+    font-size: 1.8rem;     /* Makes the ₦ slightly smaller than the numbers */
+    font-weight: 600;
+    vertical-align: super; /* Lifts the symbol slightly */
+    margin-right: 2px;
 }
 
 /* --- CTA CARD & BUTTON STYLES --- */
