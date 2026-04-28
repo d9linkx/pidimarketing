@@ -1648,7 +1648,7 @@ ul { list-style: none; }
 
 /* Dark Card */
 .dark-card {
-  background-color: var(--bg-dark);
+  background-color: #000000;
   color: white;
 }
 
@@ -1719,33 +1719,160 @@ ul { list-style: none; }
 .author strong { display: block; }
 .author span { font-size: 0.8rem; color: #888; }
 
-/* 3. PRICING CSS */
-.pricing-grid { display: flex; gap: 24px; }
-.price-card { flex: 1; border-radius: 32px; padding: 50px; display: flex; gap: 40px; }
+/* --- PRICING SECTION --- */
+.pricing-grid { 
+  display: flex; 
+  gap: 24px; /* Consistent Bento gap */
+  align-items: stretch; 
+  padding: 60px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.price-card { 
+  flex: 1; 
+  border-radius: 32px; /* Smooth Bento corners */
+  padding: 40px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 20px; 
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); /* Ultra smooth ease-out */
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* --- THE INTERACTIVE ANIMATION --- */
+.price-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+/* Enlarge Middle Card by default */
+.blue-card { 
+  background: #4a3aff; 
+  color: white; 
+  transform: scale(1.05);
+  z-index: 2;
+  box-shadow: 0 15px 35px rgba(74, 58, 255, 0.25);
+}
+
+/* Special hover for the middle card so it still responds */
+.blue-card:hover {
+  transform: scale(1.08) translateY(-5px);
+}
+
 .yellow-card { background: #f4e899; color: #1a1a1a; }
-.blue-card { background: #4a3aff; color: white; }
+.dark-card { background: #111; color: white; border-color: rgba(255,255,255,0.1); }
 
-.price-left { flex: 1; border-right: 1px solid rgba(0,0,0,0.1); padding-right: 40px; display: flex; flex-direction: column; }
-.blue-card .price-left { border-right-color: rgba(255,255,255,0.1); }
+/* --- BUTTON ANIMATIONS --- */
+.price-btn { 
+  background: white; 
+  color: #1a1a1a; 
+  text-decoration: none; 
+  padding: 16px 24px; 
+  border-radius: 50px; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  font-weight: 700; 
+  font-size: 0.9rem;
+  margin-top: auto;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
 
-.badge { background: #1a1a1a; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; width: fit-content; margin-bottom: 20px; }
-.card-desc { font-size: 0.95rem; line-height: 1.4; margin-bottom: 40px; opacity: 0.8; }
-.price-tag { margin-top: auto; display: flex; align-items: baseline; margin-bottom: 30px; }
-.price-tag h1 { font-size: 4rem; }
+/* Button "pops" when card is hovered */
+.price-card:hover .price-btn {
+  background: #1a1a1a;
+  color: white;
+}
 
-.price-right { flex: 1.2; padding-left: 10px; }
-.feat-title { font-weight: 700; margin-bottom: 20px; }
-ul { list-style: none; }
-li { margin-bottom: 12px; font-size: 0.9rem; display: flex; align-items: center; }
+/* Blue card button stay black/white contrast or inverted */
+.blue-card .price-btn { background: white; color: #4a3aff; }
+.blue-card:hover .price-btn { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
-.price-btn { background: white; color: #1a1a1a; text-decoration: none; padding: 15px 25px; border-radius: 40px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-.btn-arrow { background: #1a1a1a; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
+.btn-arrow { 
+  width: 28px; 
+  height: 28px; 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
-    .pricing-grid, .bento-grid { grid-template-columns: 1fr; flex-direction: column; }
-    .price-card { flex-direction: column; }
-    .price-left { border: none; padding: 0; margin-bottom: 20px; }
+.price-card:hover .btn-arrow {
+  transform: rotate(45deg);
+}
+
+/* --- BULLET STYLING (Isolated) --- */
+.price-right ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.price-right li { 
+  margin-bottom: 14px; 
+  font-size: 0.9rem; 
+  display: flex; 
+  align-items: flex-start; 
+  gap: 12px;
+  opacity: 0.9;
+}
+
+.price-right li::before {
+  content: "✓";
+  font-weight: 900;
+  color: inherit;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 1024px) {
+  .pricing-grid { 
+    flex-direction: column; 
+    padding: 20px;
+    gap: 32px;
+  }
+  .blue-card { 
+    transform: scale(1); 
+  }
+  .blue-card:hover { 
+    transform: translateY(-8px); 
+  }
+}
+
+/* --- THE POPULAR TAG --- */
+.popular-tag {
+  position: absolute;
+  top: -18px; /* Floats it half-way above the card border */
+  left: 50%;
+  transform: translateX(-50%); /* Centers it perfectly */
+  background: #ffffff; /* White background for contrast against blue */
+  color: #4a3aff;    /* Blue text to match the card */
+  padding: 6px 20px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 5;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+/* Make the tag react when the card is hovered */
+.price-card:hover .popular-tag {
+  top: -25px; /* Lifts it slightly more on hover */
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+/* Ensure the card doesn't hide the tag */
+.price-card.blue-card {
+  overflow: visible !important; /* Crucial so the tag doesn't get cut off */
 }
 
 .awards-section,
@@ -2419,9 +2546,9 @@ summary::-webkit-details-marker {
   text-align: center;
   position: relative;
   overflow: hidden;
-  background: radial-gradient(circle at 100% 100%, rgba(94, 23, 235, 0.05), transparent 40%),
-              radial-gradient(circle at 0% 0%, rgba(241, 90, 36, 0.05), transparent 30%),
-              #ffffff;
+  background: radial-gradient(circle at 100% 100%, rgba(94, 23, 235, 0.39), transparent 40%),
+              radial-gradient(circle at 0% 0%, rgba(241, 91, 36, 0.337), transparent 30%),
+              #cceabd49;
 }
 
 .cta-content {
