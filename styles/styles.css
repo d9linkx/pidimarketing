@@ -50,7 +50,7 @@ ul { list-style: none; }
 .btn-orange { 
     background: var(--accent); 
     color: var(--white); 
-    padding: 14px 30px; 
+    padding: 25px 50px; 
     border-radius: 40px;
     font-weight: 700; 
     border: none; 
@@ -62,7 +62,7 @@ ul { list-style: none; }
 }
 
 .btn-orange:hover { 
-    background: var(--accent-hover); 
+    background: #000000; 
     transform: translateY(-2px); 
 }
 
@@ -989,15 +989,17 @@ ul { list-style: none; }
 
 /* Secondary Action Button */
 .btn-outline {
-    display: inline-block;
-    padding: 12px 30px;
-    border: 2px solid var(--primary);
-    color: var(--primary);
-    border-radius: 4px;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    transition: var(--transition);
+    background: #ffffff; 
+    color: #000000;
+    padding: 25px 50px; 
+    border-radius: 100px;
+    font-weight: 700; 
+    border: #c1c1c1 0.1px solid; 
+    cursor: pointer; 
+    display: inline-block; 
+    text-transform: uppercase; 
+    font-size: 0.85rem; 
+    letter-spacing: 0.5px;
 }
 
 .btn-outline:hover {
