@@ -244,6 +244,7 @@ ul { list-style: none; }
     align-items: center; 
     gap: 6px;
     padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .chevron-down {
