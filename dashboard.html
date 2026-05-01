@@ -2179,14 +2179,10 @@
         </div>
 
         <!-- Reusing your exact Sidebar Content logic -->
-        <div class="nav-container p-1 rounded-xl border flex flex-col gap-1 mb-8 bg-slate-50">
-            <button onclick="switchRole('creator')" class="px-4 py-3 rounded-lg text-xs font-bold transition text-left flex items-center gap-2 bg-white shadow-sm" id="mobile-btn-creator">
-                <i data-feather="plus-square" class="w-4"></i> Creator Mode
-            </button>
-            <button onclick="switchRole('performer')" class="px-4 py-3 rounded-lg text-xs font-bold text-dash-secondary transition text-left flex items-center gap-2" id="mobile-btn-performer">
-                <i data-feather="zap" class="w-4"></i> Performer Mode
-            </button>
-        </div>
+            <div class="nav-container p-1 rounded-xl border flex flex-col gap-1 mb-8">
+                <button onclick="switchRole('creator')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-left flex items-center gap-2" id="btn-creator"><i data-feather="plus-square" class="w-3.5"></i> Creator Mode</button>
+                <button onclick="switchRole('performer')" class="px-4 py-2 rounded-lg text-xs font-bold text-dash-secondary transition text-left flex items-center gap-2" id="btn-performer"><i data-feather="zap" class="w-3.5"></i> Performer Mode</button>
+            </div>
 
         <nav class="flex-1 space-y-2">
             <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest px-2">Account</p>
