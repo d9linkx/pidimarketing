@@ -77,8 +77,8 @@
         /* Sidebar Layout for Desktop */
         @media (min-width: 850px) {
             .dashboard-layout { display: flex; }
-            aside.sidebar { width: 260px; height: 100vh; position: sticky; top: 0; display: flex; flex-direction: column; border-right: 1px solid var(--border-dash); background: var(--bg-sidebar); padding: 1.5rem; flex-shrink: 0; position: relative; overflow: hidden; }
-            main.content-area { flex: 1; padding: 0rem; }
+            aside.sidebar { width: 260px; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; border-right: 1px solid var(--border-dash); background: var(--bg-sidebar); padding: 1.5rem; z-index: 1001; overflow: hidden; }
+            main.content-area { flex: 1; padding: 0rem; margin-left: 260px; }
         }
         
         /* Sidebar Noise treatment */
@@ -357,7 +357,7 @@
             <div class="mb-8">
                 <a href="dashboard.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <img id="logo-img-sidebar" src="assets/pidiblack.png" alt="PIDI Logo" class="h-8 w-auto">
-                    <span class="text-lg font-normal">PIDI Tasks</span>
+                    <span class="text-lg font-normal">PIDItasks</span>
                 </a>
             </div>
 
@@ -366,6 +366,35 @@
             </div>
 
             <nav class="flex-1 space-y-1">
+                <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
+                <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i class="fa-solid fa-chart-line w-4 text-center"></i> Analytics
+                </a>
+                <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i class="fa-solid fa-layer-group w-4 text-center"></i> Campaigns
+                </a>
+                <a href="#" onclick="switchSPAView('wallet')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i class="fa-solid fa-wallet w-4 text-center"></i> Wallet
+                </a>
+                <div class="my-4 border-t border-dash"></div>
+                <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Tools</p>
+                <a href="academy.html" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i class="fa-solid fa-graduation-cap w-4 text-center"></i> PIDIlearn
+                </a>
+                <a href="#" onclick="switchSPAView('referrals')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i class="fa-solid fa-users-line w-4 text-center"></i> Referrals
+                </a>
+                <a href="#" onclick="switchSPAView('feedback')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i class="fa-solid fa-comment-dots w-4 text-center"></i> Feedback
+                </a>
+                <div class="admin-only hidden">
+                    <div class="my-4 border-t border-dash"></div>
+                    <p class="text-[9px] font-bold text-red-500 uppercase tracking-widest px-2 mb-2">Internal</p>
+                    <a href="#" onclick="switchSPAView('admin')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-red-500 hover:bg-red-500/10 transition font-bold">
+                        <i class="fa-solid fa-screwdriver-wrench w-4 text-center"></i> Admin Panel
+                    </a>
+                </div>
+                <div class="my-4 border-t border-dash"></div>
                 <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account</p>
                 <a href="#" onclick="openSettings('profile')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
@@ -386,7 +415,9 @@
 
         <!-- Main Content Area -->
         <main class="content-area flex-1 min-h-screen"> 
-            <header class="flex justify-between items-center gap-4 p-4 lg:px-4 border-b border-dash sticky top-0 z-[100] backdrop-blur-md" style="background: var(--bg-header);"> 
+            <!-- Fixed Header Container for All Devices -->
+            <div class="sticky top-0 z-[100] backdrop-blur-md" style="background: var(--bg-header);">
+                <header class="flex justify-between items-center gap-4 p-4 lg:px-4 border-b border-dash"> 
 
                 <!-- Search Bar (Desktop/Tablet) -->
                 <div class="search-bar-container flex-1 mx-0 hidden md:flex items-center">
@@ -417,128 +448,68 @@
             </header>
 
             <!-- Mobile Search Bar (visible only on small screens) -->
-            <header class="md:hidden p-4 border-b border-dash" style="background: var(--bg-header);">
+                <header class="md:hidden p-4 border-b border-dash">
                 <div class="relative w-full">
                     <input type="text" placeholder="Search tasks, campaigns, users..." class="w-full bg-dash-secondary border border-dash rounded-xl p-2.5 pl-10 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
                     <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-dash-secondary w-4 h-4"></i>
                 </div>
             </header>
-
-<div class="p-6 lg:p-4 mt-0 mb-0 flex flex-col md:flex-row md:justify-between md:items-center gap-6 md:gap-4">
-    <div class="space-y-1">
-        <h1 class="text-lg md:text-xl font-normal text-dash-secondary">
-            Welcome back, <span class="user-name-display text-[var(--text-primary)] font-semibold">Loading...</span>
-        </h1>
-        <p class="text-xs md:text-sm text-dash-secondary opacity-80">
-            Here's what's happening with your account today.
-        </p>
-    </div>
-
-    <div class="w-full md:w-auto">
-        <button id="main-cta-btn" onclick="openCampaignWizard()" 
-            class="btn-fintech btn-primary flex items-center justify-center w-full md:w-auto py-3 md:py-4 px-6 md:px-8 text-xs md:text-sm whitespace-nowrap shadow-lg shadow-blue-500/20">
-            <i data-feather="plus" class="w-4 h-4 mr-2"></i> 
-            <span id="main-cta" class="font-bold uppercase tracking-wider">Create Campaign</span>
-        </button>
-    </div>
-</div>
-
-            <!-- Creator Dashboard Layout -->
-                <div id="creator-dashboard-content" class="bento-grid p-4 mt-[-1rem] hidden gap-3 lg:gap-4">
-                <!-- Row 1: Active Campaigns & Create Campaign -->
-                
-<div class="bento-card bento-card col-span-2 md:order-second flex flex-col bg-[var(--bg-card)] border border-dash rounded-3xl overflow-hidden relative group">
-    <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-    <div class="card-explanation">
-        <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">Ongoing Campaigns</h4>
-        <p class="text-[11px] text-dash-secondary leading-relaxed">Live tracking of your active campaign progress, including real-time engagement counts and estimated time to completion.</p>
-    </div>
-    <div class="p-5 flex justify-between items-center border-b border-dash">
-<div class="flex flex-col gap-1.5">
-            <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-[var(--emerald-vibrant)] animate-pulse"></div>
-                <h2 class="text-2xl font-normal leading-tight">Ongoing</h2>
             </div>
-            <p class="text-[11px] text-dash-secondary font-medium pl-4">
-                Real-time performance tracking for your latest tasks
-            </p>
-        </div>
-        <span class="bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
-            12 Active
-        </span>
-    </div>
 
-    <div class="flex-1 overflow-hidden">
-        <table class="w-full text-left border-collapse">
-            <tbody class="divide-y divide-dash">
-                <tr class="group/row hover:bg-[var(--nav-bg)] transition-colors cursor-pointer">
-                    <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)] flex items-center justify-center">
-                                <i data-feather="trending-up" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs font-semibold text-[var(--text-primary)]">TikTok Brand Lift</p>
-                                <p class="text-[10px] text-dash-secondary">Ending in 4h</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4 hidden md:table-cell">
-                        <div class="flex flex-col gap-1">
-                            <div class="flex justify-between text-[9px] font-bold text-dash-secondary">
-                                <span>Progress</span>
-                                <span>85%</span>
-                            </div>
-                            <div class="w-28 bg-dash-secondary h-1 rounded-full overflow-hidden">
-                                <div class="bg-[var(--accent-primary)] h-full w-[85%]"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4 text-right">
-                        <button class="text-[10px] font-bold text-dash-secondary group-hover/row:text-[#8b5cf6] transition-colors flex items-center gap-1 ml-auto">
-                            DETAILS <i data-feather="chevron-right" class="w-3 h-3"></i>
+            <div id="dashboard-home-view" class="spa-view">
+                <div id="welcome-section" class="p-6 lg:p-4 mt-0 mb-0 flex flex-col md:flex-row md:justify-between md:items-center gap-6 md:gap-4">
+                    <div class="space-y-1">
+                        <h1 class="text-lg md:text-xl font-normal text-dash-secondary">
+                            Welcome back, <span class="user-name-display text-[var(--text-primary)] font-semibold">Loading...</span>
+                        </h1>
+                        <p class="text-xs md:text-sm text-dash-secondary opacity-80">
+                            Here's what's happening with your account today.
+                        </p>
+                    </div>
+
+                    <div class="w-full md:w-auto">
+                        <button id="main-cta-btn" onclick="openCampaignWizard()" 
+                            class="btn-fintech btn-primary flex items-center justify-center w-full md:w-auto py-3 md:py-4 px-6 md:px-8 text-xs md:text-sm whitespace-nowrap shadow-lg shadow-blue-500/20">
+                            <i data-feather="plus" class="w-4 h-4 mr-2"></i> 
+                            <span id="main-cta" class="font-bold uppercase tracking-wider">Create Campaign</span>
                         </button>
-                    </td>
-                </tr>
+                    </div>
+                </div>
 
-                <tr class="group/row hover:bg-[var(--nav-bg)] transition-colors cursor-pointer">
-                    <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] flex items-center justify-center">
-                                <i data-feather="play-circle" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs font-semibold text-[var(--text-primary)]">Product Unboxing</p>
-                                <p class="text-[10px] text-dash-secondary">Active</p>
-                            </div>
+                <!-- Creator Dashboard Layout -->
+                <div id="creator-dashboard-content" class="bento-grid p-4 mt-[-1rem] hidden gap-3 lg:gap-4">
+                    <!-- Row 1: Active Campaigns & Create Campaign -->
+                    <div class="bento-card col-span-2 md:order-second flex flex-col bg-[var(--bg-card)] border border-dash rounded-3xl overflow-hidden relative group">
+                        <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
+                        <div class="card-explanation">
+                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
+                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">Ongoing Campaigns</h4>
+                            <p class="text-[11px] text-dash-secondary leading-relaxed">Live tracking of your active campaign progress, including real-time engagement counts and estimated time to completion.</p>
                         </div>
-                    </td>
-                    <td class="p-4 hidden md:table-cell">
-                        <div class="flex flex-col gap-1">
-                            <div class="flex justify-between text-[9px] font-bold text-dash-secondary">
-                                <span>Progress</span>
-                                <span>40%</span>
+                        <div class="p-5 flex justify-between items-center border-b border-dash">
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-[var(--emerald-vibrant)] animate-pulse"></div>
+                                    <h2 class="text-2xl font-normal leading-tight">Ongoing</h2>
+                                </div>
+                                <p class="text-[11px] text-dash-secondary font-medium pl-4">
+                                    Real-time performance tracking for your latest tasks
+                                </p>
                             </div>
-                            <div class="w-28 bg-dash-secondary h-1 rounded-full overflow-hidden">
-                                <div class="bg-[var(--accent-primary)] h-full w-[40%]"></div>
-                            </div>
+                            <span id="ongoing-count" class="bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                                0 Active
+                            </span>
                         </div>
-                    </td>
-                    <td class="p-4 text-right">
-                        <button class="text-[10px] font-bold text-dash-secondary group-hover/row:text-[#8b5cf6] transition-colors flex items-center gap-1 ml-auto">
-                            DETAILS <i data-feather="chevron-right" class="w-3 h-3"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
 
-    <a href="#" onclick="scrollToTasks()" class="block p-4 text-center text-[11px] font-bold uppercase tracking-widest text-dash-secondary hover:text-[#8b5cf6] border-t border-dash transition-all bg-white/50">
-        View All Campaigns <i data-feather="arrow-right" class="w-3 h-3 inline ml-1"></i>
-    </a>
-</div>
+                        <div class="flex-1 overflow-hidden">
+                            <table class="w-full text-left border-collapse">
+                                <tbody id="ongoing-campaigns-list" class="divide-y divide-dash"></tbody>
+                            </table>
+                        </div>
+                        <a href="#" onclick="scrollToTasks()" class="block p-4 text-center text-[11px] font-bold uppercase tracking-widest text-dash-secondary hover:text-[#8b5cf6] border-t border-dash transition-all bg-white/50">
+                            View All Campaigns <i data-feather="arrow-right" class="w-3 h-3 inline ml-1"></i>
+                        </a>
+                    </div>
 
                 <!-- Changed 'col-span-1' to 'col-span-2 md:col-span-1' -->
                 <div class="bento-card col-span-2 md:col-span-1 md:order-first card-azure flex flex-col justify-between relative group">
@@ -573,7 +544,7 @@
                             <p class="text-[11px] text-dash-secondary leading-relaxed">The estimated visibility generated across social algorithms by human interactions and secondary shares.</p>
                         </div>
                         <div class="icon-box bg-[var(--azure-pale)] text-[var(--azure-vibrant)] mb-0 w-10 h-10"><i data-feather="eye" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Reach</p><h4 class="text-lg font-bold">102.4k</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Potential Impressions</p></div>
+                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Reach</p><h4 id="total-reach-val" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Potential Impressions</p></div>
                     </div>
 
                     <!-- Card 2: Submission Accuracy (Quality Control) -->
@@ -585,7 +556,7 @@
                             <p class="text-[11px] text-dash-secondary leading-relaxed">Our 'Bot-Killer' metric ensuring all interactions are authentic and strictly follow the 10-word rule.</p>
                         </div>
                         <div class="icon-box bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] mb-0 w-10 h-10"><i data-feather="shield" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Accuracy</p><h4 class="text-lg font-bold">98.2%</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Verified Human Work</p></div>
+                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Accuracy</p><h4 id="accuracy-score-val" class="text-lg font-bold">0%</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Verified Human Work</p></div>
                     </div>
 
                     <!-- Card 3: Cost Per Engagement (ROI) -->
@@ -597,7 +568,7 @@
                             <p class="text-[11px] text-dash-secondary leading-relaxed">ROI metric representing the average amount spent per verified human engagement compared to high ad costs.</p>
                         </div>
                         <div class="icon-box bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)] mb-0 w-10 h-10"><i data-feather="target" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Avg. CPE</p><h4 class="text-lg font-bold">₦2.50</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Better than IG Ads</p></div>
+                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Avg. CPE</p><h4 id="avg-cpe-val" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Better than IG Ads</p></div>
                     </div>
 
                     <!-- Card 4: Active Creators (Social Proof) -->
@@ -611,7 +582,7 @@
                         <div class="icon-box bg-[var(--amber-pale)] text-[var(--amber-vibrant)] mb-0 w-10 h-10"><i data-feather="users" class="w-5"></i></div>
                         <div>
                             <p class="text-dash-secondary text-[8px] uppercase font-bold">Live Workforce</p>
-                            <h4 class="text-lg font-bold">412</h4>
+                             <h4 id="live-workforce-val" class="text-lg font-bold">0</h4>
                             <p class="text-[7px] text-dash-secondary font-bold uppercase">Creators at work</p>
                         </div>
                         
@@ -672,169 +643,315 @@
         </table>
     </div>
 </div>
+                </div> <!-- End creator-dashboard-content -->
+            </div>
 
-        </main>
+            <!-- SPA CONTAINER: Analytics View -->
+            <div id="analytics-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold">Analytics Engine</h2>
+                    <button class="bg-dash-secondary px-4 py-2 rounded-xl text-xs font-bold border border-dash">Export CSV</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bento-card h-[300px] flex items-center justify-center border-dashed">
+                        <p class="text-dash-secondary text-sm">Engagement Growth Chart Placeholder</p>
+                    </div>
+                    <div class="bento-card h-[300px] flex items-center justify-center border-dashed">
+                        <p class="text-dash-secondary text-sm">Audience Retention Chart Placeholder</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Campaigns View -->
+            <div id="campaigns-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold">Your Missions</h2>
+                    <button onclick="openCampaignWizard()" class="accent-gradient px-6 py-3 rounded-xl font-bold text-sm">New Campaign</button>
+                </div>
+                <div class="bento-card">
+                    <table class="w-full text-left text-sm">
+                        <tbody id="full-campaign-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Wallet View -->
+            <div id="wallet-view" class="spa-view hidden p-6 lg:p-8 max-w-4xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+                    <div>
+                        <h2 class="text-3xl font-bold">Creator Treasury</h2>
+                        <p class="text-dash-secondary text-sm">Financial overview of your marketing spend</p>
+                    </div>
+                    <button onclick="openCampaignWizard()" class="btn-fintech btn-primary">
+                        <i class="fa-solid fa-plus mr-2"></i> Fund New Mission
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bento-card card-azure">
+                        <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest mb-3">Total Invested</p>
+                        <h3 class="text-3xl font-bold mb-1" id="wallet-total-paid">₦0</h3>
+                        <p class="text-[10px] text-dash-secondary">Lifetime deployment</p>
+                    </div>
+                    <div class="bento-card card-amber">
+                        <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest mb-3">Working Capital</p>
+                        <h3 class="text-3xl font-bold mb-1" id="wallet-working-funds">₦0</h3>
+                        <p class="text-[10px] text-dash-secondary">Active missions funding</p>
+                    </div>
+                    <div class="bento-card card-emerald">
+                        <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest mb-3">Spent/Completed</p>
+                        <h3 class="text-3xl font-bold mb-1" id="wallet-spent-funds">₦0</h3>
+                        <p class="text-[10px] text-dash-secondary">Fully delivered value</p>
+                    </div>
+                </div>
+
+                <div class="bento-card">
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="font-bold">Deployment History</h4>
+                        <i class="fa-solid fa-clock-rotate-left text-dash-secondary text-xs"></i>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-dash-secondary border-b border-dash">
+                                    <th class="pb-3 uppercase tracking-widest">Transaction ID</th>
+                                    <th class="pb-3 uppercase tracking-widest">Type</th>
+                                    <th class="pb-3 uppercase tracking-widest">Amount</th>
+                                    <th class="pb-3 uppercase tracking-widest text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wallet-ledger-body">
+                                <tr><td colspan="4" class="py-8 text-center text-dash-secondary">No transactions recorded.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Admin Verification View -->
+            <div id="admin-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold">Admin Verification Hub</h2>
+                        <p class="text-dash-secondary text-sm">Review receipts and approve campaign deployments</p>
+                    </div>
+                    <span class="bg-red-500/10 text-red-500 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Confidential</span>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-4" id="admin-pending-list">
+                    <!-- Pending items injected here -->
+                    <div class="bento-card text-center py-20 text-dash-secondary">
+                        <i class="fa-solid fa-circle-check text-4xl mb-4 opacity-20"></i>
+                        <p>Queue clear. All payments verified.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Referrals View -->
+            <div id="referrals-view" class="spa-view hidden p-6 lg:p-8 max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-8">Referral Program</h2>
+                <div class="bento-card card-azure mb-10">
+                    <h4 class="font-bold mb-2">Earn 5% on every deposit</h4>
+                    <p class="text-sm opacity-80 mb-6">Invite other creators to PIDItasks and earn commissions on their campaign spend.</p>
+                    <div class="flex gap-2">
+                        <input type="text" readonly value="https://piditasks.com/ref/${currentUser.id}" class="flex-1 bg-white/20 border border-white/30 rounded-xl p-3 text-xs font-mono">
+                        <button class="bg-white text-black px-6 rounded-xl font-bold text-xs">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Feedback View -->
+            <div id="feedback-view" class="spa-view hidden p-6 lg:p-8 max-w-2xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-4">Help us improve</h2>
+                <p class="text-dash-secondary mb-10">Spotted a bug or have a feature request? Let our engineering team know.</p>
+                <textarea class="w-full bg-dash-secondary border border-dash rounded-3xl p-6 text-sm mb-6" rows="6" placeholder="Tell us anything..."></textarea>
+                <button class="accent-gradient w-full py-4 rounded-2xl font-bold shadow-lg">Submit Feedback</button>
+            </div>
+
+            <div id="campaign-creation-view" class="spa-view hidden p-6 lg:p-8 max-w-4xl mx-auto">
+<div class="bento-card w-full relative p-6 md:p-8">
+    <div class="flex items-center justify-between mb-10">
+        <button onclick="closeCampaignWizard()" class="text-dash-secondary hover:text-[var(--text-primary)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors group">
+            <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> 
+            <span>Back to Dashboard</span>
+        </button>
+
+        <div class="flex gap-1.5">
+            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-[var(--accent-primary)] shadow-[0_0_8px_rgba(69,185,110,0.3)]" id="bar-1"></div>
+            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-dash-secondary" id="bar-2"></div>
+            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-dash-secondary" id="bar-3"></div>
+            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-dash-secondary" id="bar-4"></div>
+        </div>
     </div>
 
-    <!-- Campaign Creation Wizard Overlay -->
-    <div id="wizard-overlay" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bento-card w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
-            <button onclick="closeCampaignWizard()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-
-            <!-- Progress Header -->
-            <div class="flex items-center justify-between mb-10 px-4">
-                <div class="flex gap-4">
-                    <div class="step-node active" id="node-1">1</div>
-                    <div class="step-node" id="node-2">2</div>
-                    <div class="step-node" id="node-3">3</div>
-                    <div class="step-node" id="node-4">4</div>
-                </div>
-                <div class="text-right">
-                    <p class="text-[8px] sm:text-[8px] md:text-[14px] font-bold text-dash-secondary uppercase tracking-widest">Current Step</p>
-                    <p class="text-[8px] sm:text-[10px] md:text-xs font-bold" id="step-title">Campaign Goal</p>
-                </div>
-            </div>
-
-            <!-- Step 1: Goal & URL -->
-            <div id="step-1" class="wizard-step space-y-6">
-                <h3 class="text-2xl font-bold">What are we promoting?</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Select Platform</label>
-                        <div class="grid grid-cols-3 gap-3">
-                            <button onclick="selectPlatform('instagram')" class="platform-btn p-4 rounded-2xl border border-[var(--accent-primary)] bg-[var(--accent-primary)]/5 transition text-center active" id="plt-instagram"><i class="fa-brands fa-instagram text-xl mb-2"></i><p class="text-[9px] font-bold">Instagram</p></button>
-                            <button onclick="selectPlatform('google')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-google"><i class="fa-brands fa-google text-xl mb-2"></i><p class="text-[9px] font-bold">Google</p></button>
-                            <button onclick="selectPlatform('tiktok')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-tiktok"><i class="fa-brands fa-tiktok text-xl mb-2"></i><p class="text-[9px] font-bold">TikTok</p></button>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Target URL</label>
-                        <input type="url" id="target-url" placeholder="https://..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: Quantity -->
-            <div id="step-2" class="wizard-step hidden space-y-6">
-                <h3 class="text-2xl font-bold">Set your target</h3>
-                <div class="p-6 bg-dash-secondary rounded-2xl border border-dash">
-                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-4">Quantity of Engagements</label>
-                    <input type="range" id="goal-range" min="10" max="1000" step="10" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[var(--accent-primary)]" oninput="updateCalculation()">
-                    <div class="flex justify-between mt-4">
-                        <span class="text-3xl font-bold" id="goal-val">10</span>
-                        <span class="text-3xl font-bold text-[var(--accent-primary)]" id="cost-val">₦1,000</span>
-                    </div>
-                </div>
-                <p class="text-xs text-dash-secondary italic">* Price calculated at ₦100 per high-quality human interaction.</p>
-            </div>
-
-            <!-- Step 3: Instructions -->
-            <div id="step-3" class="wizard-step hidden space-y-6">
-                <h3 class="text-2xl font-bold">Custom Instructions</h3>
-                <div>
-                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Required Keywords / Context</label>
-                    <textarea id="task-instructions" rows="4" placeholder="e.g. Please ask about international shipping. Use at least 10 words. Mention 'quality'..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></textarea>
-                </div>
-                <div class="flex gap-2">
-                    <span class="bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-3 py-1 rounded-lg text-[10px] font-bold">RULE OF 10 WORDS</span>
-                    <span class="bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-3 py-1 rounded-lg text-[10px] font-bold">HUMAN VERIFIED</span>
-                </div>
-            </div>
-
-            <!-- Step 4: Payment -->
-            <div id="step-4" class="wizard-step hidden space-y-6">
-                <div id="payment-details-view" class="space-y-6">
-                    <h3 class="text-2xl font-bold">Direct Bank Payment</h3>
-                    <div class="p-8 border-2 border-dashed border-dash rounded-3xl text-center space-y-6">
-                        <p class="text-sm text-dash-secondary">Please make a direct payment of <span class="font-bold text-[var(--text-primary)]" id="final-cost">₦1,000</span> to the account below. Your campaign will launch immediately upon verification.</p>
-                        
-                        <div class="bg-dash-secondary p-6 rounded-2xl text-left space-y-4 border border-dash">
-                            <div class="flex justify-between items-center">
-                                <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Account Number</p>
-                                <button onclick="copyAccountNumber()" class="text-[10px] font-bold text-[var(--accent-primary)] hover:underline">COPY</button>
-                            </div>
-                            <p class="text-2xl font-bold tracking-tighter">3000487237</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-dash">
-                                <div>
-                                    <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest">Bank</p>
-                                    <p class="text-xs font-bold">KUDA MFB</p>
-                                </div>
-                                <div>
-                                    <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest">Name</p>
-                                    <p class="text-xs font-bold">Prince Chidera Dike</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="py-4 px-6 bg-dash-secondary/50 rounded-2xl flex items-center justify-between text-left border border-dash">
-                            <div>
-                                <p class="text-[10px] font-bold text-dash-secondary uppercase">Order Summary</p>
-                                <p class="text-xs font-bold" id="summary-text">10 Instagram Comments</p>
-                            </div>
-                            <i class="fa-solid fa-receipt text-[var(--accent-primary)]"></i>
-                        </div>
-
-                        <div>
-                            <p class="text-[11px] text-dash-secondary italic">Payments are processed manually by our compliance team.</p>
-                            <button onclick="toggleRefundPolicy(true)" class="text-[11px] text-[var(--accent-primary)] font-bold hover:underline mt-2">View Refund Policy</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="refund-policy-view" class="hidden space-y-6">
-                    <h3 class="text-2xl font-bold">Refund Policy</h3>
-                    <div class="bg-dash-secondary p-6 rounded-2xl text-sm leading-relaxed text-dash-secondary max-h-[350px] overflow-y-auto border border-dash">
-                        <p class="mb-4 text-[var(--text-primary)] font-bold">Terms of Service & Refund Eligibility</p>
-                        <p class="mb-4">At PIDI Marketing, we strive to ensure 100% satisfaction for every campaign launched. However, because we initiate real-time human engagement immediately upon payment verification, our refund policy is strictly structured to protect both our performers and our clients.</p>
-                        <p class="mb-4">1. Non-Performance: If your campaign fails to reach the target quantity of engagements within the specified timeframe (standard 72 hours unless otherwise stated), you are eligible for a pro-rated refund for the unfulfilled portion of the campaign.</p>
-                        <p class="mb-4">2. Quality Standards: Every engagement is verified by our AI "Bot-Killer" and manual audit team. If you find engagements that do not meet our "Rule of 10 Words" or quality guidelines, please report them within 24 hours for a credit replacement or partial refund.</p>
-                        <p class="mb-4">3. Direct Payment: Please note that payments made via bank transfer are for specific service delivery. Once performers are assigned and tasks are claimed, the funds are committed to the workforce pool to ensure fair compensation for our human taskers.</p>
-                        <p class="mb-4">4. Cancellation: Campaigns can be paused at any time, but funds already distributed to performers for completed tasks cannot be reversed. Remaining balances can be applied to new campaigns or refunded upon request.</p>
-                        <p>5. Support: To request a review of your campaign, please contact the Support Desk with your Transaction ID. Our team typically resolves all claims within 48 hours. We value the trust you place in our network and ensure that every Naira spent contributes directly to your brand's growth through genuine human interaction. By proceeding with this transfer, you acknowledge that PIDI Marketing acts as a facilitator for verified attention and that results depend on the quality of the target content provided.</p>
-                    </div>
-                    <button onclick="toggleRefundPolicy(false)" class="w-full bg-white text-black py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Back to Payment</button>
-                </div>
-
-                <div id="proof-submission-view" class="hidden space-y-6 text-center">
-                    <h3 class="text-2xl font-bold">Submit Payment Proof</h3>
-                    <p class="text-sm text-dash-secondary">Your campaign launches as soon as our team verifies your transfer.</p>
-                    
-                    <div class="space-y-4">
-                        <div class="relative group">
-                            <input type="file" id="payment-proof-file" accept="image/*,.pdf" class="hidden" onchange="updateProofLabel(this)">
-                            <label for="payment-proof-file" class="w-full bg-dash-secondary border-2 border-dashed border-dash hover:border-[var(--accent-primary)] transition p-8 rounded-3xl flex flex-col items-center gap-3 cursor-pointer group-hover:bg-dash-secondary/80">
-                                <i class="fa-solid fa-cloud-arrow-up text-3xl text-dash-secondary group-hover:text-[var(--accent-primary)]"></i>
-                                <span id="proof-file-label" class="text-xs font-bold text-dash-secondary uppercase tracking-widest">Upload Receipt (IMG/PDF)</span>
-                            </label>
-                        </div>
-
-                        <div class="flex items-center gap-4 py-2">
-                            <div class="h-px bg-dash-secondary flex-1"></div>
-                            <span class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">OR</span>
-                            <div class="h-px bg-dash-secondary flex-1"></div>
-                        </div>
-
-                        <a href="https://wa.me/2347070989034" target="_blank" class="w-full bg-green-500/10 text-green-500 border border-green-500/30 py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-green-500/20 transition">
-                            <i class="fa-brands fa-whatsapp text-xl"></i> Send Proof on WhatsApp
-                        </a>
-                    </div>
-
-                    <button onclick="finishCreation()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">
-                        Submit & Launch Campaign
-                    </button>
-                    <button onclick="toggleProofSubmission(false)" class="text-[11px] text-dash-secondary font-bold hover:underline">Back to Details</button>
-                </div>
-            </div>
-
-            <!-- Footer Navigation -->
-            <div class="mt-10 flex gap-3">
-                <button onclick="prevStep()" id="prev-btn" class="hidden flex-1 bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Back</button>
-                <button onclick="nextStep()" id="next-btn" class="flex-[2] accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Continue</button>
-                <button onclick="toggleProofSubmission(true)" id="finish-btn" class="hidden flex-[2] bg-green-500 text-white py-4 rounded-2xl font-bold text-sm shadow-lg hover:bg-green-600 transition">I've Made the Transfer</button>
-            </div>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-dash pb-8 mb-8">
+        <div class="flex items-center gap-3">
+            <div class="step-node active shadow-lg shadow-[var(--accent-primary)]/20" id="node-1">1</div>
+            <div class="h-[1px] w-4 bg-dash-secondary opacity-50"></div>
+            <div class="step-node" id="node-2">2</div>
+            <div class="h-[1px] w-4 bg-dash-secondary opacity-50"></div>
+            <div class="step-node" id="node-3">3</div>
+            <div class="h-[1px] w-4 bg-dash-secondary opacity-50"></div>
+            <div class="step-node" id="node-4">4</div>
         </div>
+
+        <div class="flex flex-col md:items-end">
+            <p class="text-[9px] font-black text-dash-secondary uppercase tracking-[0.2em] mb-1">Step Configuration</p>
+            <h3 class="text-xl md:text-2xl font-normal tracking-tight" id="step-title">Campaign Goal</h3>
+        </div>
+    </div>
+
+                    <!-- Step 1: Goal & URL -->
+                    <div id="step-1" class="wizard-step space-y-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Select Platform</label>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <button onclick="selectPlatform('instagram')" class="platform-btn p-4 rounded-2xl border border-[var(--accent-primary)] bg-[var(--accent-primary)]/5 transition text-center active" id="plt-instagram"><i class="fa-brands fa-instagram text-xl mb-2"></i><p class="text-[9px] font-bold">Instagram</p></button>
+                                    <button onclick="selectPlatform('google')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-google"><i class="fa-brands fa-google text-xl mb-2"></i><p class="text-[9px] font-bold">Google</p></button>
+                                    <button onclick="selectPlatform('tiktok')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-tiktok"><i class="fa-brands fa-tiktok text-xl mb-2"></i><p class="text-[9px] font-bold">TikTok</p></button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Target URL</label>
+                                <input type="url" id="target-url" placeholder="https://..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Quantity -->
+                    <div id="step-2" class="wizard-step hidden space-y-6">
+                        <div class="p-6 bg-dash-secondary rounded-2xl border border-dash">
+                            <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-4">Quantity of Engagements</label>
+                            <input type="range" id="goal-range" min="10" max="1000" step="10" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[var(--accent-primary)]" oninput="updateCalculation()">
+                            <div class="flex justify-between mt-4">
+                                <span class="text-3xl font-bold" id="goal-val">10</span>
+                                <span class="text-3xl font-bold text-[var(--accent-primary)]" id="cost-val">₦1,000</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-dash-secondary italic">* Price calculated at ₦100 per high-quality human interaction.</p>
+                    </div>
+
+                    <!-- Step 3: Instructions -->
+                    <div id="step-3" class="wizard-step hidden space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Required Keywords / Context</label>
+                            <textarea id="task-instructions" rows="4" placeholder="e.g. Please ask about international shipping. Use at least 10 words. Mention 'quality'..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></textarea>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-3 py-1 rounded-lg text-[10px] font-bold">RULE OF 10 WORDS</span>
+                            <span class="bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-3 py-1 rounded-lg text-[10px] font-bold">HUMAN VERIFIED</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Payment -->
+                    <div id="step-4" class="wizard-step hidden space-y-6">
+                        <div id="payment-details-view" class="space-y-6">
+                            <div class="p-8 border-2 border-dashed border-dash rounded-3xl text-center space-y-6">
+                                <p class="text-sm text-dash-secondary">Please make a direct payment of <span class="font-bold text-[var(--text-primary)]" id="final-cost">₦1,000</span> to the account below. Your campaign will launch immediately upon verification.</p>
+                                
+                                <div class="bg-dash-secondary p-6 rounded-2xl text-left space-y-4 border border-dash">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Account Number</p>
+                                        <button onclick="copyAccountNumber()" class="text-[10px] font-bold text-[var(--accent-primary)] hover:underline">COPY</button>
+                                    </div>
+                                    <p class="text-2xl font-bold tracking-tighter">3000487237</p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-dash">
+                                        <div>
+                                            <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest">Bank</p>
+                                            <p class="text-xs font-bold">KUDA MFB</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest">Name</p>
+                                            <p class="text-xs font-bold">Prince Chidera Dike</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="py-4 px-6 bg-dash-secondary/50 rounded-2xl flex items-center justify-between text-left border border-dash">
+                                    <div>
+                                        <p class="text-[10px] font-bold text-dash-secondary uppercase">Order Summary</p>
+                                        <p class="text-xs font-bold" id="summary-text">10 Instagram Comments</p>
+                                    </div>
+                                    <i class="fa-solid fa-receipt text-[var(--accent-primary)]"></i>
+                                </div>
+
+                                <div>
+                                    <p class="text-[11px] text-dash-secondary italic">Payments are processed manually by our compliance team.</p>
+                                    <button onclick="toggleRefundPolicy(true)" class="text-[11px] text-[var(--accent-primary)] font-bold hover:underline mt-2">View Refund Policy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="refund-policy-view" class="hidden space-y-6">
+                            <h3 class="text-2xl font-bold">Refund Policy</h3>
+                            <div class="bg-dash-secondary p-6 rounded-2xl text-sm leading-relaxed text-dash-secondary max-h-[350px] overflow-y-auto border border-dash">
+                                <p class="mb-4 text-[var(--text-primary)] font-bold">Terms of Service & Refund Eligibility</p>
+                                <p class="mb-4">At PIDI Marketing, we strive to ensure 100% satisfaction for every campaign launched. However, because we initiate real-time human engagement immediately upon payment verification, our refund policy is strictly structured to protect both our performers and our clients.</p>
+                                <p class="mb-4">1. Non-Performance: If your campaign fails to reach the target quantity of engagements within the specified timeframe (standard 72 hours unless otherwise stated), you are eligible for a pro-rated refund for the unfulfilled portion of the campaign.</p>
+                                <p class="mb-4">2. Quality Standards: Every engagement is verified by our AI "Bot-Killer" and manual audit team. If you find engagements that do not meet our "Rule of 10 Words" or quality guidelines, please report them within 24 hours for a credit replacement or partial refund.</p>
+                                <p class="mb-4">3. Direct Payment: Please note that payments made via bank transfer are for specific service delivery. Once performers are assigned and tasks are claimed, the funds are committed to the workforce pool to ensure fair compensation for our human taskers.</p>
+                                <p class="mb-4">4. Cancellation: Campaigns can be paused at any time, but funds already distributed to performers for completed tasks cannot be reversed. Remaining balances can be applied to new campaigns or refunded upon request.</p>
+                                <p>5. Support: To request a review of your campaign, please contact the Support Desk with your Transaction ID. Our team typically resolves all claims within 48 hours. We value the trust you place in our network and ensure that every Naira spent contributes directly to your brand's growth through genuine human interaction. By proceeding with this transfer, you acknowledge that PIDI Marketing acts as a facilitator for verified attention and that results depend on the quality of the target content provided.</p>
+                            </div>
+                            <button onclick="toggleRefundPolicy(false)" class="w-full bg-white text-black py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Back to Payment</button>
+                        </div>
+
+                        <div id="proof-submission-view" class="hidden space-y-6 text-center">
+                            <h3 class="text-2xl font-bold">Submit Payment Proof</h3>
+                            <p class="text-sm text-dash-secondary">Your campaign launches as soon as our team verifies your transfer.</p>
+                            
+                            <div class="space-y-4">
+                                <div class="relative group">
+                                    <input type="file" id="payment-proof-file" accept="image/*,.pdf" class="hidden" onchange="updateProofLabel(this)">
+                                    <label for="payment-proof-file" class="w-full bg-dash-secondary border-2 border-dashed border-dash hover:border-[var(--accent-primary)] transition p-8 rounded-3xl flex flex-col items-center gap-3 cursor-pointer group-hover:bg-dash-secondary/80">
+                                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-dash-secondary group-hover:text-[var(--accent-primary)]"></i>
+                                        <span id="proof-file-label" class="text-xs font-bold text-dash-secondary uppercase tracking-widest">Upload Receipt (IMG/PDF)</span>
+                                    </label>
+                                </div>
+
+                                <div class="flex items-center gap-4 py-2">
+                                    <div class="h-px bg-dash-secondary flex-1"></div>
+                                    <span class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">OR</span>
+                                    <div class="h-px bg-dash-secondary flex-1"></div>
+                                </div>
+
+                                <a href="https://wa.me/2347070989034" target="_blank" class="w-full bg-green-500/10 text-green-500 border border-green-500/30 py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-green-500/20 transition">
+                                    <i class="fa-brands fa-whatsapp text-xl"></i> Send Proof on WhatsApp
+                                </a>
+                            </div>
+
+<button onclick="finishCreation()" 
+    class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+    <span>Submit & Launch Campaign</span>
+    <i data-feather="arrow-up-right" class="ml-2 w-4 h-4"></i>
+</button>
+                            <button onclick="toggleProofSubmission(false)" class="text-[11px] text-dash-secondary font-bold hover:underline">Back to Details</button>
+                        </div>
+                    </div>
+
+                    <!-- Footer Navigation -->
+<div class="mt-10 flex flex-col md:flex-row gap-3">
+    <button onclick="prevStep()" id="prev-btn" 
+        class="hidden flex-1 btn-fintech bg-dash-secondary border border-dash text-dash-secondary justify-center py-4 hover:opacity-80 transition-all">
+        <i data-feather="arrow-left" class="mr-2"></i> Back
+    </button>
+
+    <button onclick="nextStep()" id="next-btn" 
+        class="flex-[2] btn-fintech btn-primary justify-center py-4 shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+        Continue <i data-feather="arrow-right" class="ml-2"></i>
+    </button>
+
+<button onclick="toggleProofSubmission(true)" id="finish-btn" 
+    class="hidden flex-[2] btn-fintech btn-primary justify-center py-4 shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+    <span>I've Made the Transfer</span>
+    <i data-feather="check-circle" class="ml-2"></i>
+</button>
+</div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <!-- Wallet: Deposit Modal (Creator) -->
@@ -1047,15 +1164,33 @@
                 roles.creator.allocatedFunds = profile.allocated_funds || 0;
             }
 
-            // Real-time task updates subscription
-            supabase.channel('tasks-realtime')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'campaigns' }, () => {
+            // Real-time Engine: Campaigns, Wallet, and Global Activity
+            supabase.channel('dashboard-sync')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'campaigns' }, payload => {
                     fetchRoleData(currentRole);
                 })
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'campaigns' }, payload => {
+                    // Instant Update: Transition from PENDING_VERIFICATION to ACTIVE
+                    if (payload.old.status === 'pending_verification' && payload.new.status === 'active') {
+                        window.triggerConfetti();
+                    }
+                    fetchRoleData(currentRole);
+                })
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_activity' }, payload => {
+                    // Live Updates Feed: Nigerian performers completing tasks
+                    addToLiveFeed(payload.new);
+                })
+                .on('postgres_changes', { 
+                    event: 'UPDATE', 
+                    schema: 'public', 
+                    table: 'profiles', 
+                    filter: `id=eq.${user.id}` 
+                }, payload => {
+                    roles.creator.availableBalance = payload.new.balance;
+                    roles.creator.allocatedFunds = payload.new.allocated_funds;
+                    updateWalletDisplay();
+                })
                 .subscribe();
-
-            // Initialize dynamic components
-            refreshActivityFeed();
 
             // Initialize View based on query param OR user's stored role preference
             const urlParams = new URLSearchParams(window.location.search);
@@ -1084,38 +1219,14 @@
             });
 
             const desktopBtn = document.getElementById(`btn-${role}`);
-            
             [desktopBtn].forEach(btn => {
                 if (btn) {
                     btn.classList.add('active-btn');
                     btn.classList.remove('text-dash-secondary');
                 }
             });
-
-            // Keep Menu logic: Close mobile menu if open
-            const menu = document.getElementById('mobile-menu');
-            if (menu && !menu.classList.contains('hidden')) toggleMobileMenu();
-
-            // Update Labels from config
-            const config = ROLE_CONFIG['creator'];
+            
             if (role === 'creator') checkMilestones(roles.creator.totalGrowthMetric);
-            
-            // Resilient check for legacy UI elements
-            const labelEl = document.getElementById('main-stat-label');
-            const subEl = document.getElementById('main-sub-label');
-            const ctaEl = document.getElementById('main-cta');
-            
-            if (labelEl) labelEl.innerText = config.label;
-            if (subEl) subEl.innerText = config.sub;
-            if (ctaEl) ctaEl.innerText = config.cta;
-            
-            // Update CTA Icon and Action
-            const mainCtaBtn = document.getElementById('main-cta-btn');
-            if (mainCtaBtn) {
-                const iconEl = mainCtaBtn.querySelector('i');
-                if (iconEl) iconEl.className = `fa-solid ${config.icon}`;
-                mainCtaBtn.onclick = () => window.openCampaignWizard();
-            }
 
             updateWalletDisplay();
             fetchRoleData('creator');
@@ -1124,11 +1235,112 @@
         async function fetchRoleData(role) {
             try {
                 if (role === 'creator') {
-                    const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
+                    // 1. Fetch Missions (SELECT query filtered by user's ID)
+                    const { data: campaigns } = await supabase
+                        .from('campaigns')
+                        .select('*')
+                        .eq('creator_id', currentUser.id)
+                        .order('created_at', { ascending: false });
+                    
                     roles.creator.items = campaigns || [];
-                    const valEl = document.getElementById('main-value');
-                    if (valEl) valEl.innerText = roles.creator.items.length;
-                    renderTable(campaigns?.map(c => ({ name: c.target_url, status: c.status, metric: `${c.current_count}/${c.goal_count}` })) || [], 'creator-campaign-list');
+
+                    // 2. Populate Ongoing & Your Campaigns cards
+                    const activeCampaigns = (campaigns || []).filter(c => c.status === 'active');
+                    const ongoingCountEl = document.getElementById('ongoing-count');
+                    if (ongoingCountEl) ongoingCountEl.innerText = `${activeCampaigns.length} Active`;
+                    renderOngoingTable(activeCampaigns);
+
+                    renderTable(campaigns?.map(c => ({ 
+                        name: c.target_url, 
+                        status: c.status === 'pending_verification' ? 'Verifying' : c.status, 
+                        metric: `${c.current_count}/${c.goal_count}` 
+                    })) || [], 'creator-campaign-list');
+
+                    // 3. Update Analytics via Aggregated Stats
+                    fetchAnalytics();
+        async function fetchAnalytics() {
+            try {
+                // RPC to aggregate data from engagements and campaigns tables
+                const { data, error } = await supabase.rpc('get_creator_analytics', { creator_id: currentUser.id });
+                if (error) throw error;
+                if (data) {
+                    document.getElementById('total-reach-val').innerText = data.total_reach || '0';
+                    document.getElementById('accuracy-score-val').innerText = (data.accuracy || '0') + '%';
+                    document.getElementById('avg-cpe-val').innerText = '₦' + (data.avg_cpe || '0');
+                    document.getElementById('live-workforce-val').innerText = data.live_workforce || '0';
+                }
+            } catch (err) {
+                console.error("Analytics Sync Error:", err);
+            }
+        }
+
+        function renderOngoingTable(campaigns) {
+            const list = document.getElementById('ongoing-campaigns-list');
+            if (!list) return;
+            if (!campaigns.length) {
+                list.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-xs text-dash-secondary">No active missions running.</td></tr>';
+                return;
+            }
+            list.innerHTML = campaigns.map(c => {
+                const progress = Math.round((c.current_count / c.goal_count) * 100) || 0;
+                return `
+                    <tr class="group/row hover:bg-[var(--nav-bg)] transition-colors cursor-pointer">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)] flex items-center justify-center">
+                                    <i class="fa-solid fa-trending-up w-4 h-4 text-center"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold text-[var(--text-primary)]">${c.platform.toUpperCase()} Mission</p>
+                                    <p class="text-[10px] text-dash-secondary">${c.target_url.split('/')[2] || 'Campaign'}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 hidden md:table-cell">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex justify-between text-[9px] font-bold text-dash-secondary">
+                                    <span>Progress</span>
+                                    <span>${progress}%</span>
+                                </div>
+                                <div class="w-28 bg-dash-secondary h-1 rounded-full overflow-hidden">
+                                    <div class="bg-[var(--accent-primary)] h-full" style="width: ${progress}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 text-right">
+                            <button class="text-[10px] font-bold text-dash-secondary group-hover/row:text-[#8b5cf6] transition-colors flex items-center gap-1 ml-auto">
+                                DETAILS <i class="fa-solid fa-chevron-right w-3 h-3"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function addToLiveFeed(activity) {
+            const feed = document.getElementById('live-activity-feed');
+            if (!feed) return;
+            
+            const avatar = activity.user_avatar || `https://ui-avatars.com/api/?name=${activity.user_handle || 'User'}&background=random&color=fff`;
+
+            const item = document.createElement('div');
+            item.className = 'flex gap-3 items-start opacity-0 translate-y-4 transition-all duration-500 py-1';
+            item.innerHTML = `
+                <div class="relative">
+                    <img src="${avatar}" class="w-7 h-7 rounded-lg border border-dash flex-shrink-0">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[11px] leading-tight text-[var(--text-primary)]">
+                        <span class="font-bold">${activity.user_handle || 'Pidian'}</span> ${activity.message || 'completed a task'}
+                    </p>
+                    <p class="text-[9px] text-dash-secondary mt-1">Just now</p>
+                </div>
+            `;
+            feed.prepend(item);
+            setTimeout(() => item.classList.remove('opacity-0', 'translate-y-4'), 50);
+            
+            if (feed.children.length > 15) feed.lastElementChild.remove();
+        }
                     
                     if (campaigns?.length > 0) {
                         const totalGoals = campaigns.reduce((acc, c) => acc + c.goal_count, 0);
@@ -1245,29 +1457,149 @@
         let taskTimerInterval = null;
         let taskCountdownSeconds = 0;
 
-        window.openCampaignWizard = function() {
-            document.getElementById('wizard-overlay').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+        window.switchSPAView = function(viewId) {
+            // Hide all SPA views
+            document.querySelectorAll('.spa-view').forEach(view => view.classList.add('hidden'));
+            
+            // Show target view
+            const target = document.getElementById(`${viewId}-view`);
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Trigger data fetches for specific views
+                if (viewId === 'wallet') fetchWalletData();
+                if (viewId === 'admin') fetchAdminPendingMissions();
+                if (viewId === 'campaigns') fetchRoleData('creator');
+            }
+
+            // Special case logic
+            if (viewId === 'dashboard-home') {
+                const grid = document.getElementById('creator-dashboard-content');
+                if (grid) grid.classList.remove('hidden');
+            }
+            
+            // Auto-close mobile menu if open
+            const menu = document.getElementById('mobile-menu');
+            if (menu && !menu.classList.contains('hidden')) toggleMobileMenu();
         }
 
-        window.closeCampaignWizard = function() {
-            document.getElementById('wizard-overlay').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-            resetWizard();
+        // --- WALLET DATA LOGIC ---
+        async function fetchWalletData() {
+            const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
+            const { data: transactions } = await supabase.from('transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+
+            if (campaigns) {
+                const totalPaid = campaigns.filter(c => c.status !== 'rejected').reduce((acc, c) => acc + c.total_cost, 0);
+                const working = campaigns.filter(c => c.status === 'active').reduce((acc, c) => acc + c.total_cost, 0);
+                const spent = campaigns.filter(c => c.status === 'completed').reduce((acc, c) => acc + c.total_cost, 0);
+
+                document.getElementById('wallet-total-paid').innerText = `₦${totalPaid.toLocaleString()}`;
+                document.getElementById('wallet-working-funds').innerText = `₦${working.toLocaleString()}`;
+                document.getElementById('wallet-spent-funds').innerText = `₦${spent.toLocaleString()}`;
+            }
+
+            const ledger = document.getElementById('wallet-ledger-body');
+            if (transactions && transactions.length > 0) {
+                ledger.innerHTML = transactions.map(t => `
+                    <tr class="border-b border-dash hover:bg-dash-secondary/30 transition-colors">
+                        <td class="py-4 font-mono text-[10px]">${t.id.slice(0, 8)}...</td>
+                        <td class="py-4">
+                            <p class="font-bold">${t.type === 'escrow_lock' ? 'Campaign Funding' : 'Manual Deposit'}</p>
+                            <p class="text-[9px] text-dash-secondary">${new Date(t.created_at).toLocaleDateString()}</p>
+                        </td>
+                        <td class="py-4 font-bold">₦${t.amount.toLocaleString()}</td>
+                        <td class="py-4 text-right">
+                            <span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase ${t.status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}">
+                                ${t.status}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
         }
+
+        // --- ADMIN VERIFICATION LOGIC ---
+        async function fetchAdminPendingMissions() {
+            const { data: pending } = await supabase
+                .from('campaigns')
+                .select('*, profiles(full_name)')
+                .eq('status', 'pending_verification')
+                .order('created_at', { ascending: true });
+
+            const container = document.getElementById('admin-pending-list');
+            if (!pending || pending.length === 0) {
+                container.innerHTML = `<div class="bento-card text-center py-20 text-dash-secondary"><p>All payments verified.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = pending.map(c => `
+                <div class="bento-card flex flex-col md:flex-row gap-6 items-center">
+                    <div class="w-full md:w-32 h-32 bg-dash-secondary rounded-2xl overflow-hidden border border-dash">
+                        ${c.payment_proof_url ? `<img src="${c.payment_proof_url}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${c.payment_proof_url}')">` : `<div class="flex items-center justify-center h-full text-xs">No Proof</div>`}
+                    </div>
+                    <div class="flex-1 space-y-1 text-center md:text-left">
+                        <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest">Creator: ${c.profiles?.full_name || 'Unknown'}</p>
+                        <h4 class="text-xl font-bold">₦${c.total_cost.toLocaleString()} for ${c.goal_count} ${c.platform}</h4>
+                        <p class="text-xs text-dash-secondary truncate max-w-md">${c.target_url}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="adminAction('${c.id}', 'active')" class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-green-600 transition">Approve</button>
+                        <button onclick="adminAction('${c.id}', 'rejected')" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-red-600 transition">Reject</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function adminAction(campaignId, newStatus) {
+            try {
+                // 1. Update Campaign Status
+                const { error: campError } = await supabase
+                    .from('campaigns')
+                    .update({ status: newStatus })
+                    .eq('id', campaignId);
+                
+                if (campError) throw campError;
+
+                // 2. Update linked Transaction Status
+                const { error: transError } = await supabase
+                    .from('transactions')
+                    .update({ status: newStatus === 'active' ? 'completed' : 'failed' })
+                    .eq('campaign_id', campaignId);
+                
+                if (transError) throw transError;
+
+                // 3. Add to Global Activity if approved
+                if (newStatus === 'active') {
+                    await supabase.from('global_activity').insert([{
+                        message: `launched a new ${newStatus} mission`,
+                        user_handle: 'PIDI Admin'
+                    }]);
+                }
+
+                alert(`Campaign ${newStatus} successfully.`);
+                fetchAdminPendingMissions();
+            } catch (err) {
+                console.error("Admin Error:", err);
+                alert("Failed to process action.");
+            }
+        }
+
+        window.openCampaignWizard = () => switchSPAView('campaign-creation');
+        window.closeCampaignWizard = () => { switchSPAView('dashboard-home'); resetWizard(); };
 
         window.toggleRefundPolicy = function(show) {
             document.getElementById('payment-details-view').classList.toggle('hidden', show);
             document.getElementById('refund-policy-view').classList.toggle('hidden', !show);
             // Hide main wizard buttons when policy is open to prevent step skips
-            document.querySelector('#wizard-overlay .mt-10').classList.toggle('hidden', show);
+            document.querySelector('#campaign-creation-view .mt-10').classList.toggle('hidden', show);
         }
 
         window.toggleProofSubmission = function(show) {
             document.getElementById('payment-details-view').classList.toggle('hidden', show);
             document.getElementById('proof-submission-view').classList.toggle('hidden', !show);
             // Hide main wizard navigation buttons while submitting proof
-            document.querySelector('#wizard-overlay .mt-10').classList.toggle('hidden', show);
+            document.querySelector('#campaign-creation-view .mt-10').classList.toggle('hidden', show);
         }
 
         window.updateProofLabel = function(input) {
@@ -1352,6 +1684,14 @@
         }
 
         async function finishCreation() {
+            // UI Feedback: Trigger "Deploying" state immediately
+            const finishBtn = document.querySelector('#proof-submission-view button');
+            const btnSpan = finishBtn.querySelector('span');
+            const originalText = btnSpan.innerText;
+            btnSpan.innerText = "Deploying...";
+            finishBtn.disabled = true;
+
+            // Aggregate Wizard State
             const qty = document.getElementById('goal-range').value;
             const url = document.getElementById('target-url').value;
             const instructions = document.getElementById('task-instructions').value;
@@ -1360,19 +1700,15 @@
 
             if (!url) {
                 alert("Please provide a target URL.");
+                btnSpan.innerText = originalText;
+                finishBtn.disabled = false;
                 return;
             }
-
-            // UI Feedback
-            const finishBtn = document.querySelector('#proof-submission-view button');
-            const originalText = finishBtn.innerText;
-            finishBtn.innerText = "Processing...";
-            finishBtn.disabled = true;
 
             try {
                 let proofUrl = null;
 
-                // 1. Upload Receipt to Supabase Storage
+                // 1. Upload Receipt to Supabase Storage in "proofs" bucket
                 if (fileInput.files && fileInput.files[0]) {
                     const file = fileInput.files[0];
                     const fileExt = file.name.split('.').pop();
@@ -1380,16 +1716,16 @@
                     const filePath = `receipts/${fileName}`;
 
                     const { error: uploadError } = await supabase.storage
-                        .from('payment-proofs')
+                        .from('proofs')
                         .upload(filePath, file);
 
                     if (uploadError) throw uploadError;
-                    const { data: { publicUrl } } = supabase.storage.from('payment-proofs').getPublicUrl(filePath);
+                    const { data: { publicUrl } } = supabase.storage.from('proofs').getPublicUrl(filePath);
                     proofUrl = publicUrl;
                 }
 
-                // 2. Save Campaign details to Database
-                const { error: dbError } = await supabase
+                // 2. Save Campaign details and capture returned ID for ledger
+                const { data: campaignData, error: dbError } = await supabase
                     .from('campaigns')
                     .insert([{
                         creator_id: currentUser.id,
@@ -1399,20 +1735,32 @@
                         instructions: instructions,
                         payment_proof_url: proofUrl,
                         total_cost: totalCost,
-                        status: 'active'
-                    }]);
+                        status: 'pending_verification'
+                    }]).select();
 
                 if (dbError) throw dbError;
 
-                alert("Payment proof submitted! Your campaign will be launched once our team verifies the transfer.");
+                // 3. Create relational link in transactions ledger for balance reconciliation
+                if (campaignData && campaignData[0]) {
+                    await supabase.from('transactions').insert([{
+                        user_id: currentUser.id,
+                        campaign_id: campaignData[0].id,
+                        amount: totalCost,
+                        type: 'escrow_lock',
+                        status: 'pending',
+                        description: `Funding for ${qty} ${selectedPlatform} engagements`
+                    }]);
+                }
+
+                alert("Campaign deployed! Status: Pending Verification.");
                 closeCampaignWizard();
                 switchRole('creator');
 
             } catch (err) {
                 console.error("Submission Error:", err);
-                alert("Failed to submit campaign: " + err.message);
+                alert("Failed to deploy campaign: " + err.message);
             } finally {
-                finishBtn.innerText = originalText;
+                btnSpan.innerText = originalText;
                 finishBtn.disabled = false;
             }
         }
@@ -1797,8 +2145,7 @@
                 schedulePulse();
             }, delay);
         }
-        schedulePulse();
-        
+        // Global Pulse is now driven by real-time database events from Nigerian taskers
         feather.replace();
 
     function toggleMobileMenu() {
@@ -1834,7 +2181,7 @@
         <div class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
                 <img id="logo-img-mobile" src="assets/pidiblack.png" alt="Logo" class="h-8 w-auto">
-                <span class="text-lg font-normal">PIDI Tasks</span>
+                <span class="text-lg font-normal">PIDItasks</span>
             </div>
             <button onclick="toggleMobileMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100">
                 <i class="fa-solid fa-xmark"></i>
@@ -1848,6 +2195,28 @@
         
 
         <nav class="flex-1 space-y-1">
+            <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
+            <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i class="fa-solid fa-chart-line w-4 text-center"></i> Analytics
+            </a>
+            <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i class="fa-solid fa-layer-group w-4 text-center"></i> Campaigns
+            </a>
+            <a href="#" onclick="switchSPAView('wallet')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i class="fa-solid fa-wallet w-4 text-center"></i> Wallet
+            </a>
+            <div class="my-4 border-t border-dash"></div>
+            <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Tools</p>
+            <a href="academy.html" onclick="toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i class="fa-solid fa-graduation-cap w-4 text-center"></i> PIDIlearn
+            </a>
+            <a href="#" onclick="switchSPAView('referrals')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i class="fa-solid fa-users-line w-4 text-center"></i> Referrals
+            </a>
+            <a href="#" onclick="switchSPAView('feedback')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i class="fa-solid fa-comment-dots w-4 text-center"></i> Feedback
+            </a>
+            <div class="my-4 border-t border-dash"></div>
             <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account</p>
             <a href="#" onclick="openSettings('profile'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
