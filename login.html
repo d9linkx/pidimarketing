@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In | PIDI Console</title>
+    <title>Log In | PIDItasks</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -28,7 +28,16 @@
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease; max-width: 100vw; overflow-x: hidden; }
         .bento-card { background: var(--bg-card); border: 1px solid var(--border-dash); border-radius: 24px; padding: 2rem; transition: all 0.3s ease; }
-        .accent-gradient { background: linear-gradient(135deg, #6a26da 0%, #a366ff 100%); color: white !important; }
+        .accent-gradient { 
+            background: linear-gradient(135deg, #45b96e 60%, #3daf65 40%); 
+            color: #0f172a !important;
+            border: 1px solid #45b96e !important;
+            transition: background 0.5s ease, transform 0.2s ease;
+        }
+        .accent-gradient:hover {
+            background: linear-gradient(135deg, #45b96e 60%, #14913f 40%); 
+            transform: scale(1.05);
+        }
         .text-dash-secondary { color: var(--text-secondary) !important; }
         .bg-dash-secondary { background-color: var(--btn-secondary); }
         .border-dash { border-color: var(--border-dash) !important; }
@@ -39,7 +48,7 @@
     <header class="flex justify-between items-center mb-8 gap-4">
         <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img id="logo-img" src="assets/pidiblack.png" alt="PIDI Logo" class="h-12 w-auto">
-            <h1 class="text-2xl font-bold tracking-tight">PIDI Tasks</h1>
+            <h1 class="text-normal text-2xl font-bold tracking-tight">PIDItasks</h1>
         </a>
         <div class="flex items-center gap-2 md:gap-4">
             <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition" id="theme-toggle">

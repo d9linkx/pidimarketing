@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIDI Dashboard | Bento Edition</title>
+    <title>PIDItasks | Earn as You Scroll</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
@@ -19,7 +19,7 @@
             
             /* Cards: Pure white with a tiny hint of gray at the bottom */
             --bg-card: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
-            --search-bg: #f1f5f9;
+            --search-bg: #f3f3f3;
             
             --border-dash: #e2e8f0;
             --text-primary: #0f172a; 
@@ -363,19 +363,12 @@
 
             <div class="nav-container p-1 rounded-xl border flex flex-col gap-1 mb-8">
                 <button onclick="switchRole('creator')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-left flex items-center gap-2" id="btn-creator"><i data-feather="plus-square" class="w-3.5"></i> Creator Mode</button>
-                <button onclick="switchRole('performer')" class="px-4 py-2 rounded-lg text-xs font-bold text-dash-secondary transition text-left flex items-center gap-2" id="btn-performer"><i data-feather="zap" class="w-3.5"></i> Performer Mode</button>
             </div>
 
             <nav class="flex-1 space-y-1">
                 <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account</p>
                 <a href="#" onclick="openSettings('profile')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
-                </a>
-                <a href="#" onclick="openSettings('bank')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i class="fa-solid fa-building-columns w-4 text-center"></i> Bank Account
-                </a>
-                <a href="#" onclick="openSettings('id-verification')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i class="fa-solid fa-id-card-clip w-4 text-center"></i> ID Verification
                 </a>
                 <div class="my-4 border-t border-dash"></div>
                 <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Support</p>
@@ -431,16 +424,30 @@
                 </div>
             </header>
 
-            <div class="p-4 lg:p-4 mt-0 mb-0 lg:mt-0">
-                <h1 class="font-normal text-dash-secondary">Welcome back, <span class="user-name-display text-[var(--text-primary)]">Loading...</span></h1>
-                <p class="text-dash-secondary mt-1">Here's what's happening with your account today.</p>
-            </div>
+<div class="p-6 lg:p-4 mt-0 mb-0 flex flex-col md:flex-row md:justify-between md:items-center gap-6 md:gap-4">
+    <div class="space-y-1">
+        <h1 class="text-lg md:text-xl font-normal text-dash-secondary">
+            Welcome back, <span class="user-name-display text-[var(--text-primary)] font-semibold">Loading...</span>
+        </h1>
+        <p class="text-xs md:text-sm text-dash-secondary opacity-80">
+            Here's what's happening with your account today.
+        </p>
+    </div>
+
+    <div class="w-full md:w-auto">
+        <button id="main-cta-btn" onclick="openCampaignWizard()" 
+            class="btn-fintech btn-primary flex items-center justify-center w-full md:w-auto py-3 md:py-4 px-6 md:px-8 text-xs md:text-sm whitespace-nowrap shadow-lg shadow-blue-500/20">
+            <i data-feather="plus" class="w-4 h-4 mr-2"></i> 
+            <span id="main-cta" class="font-bold uppercase tracking-wider">Create Campaign</span>
+        </button>
+    </div>
+</div>
 
             <!-- Creator Dashboard Layout -->
                 <div id="creator-dashboard-content" class="bento-grid p-4 mt-[-1rem] hidden gap-3 lg:gap-4">
                 <!-- Row 1: Active Campaigns & Create Campaign -->
                 
-<div class="bento-card col-span-2 flex flex-col bg-[var(--bg-card)] border border-dash rounded-3xl overflow-hidden relative group">
+<div class="bento-card bento-card col-span-2 md:order-second flex flex-col bg-[var(--bg-card)] border border-dash rounded-3xl overflow-hidden relative group">
     <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
     <div class="card-explanation">
         <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
@@ -534,7 +541,7 @@
 </div>
 
                 <!-- Changed 'col-span-1' to 'col-span-2 md:col-span-1' -->
-                <div class="bento-card col-span-2 md:col-span-1 card-azure flex flex-col justify-between relative group">
+                <div class="bento-card col-span-2 md:col-span-1 md:order-first card-azure flex flex-col justify-between relative group">
                     <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
                     <div class="card-explanation">
                         <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
@@ -640,212 +647,32 @@
     
     </div>
 
-<!-- Set to full width (col-span-2) by default, then half width (md:col-span-1) for desktop -->
-                <div class="bento-card col-span-2 md:col-span-1 card-amber flex flex-col justify-between">
-                    <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                    <div class="card-explanation">
-                        <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--amber-vibrant)]">Smart Insights</h4>
-                        <p class="text-[11px] text-dash-secondary leading-relaxed">AI-driven insights suggesting platform or budget shifts to optimize your growth for the current social climate.</p>
-                    </div>
-                    <div class="icon-box bg-[var(--amber-pale)] text-[var(--amber-vibrant)]"><i data-feather="cpu"></i></div>
-                    <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Smart Recommendations</p><h4 class="text-base font-bold mt-1">TikTok campaigns perform better for your audience.</h4></div>
-                    <div class="flex items-center text-[var(--amber-vibrant)] text-xs font-bold cursor-pointer group/link mt-4">
-                        <span class="hover:underline">Increase your budget</span>
-                        <i data-feather="arrow-right" class="ml-1 w-4 h-4 transition-transform group-hover/link:translate-x-1"></i>
-                <   /div>
-                </div>
+<div class="bento-card col-span-full card-slate relative group">
+    <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
+    <div class="card-explanation">
+        <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
+        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--slate-vibrant)]">Management Center</h4>
+        <p class="text-[11px] text-dash-secondary leading-relaxed">Detailed center for tracking individual mission ROI, viewing verification logs, and managing active content links.</p>
+    </div>
+    
+    <h3 class="text-lg font-bold mb-6">Your Campaigns</h3>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-separate border-spacing-y-2">
+            <thead>
+                <tr class="text-dash-secondary">
+                    <th class="pb-2 font-semibold uppercase tracking-wider text-[10px]">Target URL</th>
+                    <th class="pb-2 font-semibold uppercase tracking-wider text-[10px]">Status</th>
+                    <th class="pb-2 font-semibold uppercase tracking-wider text-[10px]">Progress</th>
+                    <th class="pb-2 font-semibold text-right uppercase tracking-wider text-[10px]">Action</th>
+                </tr>
+            </thead>
+            <tbody id="creator-campaign-list">
+                </tbody>
+        </table>
+    </div>
+</div>
 
-                <!-- Row 4: Campaign List -->
-                <div class="bento-card col-span-3 card-slate">
-                    <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                    <div class="card-explanation">
-                        <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--slate-vibrant)]">Management Center</h4>
-                        <p class="text-[11px] text-dash-secondary leading-relaxed">Detailed center for tracking individual mission ROI, viewing verification logs, and managing active content links.</p>
-                    </div>
-                    <h3 class="text-lg font-bold mb-6">Your Campaigns</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="text-dash-secondary border-b border-dash">
-                                    <th class="pb-2 font-semibold">Target URL</th>
-                                    <th class="pb-2 font-semibold">Status</th>
-                                    <th class="pb-2 font-semibold">Progress</th>
-                                    <th class="pb-2 font-semibold text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="active-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Performer Dashboard Layout -->
-            <div id="performer-dashboard-content" class="bento-grid p-4 mt-[-1rem] hidden gap-3 lg:gap-4">
-                <!-- Row 1: Active Work & Work Hub -->
-                <div class="bento-card col-span-2 flex flex-col bg-[var(--bg-card)] border border-dash rounded-3xl overflow-hidden relative group">
-                    <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                    <div class="card-explanation">
-                        <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">Claimed Tasks</h4>
-                        <p class="text-[11px] text-dash-secondary leading-relaxed">View the status of tasks you have currently reserved. Ensure you submit proof before the timer expires.</p>
-                    </div>
-                    <div class="p-5 flex justify-between items-center border-b border-dash">
-                        <div class="flex flex-col gap-1.5">
-                            <div class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-[var(--emerald-vibrant)] animate-pulse"></div>
-                                <h2 class="text-2xl font-normal leading-tight">My Queue</h2>
-                            </div>
-                            <p class="text-[11px] text-dash-secondary font-medium pl-4">
-                                Reserved missions awaiting your attention
-                            </p>
-                        </div>
-                        <span class="bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
-                            Verified Human Work
-                        </span>
-                    </div>
-
-                    <div class="flex-1 overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <tbody class="divide-y divide-dash">
-                                <tr class="group/row hover:bg-[var(--nav-bg)] transition-colors cursor-pointer">
-                                    <td class="p-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] flex items-center justify-center">
-                                                <i data-feather="clock" class="w-4 h-4"></i>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs font-semibold text-[var(--text-primary)]">TikTok Engagement</p>
-                                                <p class="text-[10px] text-red-500 font-bold">14:22 remaining</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="p-4 text-right">
-                                        <button onclick="window.openActiveTask()" class="text-[10px] font-bold text-dash-secondary group-hover/row:text-[#45b96e] transition-colors flex items-center gap-1 ml-auto">
-                                            RESUME <i data-feather="play" class="w-3 h-3 ml-1 fill-current"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <a href="#" onclick="scrollToTasks()" class="block p-4 text-center text-[11px] font-bold uppercase tracking-widest text-dash-secondary hover:text-[#45b96e] border-t border-dash transition-all bg-white/50">
-                        Browse New Gigs <i data-feather="arrow-right" class="w-3 h-3 inline ml-1"></i>
-                    </a>
-                </div>
-
-                <div class="bento-card col-span-1 card-indigo flex flex-col justify-between relative group">
-                    <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                    <div class="card-explanation">
-                        <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--indigo-vibrant)]">Income Center</h4>
-                        <p class="text-[11px] text-dash-secondary leading-relaxed">Access your task board and withdrawal options. High-pay missions are highlighted for efficiency.</p>
-                    </div>
-                    <div class="icon-box bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)]">
-                        <i data-feather="wallet"></i>
-                    </div>
-                    <div>
-                        <p class="text-dash-secondary text-xs mt-1">320 tasks available right now</p>
-                    </div>
-                    <div class="mt-6">
-                        <button onclick="scrollToTasks()" class="w-full btn-fintech btn-primary justify-center py-4 text-sm mb-3">Start Tasks <i data-feather="play" class="ml-2 fill-current"></i></button>
-                        <a href="#" class="text-dash-secondary text-xs font-bold block text-center hover:text-[var(--indigo-vibrant)] transition underline">Browse categories →</a>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-dash flex justify-between">
-                        <div class="text-center"><p class="text-dash-secondary text-[8px] uppercase font-bold">Avg/Task</p><p class="font-bold text-xs">₦35</p></div>
-                        <div class="text-center"><p class="text-dash-secondary text-[8px] uppercase font-bold">Fastest</p><p class="font-bold text-xs">15s</p></div>
-                    </div>
-                </div>
-
-                <!-- Insight Stats Strip -->
-                <div class="col-span-3 grid grid-cols-4 gap-4">
-                    <div class="bento-card p-4 card-azure flex items-center gap-4">
-                        <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                        <div class="card-explanation">
-                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--azure-vibrant)]">Completed Tasks</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Historical count of tasks submitted that successfully passed our manual and AI verification audits.</p>
-                        </div>
-                        <div class="icon-box bg-[var(--azure-pale)] text-[var(--azure-vibrant)] mb-0 w-10 h-10"><i data-feather="check-circle" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Completed</p><h4 class="text-lg font-bold">1,240 <span class="text-green-500 text-[10px]">+24</span></h4></div>
-                    </div>
-                    <div class="bento-card p-4 card-rose flex items-center gap-4">
-                        <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                        <div class="card-explanation">
-                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--rose-vibrant)]">Trust Level</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Tier based on accuracy. Elite status unlocks higher-paying tasks and priority payout processing.</p>
-                        </div>
-                        <div class="icon-box bg-[var(--rose-pale)] text-[var(--rose-vibrant)] mb-0 w-10 h-10"><i data-feather="star" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Reputation</p><h4 class="text-lg font-bold">4.8 <span class="text-blue-500 text-[9px] uppercase font-bold">Elite</span></h4></div>
-                    </div>
-                    <div class="bento-card p-4 card-amber flex items-center gap-4">
-                        <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                        <div class="card-explanation">
-                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--amber-vibrant)]">Gigs Nearby</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">The live pool of tasks you are currently eligible to claim based on your account verification level.</p>
-                        </div>
-                        <div class="icon-box bg-[var(--amber-pale)] text-[var(--amber-vibrant)] mb-0 w-10 h-10"><i data-feather="refresh-cw" class="w-4 animate-spin-slow"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Available</p><h4 class="text-lg font-bold">320</h4></div>
-                    </div>
-                    <div class="bento-card p-4 card-indigo flex flex-col justify-center">
-                        <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                        <div class="card-explanation">
-                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--indigo-vibrant)]">Bonus Progress</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Complete your daily task quota to trigger an extra ₦500 reward added directly to your wallet.</p>
-                        </div>
-                        <div class="flex justify-between items-center mb-2">
-                            <p class="text-dash-secondary text-[8px] uppercase font-bold">Daily Goal</p>
-                            <span class="text-[9px] font-bold">12 / 20</span>
-                        </div>
-                        <div class="w-full bg-dash-secondary h-1.5 rounded-full overflow-hidden">
-                            <div class="bg-[var(--indigo-vibrant)] h-full w-[60%]"></div>
-                        </div>
-                        <p class="text-[9px] text-[var(--indigo-vibrant)] font-bold mt-2">Earn ₦500 bonus today</p>
-                    </div>
-                </div>
-
-                <!-- Motivating Urgency Strip -->
-                <div class="col-span-3 bg-[var(--indigo-vibrant)]/5 border border-[var(--indigo-pale)] p-4 rounded-2xl flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-[var(--indigo-vibrant)] text-white flex items-center justify-center"><i data-feather="target" class="w-4"></i></div>
-                        <p class="text-sm font-bold text-[var(--text-primary)]">Complete 8 more tasks to earn ₦500 bonus today</p>
-                    </div>
-                    <button onclick="scrollToTasks()" class="btn-fintech bg-white text-[var(--indigo-vibrant)] border border-[var(--indigo-pale)] px-4 py-2 rounded-xl text-[10px] font-bold shadow-sm hover:bg-[var(--indigo-vibrant)] hover:text-white transition">Continue Tasks <i data-feather="arrow-right" class="ml-2 w-3"></i></button>
-                </div>
-
-                <!-- Detailed Task Feed / Recent Activity -->
-                <div class="bento-card col-span-2 card-slate">
-                    <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                    <div class="card-explanation">
-                        <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--slate-vibrant)]">Smart Match</h4>
-                        <p class="text-[11px] text-dash-secondary leading-relaxed">Missions selected for you based on your social profile history and current engagement reputation.</p>
-                    </div>
-                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2"><i data-feather="list" class="w-5"></i> Recommended Tasks</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <tbody id="active-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="bento-card col-span-1 card-slate">
-                    <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                    <div class="card-explanation">
-                        <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--slate-vibrant)]">Reward History</h4>
-                        <p class="text-[11px] text-dash-secondary leading-relaxed">Personal logbook for tracking the real-time status of your claims, verification steps, and reward credits.</p>
-                    </div>
-                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2"><i data-feather="clock" class="w-5"></i> Recent Activity</h3>
-                    <div class="space-y-4" id="recent-activity-feed">
-                        <p class="text-xs text-dash-secondary italic">Your task history will appear here...</p>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 
@@ -1010,66 +837,6 @@
         </div>
     </div>
 
-    <!-- Execution Workspace Overlay -->
-    <div id="execution-workspace-overlay" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bento-card w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
-            <button onclick="closeExecutionWorkspace()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button> 
-
-            <h3 class="text-2xl font-bold mb-6">Perform Task: <span id="exec-task-name"></span></h3>
-            
-            <div class="flex items-center justify-between mb-6 pb-4 border-b border-dash">
-                <p class="text-dash-secondary text-sm">Time remaining: <span id="task-timer" class="font-bold text-red-500">20:00</span></p>
-                <p class="text-dash-secondary text-sm">Reward: <span id="exec-task-reward" class="font-bold text-green-500"></span></p>
-            </div>
-
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Target Post</label>
-                    <a id="go-to-post-btn" href="#" target="_blank" class="w-full accent-gradient py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:scale-[1.02] transition">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Go to Post
-                    </a>
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Requirements Checklist</label>
-                    <div class="p-4 bg-dash-secondary rounded-xl border border-dash space-y-2">
-                        <p class="text-sm flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> <span id="exec-task-requirement"></span></p>
-                        <p class="text-sm flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Use at least 10 words in your comment.</p>
-                        <p class="text-sm flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Ensure your comment is relevant and adds value.</p>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">About the Brand</label>
-                    <p id="exec-brand-info" class="text-sm p-4 bg-dash-secondary rounded-xl border border-dash"></p>
-                </div>
-
-                <div class="my-6 border-t border-dash"></div>
-
-                <h4 class="text-xl font-bold mb-4">Submit Proof of Work</h4>
-                <div>
-                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Your @Username</label>
-                    <input type="text" id="proof-username" placeholder="@yourhandle" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)] transition">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Your Comment / Engagement Text</label>
-                    <textarea id="proof-comment" rows="3" placeholder="Paste the exact comment you left..." required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)] transition"></textarea>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Screenshot (Optional, but recommended)</label>
-                    <input type="file" id="proof-screenshot" accept="image/*" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)] transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200">
-                </div>
-            </div>
-
-            <div class="mt-10 flex gap-3">
-                <button onclick="cancelTaskClaim()" class="flex-1 bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Cancel Task</button>
-                <button onclick="submitProof()" id="submit-proof-btn" class="flex-[2] bg-green-500 text-white py-4 rounded-2xl font-bold text-sm shadow-lg hover:bg-green-600 transition">Submit Proof</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Wallet: Deposit Modal (Creator) -->
     <div id="deposit-overlay" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bento-card w-full max-w-md relative">
@@ -1088,112 +855,6 @@
         </div>
     </div>
 
-    <!-- Wallet: Withdrawal Modal (Performer) -->
-    <div id="withdraw-overlay" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bento-card w-full max-w-xl max-h-[90vh] overflow-y-auto relative">
-            <button onclick="closeWithdrawModal()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-
-            <div class="space-y-8">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-2xl font-bold">Withdraw Earnings</h3>
-                        <p class="text-dash-secondary text-[11px] font-bold uppercase tracking-widest mt-1">Processed Every Tue & Fri</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Available</p>
-                        <p class="text-xl font-bold text-green-500" id="withdraw-max">₦0</p>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Select Bank</label>
-                        <div class="grid grid-cols-3 gap-3">
-                            <button onclick="selectBank('OPay')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-OPay">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">OPay</p>
-                            </button>
-                            <button onclick="selectBank('Moniepoint')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-Moniepoint">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">Moniepoint</p>
-                            </button>
-                            <button onclick="selectBank('Kuda')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-Kuda">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">Kuda MFB</p>
-                            </button>
-                            <button onclick="selectBank('GTBank')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-GTBank">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">GTBank</p>
-                            </button>
-                            <button onclick="selectBank('Zenith')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-Zenith">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">Zenith Bank</p>
-                            </button>
-                            <button onclick="selectBank('Access')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-Access">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">Access Bank</p>
-                            </button>
-                            <button onclick="selectBank('UBA')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-UBA">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">UBA</p>
-                            </button>
-                            <button onclick="selectBank('FirstBank')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-FirstBank">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">First Bank</p>
-                            </button>
-                            <button onclick="selectBank('Union')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-Union">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">Union Bank</p>
-                            </button>
-                            <button onclick="selectBank('Stanbic')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-Stanbic">
-                                <i class="fa-solid fa-building-columns text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">Stanbic IBTC</p>
-                            </button>
-                            <button onclick="selectBank('Other')" class="bank-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="bnk-Other">
-                                <i class="fa-solid fa-ellipsis text-xl mb-2"></i>
-                                <p class="text-[9px] font-bold">Other</p>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="other-bank-wrapper" class="hidden">
-                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Other Bank Name</label>
-                        <input type="text" id="other-bank-name" placeholder="Enter bank name" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
-                    </div>
-
-                    <div id="payout-destination-card" class="hidden p-6 bg-[var(--accent-primary)]/5 border border-[var(--accent-primary)]/30 rounded-2xl flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] font-bold text-[var(--accent-primary)] uppercase mb-1 tracking-widest">Payout Destination</p>
-                            <p id="dest-bank-display" class="text-lg font-bold">Bank Name</p>
-                            <p id="dest-acc-display" class="text-sm font-mono text-dash-secondary tracking-widest">**** **** 1234</p>
-                        </div>
-                        <button onclick="closeWithdrawModal(); openSettings('bank')" class="bg-dash-secondary px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-[var(--accent-primary)] hover:text-white transition uppercase">Change</button>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                        <div id="account-number-wrapper">
-                            <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Account Number</label>
-                            <input type="text" id="account-number" maxlength="10" placeholder="10 digits" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Amount to Withdraw</label>
-                            <input type="number" id="withdraw-amount" placeholder="Min ₦2,000" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-dash">
-                    <button onclick="processWithdrawal()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">
-                        Request Withdrawal
-                    </button>
-                    <p class="text-[10px] text-dash-secondary text-center mt-4 italic">* Requests are processed every Tuesday and Friday at 12 PM.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Unified Settings Overlay -->
     <div id="settings-overlay" class="hidden fixed inset-0 z-[250] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bento-card w-full max-w-5xl h-[85vh] md:h-[75vh] overflow-hidden relative flex flex-col md:flex-row p-0">
@@ -1202,8 +863,6 @@
                 <h3 class="font-bold mb-6 hidden md:block">Settings Hub</h3>
                 <nav class="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 no-scrollbar">
                     <button onclick="switchSettingsView('profile')" class="settings-nav-btn active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition whitespace-nowrap w-full text-left" data-view="profile"><i class="fa-solid fa-user-gear w-5"></i> Profile</button>
-                    <button onclick="switchSettingsView('bank')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="bank"><i class="fa-solid fa-building-columns w-5"></i> Bank Account</button>
-                    <button onclick="switchSettingsView('id-verification')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="id-verification"><i class="fa-solid fa-id-card-clip w-5"></i> ID Verification</button>
                     <button onclick="switchSettingsView('security')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="security"><i class="fa-solid fa-shield-halved w-5"></i> Login & Security</button>
                     <button onclick="switchSettingsView('notifications')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="notifications"><i class="fa-solid fa-bell w-5"></i> Notifications</button>
                     <button onclick="switchSettingsView('support')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="support"><i class="fa-solid fa-circle-question w-5"></i> Support Desk</button>
@@ -1238,22 +897,6 @@
         </div>
     </div>
 
-    <!-- Active Task Warning Overlay -->
-    <div id="active-task-warning-overlay" class="hidden fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-            <div class="bento-card max-w-sm text-center p-10 relative">
-                <div class="w-16 h-16 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="fa-solid fa-hourglass-half text-2xl"></i>
-            </div>
-            <h3 class="text-2xl font-bold mb-2">Active Task</h3>
-            <p class="text-dash-secondary text-sm mb-8">You have a task in progress. You must finish or cancel it before starting a new one.</p>
-            <div class="flex flex-col gap-3">
-                <button onclick="window.openActiveTask()" class="w-full accent-gradient text-white py-4 rounded-2xl font-bold text-sm hover:scale-[1.02] transition shadow-lg">Return to Workspace</button>
-                <button onclick="window.cancelActiveTaskFromWarning()" class="w-full bg-red-500 text-white py-4 rounded-2xl font-bold text-sm hover:bg-red-600 transition">Cancel Current Task</button>
-                <button onclick="window.closeActiveTaskWarning()" class="w-full bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Back to Feed</button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
@@ -1271,24 +914,7 @@
                 availableBalance: 0,
                 allocatedFunds: 0,
                 items: [] 
-            },
-            performer: {
-                label: "Available Gigs",
-                sub: "Loading marketplace...",
-                value: "₦0",
-                cta: "Browse Tasks",
-                items: [],
-                totalBalance: 0,
-                pendingBalance: 0,
-                activeTask: null,
-                reputationScore: 0,
-                isElite: false,
-                fakeProofCount: 0,
-                verificationLevel: 1,
-                notificationPrefs: { email: true, push: true, telegram: false },
-                bankDetails: null,
-                taskTimer: null, // Stores the interval ID for the timer
-            },
+            }
         };
 
         const ROLE_CONFIG = {
@@ -1297,13 +923,7 @@
                 sub: "12 active, 3 ending today",
                 cta: "Create Campaign",
                 icon: "fa-plus"
-            },
-            performer: {
-                label: "Available Gigs",
-                sub: "You have 14 new tasks waiting in your vicinity.",
-                cta: "Browse Tasks",
-                icon: "fa-magnifying-glass"
-            },
+            }
         };
 
         let currentUser = {
@@ -1359,8 +979,6 @@
             let itemsToFilter = [];
             if (currentRole === 'creator') {
                 itemsToFilter = roles.creator.items.map(c => ({ name: c.target_url, status: c.status, metric: `${c.current_count}/${c.goal_count}` }));
-            } else if (currentRole === 'performer') {
-                itemsToFilter = roles.performer.items.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦70 Reward', id: t.id, isTask: true }));
             }
 
             const filteredItems = itemsToFilter.filter(item => {
@@ -1425,9 +1043,6 @@
             // Fetch real user data from profiles table
             const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
             if (profile) {
-                roles.performer.totalBalance = profile.balance || 0;
-                roles.performer.pendingBalance = profile.pending_balance || 0;
-                roles.performer.reputationScore = profile.reputation_score || 0;
                 roles.creator.availableBalance = profile.balance || 0;
                 roles.creator.allocatedFunds = profile.allocated_funds || 0;
             }
@@ -1444,19 +1059,17 @@
 
             // Initialize View based on query param OR user's stored role preference
             const urlParams = new URLSearchParams(window.location.search);
-            const initialRole = urlParams.get('view') || user.user_metadata.user_role || 'performer';
+            const initialRole = urlParams.get('view') || user.user_metadata.user_role || 'creator';
             switchRole(initialRole);
         }
 
         window.switchRole = async function(role) {
-            currentRole = role;
+            currentRole = 'creator'; // Force creator role
 
             // Toggle the two main dashboard sections
             const creatorDiv = document.getElementById('creator-dashboard-content');
-            const performerDiv = document.getElementById('performer-dashboard-content');
-            if (creatorDiv && performerDiv) {
-                creatorDiv.classList.toggle('hidden', role === 'performer');
-                performerDiv.classList.toggle('hidden', role === 'creator');
+            if (creatorDiv) {
+                creatorDiv.classList.remove('hidden');
             }
 
             // Update Sidebar UI buttons (Desktop & Mobile Drawer)
@@ -1471,9 +1084,8 @@
             });
 
             const desktopBtn = document.getElementById(`btn-${role}`);
-            const mobileBtn = document.getElementById(`btn-${role}-mobile`);
             
-            [desktopBtn, mobileBtn].forEach(btn => {
+            [desktopBtn].forEach(btn => {
                 if (btn) {
                     btn.classList.add('active-btn');
                     btn.classList.remove('text-dash-secondary');
@@ -1485,37 +1097,38 @@
             if (menu && !menu.classList.contains('hidden')) toggleMobileMenu();
 
             // Update Labels from config
-            const config = ROLE_CONFIG[role];
+            const config = ROLE_CONFIG['creator'];
             if (role === 'creator') checkMilestones(roles.creator.totalGrowthMetric);
-            document.getElementById('main-stat-label').innerText = config.label;
-            document.getElementById('main-sub-label').innerText = config.sub;
-            document.getElementById('main-cta').innerText = config.cta;
+            
+            // Resilient check for legacy UI elements
+            const labelEl = document.getElementById('main-stat-label');
+            const subEl = document.getElementById('main-sub-label');
+            const ctaEl = document.getElementById('main-cta');
+            
+            if (labelEl) labelEl.innerText = config.label;
+            if (subEl) subEl.innerText = config.sub;
+            if (ctaEl) ctaEl.innerText = config.cta;
             
             // Update CTA Icon and Action
             const mainCtaBtn = document.getElementById('main-cta-btn');
-            const iconEl = mainCtaBtn.querySelector('i');
-            if (iconEl) iconEl.className = `fa-solid ${config.icon}`;
-
-            if (role === 'performer') mainCtaBtn.onclick = () => window.scrollToTasks();
-            else mainCtaBtn.onclick = () => window.openCampaignWizard();
+            if (mainCtaBtn) {
+                const iconEl = mainCtaBtn.querySelector('i');
+                if (iconEl) iconEl.className = `fa-solid ${config.icon}`;
+                mainCtaBtn.onclick = () => window.openCampaignWizard();
+            }
 
             updateWalletDisplay();
-            fetchRoleData(role);
-            
-            // Trigger count-up for performer balance if switching to that mode
-            if(role === 'performer') countUp(document.getElementById('perf-balance'), 8450);
+            fetchRoleData('creator');
         }
 
         async function fetchRoleData(role) {
-            const list = document.getElementById('active-list');
-            list.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-dash-secondary">Fetching data...</td></tr>';
-
             try {
                 if (role === 'creator') {
                     const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
                     roles.creator.items = campaigns || [];
-                    document.getElementById('main-value').innerText = roles.creator.items.length;
-                    renderTable(campaigns?.map(c => ({ name: c.target_url, status: c.status, metric: `${c.current_count}/${c.goal_count}` })) || []);
+                    const valEl = document.getElementById('main-value');
+                    if (valEl) valEl.innerText = roles.creator.items.length;
+                    renderTable(campaigns?.map(c => ({ name: c.target_url, status: c.status, metric: `${c.current_count}/${c.goal_count}` })) || [], 'creator-campaign-list');
                     
                     if (campaigns?.length > 0) {
                         const totalGoals = campaigns.reduce((acc, c) => acc + c.goal_count, 0);
@@ -1525,20 +1138,11 @@
                     } else {
                         updateEngagementUI(0);
                     }
-                } else if (role === 'performer') { // Performer mode
-                    const { data: tasks } = await supabase
-                        .from('campaigns')
-                        .select('*')
-                        .eq('status', 'active')
-                        .neq('creator_id', currentUser.id);
-                    roles.performer.items = tasks || [];
-                    document.getElementById('main-value').innerText = `₦${(roles.performer.items.length * 70).toLocaleString()}`;
-                    renderTable(roles.performer.items.map(t => ({ name: t.platform.toUpperCase() + ' Task', status: 'Available', metric: '₦70 Reward', id: t.id, isTask: true })) || []);
-                    updateEngagementUI(roles.performer.reputationScore || 0);
                 }
             } catch (err) {
                 console.error("Fetch Error:", err);
-                renderTable([]); // Fallback
+                const listId = 'creator-campaign-list';
+                renderTable([], listId); 
             }
         }
 
@@ -1554,10 +1158,10 @@
             if (table) table.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function renderTable(items) {
-            const container = document.querySelector('.bento-grid .col-span-3');
-            const list = document.getElementById('active-list');
+        function renderTable(items, listId) {
+            const list = document.getElementById(listId);
             
+            if (!list) return;
             if (!items || !items.length) {
                 list.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-dash-secondary">No records found.</td></tr>';
                 return;
@@ -1839,291 +1443,10 @@
             updateWalletDisplay();
         }
 
-        function openWithdrawalModal() {
-            document.getElementById('withdraw-overlay').classList.remove('hidden');
-            document.getElementById('withdraw-max').innerText = `₦${roles.performer.totalBalance.toLocaleString()}`;
-
-            const details = roles.performer.bankDetails;
-            const destinationCard = document.getElementById('payout-destination-card');
-            const selectionGrid = document.querySelector('#withdraw-overlay .bank-btn').parentElement.parentElement;
-            const accWrapper = document.getElementById('account-number-wrapper');
-
-            if (details) {
-                destinationCard.classList.remove('hidden');
-                selectionGrid.classList.add('hidden');
-                accWrapper.classList.add('hidden');
-                
-                document.getElementById('dest-bank-display').innerText = details.bank === 'Other' ? details.otherBankName : details.bank;
-                document.getElementById('dest-acc-display').innerText = `**** **** ${details.account.slice(-4)}`;
-                
-                selectBank(details.bank);
-                if(details.bank === 'Other') document.getElementById('other-bank-name').value = details.otherBankName;
-                document.getElementById('account-number').value = details.account;
-            } else {
-                destinationCard.classList.add('hidden');
-                selectionGrid.classList.remove('hidden');
-                accWrapper.classList.remove('hidden');
-            }
-        }
-        function closeWithdrawModal() {
-            document.getElementById('withdraw-overlay').classList.add('hidden');
-        }
-        function verifyAndSaveBank() {
-            const acc = document.getElementById('account-number').value;
-            const bank = document.getElementById('bank-name').value;
-            if (acc.length !== 10) return alert("Please enter a valid 10-digit Nigerian account number.");
-            
-            // Simulating Bank API Name Verification
-            roles.performer.bankDetails = { account: acc, bank: bank, verifiedName: "PRINCE DIKE" };
-            alert(`Account Verified: ${roles.performer.bankDetails.verifiedName}`);
-            if (!document.getElementById('settings-overlay').classList.contains('hidden')) switchSettingsView('bank');
-            openWithdrawalModal(); // Toggle to step B
-        }
-        window.selectBank = function(bank) {
-            selectedBank = bank;
-            document.querySelectorAll('.bank-btn').forEach(b => {
-                b.classList.remove('border-[#6a26da]', 'bg-[#6a26da]/5');
-                b.classList.add('border-dash');
-            });
-            const activeBtn = document.getElementById(`bnk-${bank}`);
-            if (activeBtn) {
-                activeBtn.classList.add('border-[#6a26da]', 'bg-[#6a26da]/5');
-                activeBtn.classList.remove('border-dash');
-            }
-            
-            const otherInput = document.getElementById('other-bank-wrapper');
-            if (otherInput) otherInput.classList.toggle('hidden', bank !== 'Other');
-        }
-        function processWithdrawal() {
-            const acc = document.getElementById('account-number').value;
-            const amtInput = document.getElementById('withdraw-amount');
-            const amt = parseInt(amtInput.value);
-            
-            if (!selectedBank) return alert("Please select your bank.");
-            
-            let bankName = selectedBank;
-            let otherBankName = null;
-            if (selectedBank === 'Other') {
-                otherBankName = document.getElementById('other-bank-name').value;
-                if (!otherBankName) return alert("Please enter the name of your bank.");
-                bankName = otherBankName;
-            }
-
-            if (acc.length !== 10) return alert("Enter a valid 10-digit account number.");
-            if (!amt || amt < 2000) return alert("Minimum withdrawal is ₦2,000.");
-            if (amt > roles.performer.totalBalance) return alert("Insufficient balance.");
-            
-            // Logical Ledger: Debit Wallet, Credit Payout Pool
-            roles.performer.totalBalance -= amt;
-            roles.performer.pendingBalance += amt;
-            
-            roles.performer.bankDetails = { account: acc, bank: selectedBank, otherBankName: otherBankName, verifiedName: currentUser.fullName.toUpperCase() };
-            
-            alert(`Withdrawal request received for ₦${amt.toLocaleString()}. Payouts are processed every Tuesday and Friday.`);
-            amtInput.value = '';
-            closeWithdrawModal();
-            updateWalletDisplay();
-            if (currentRole === 'performer') fetchRoleData('performer');
-        }
-
-        // --- PERFORMER TASK LOGIC ---
-        function renderPerformerTasks(filter = 'all') {
-            const taskFeed = document.getElementById('active-list'); // Reusing active-list for now
-            taskFeed.innerHTML = ''; // Clear previous tasks
-
-            const filteredTasks = roles.performer.items.filter(task => {
-                // SaaS Phase 5: Show available OR the currently active task so user can resume
-                if (task.status !== 'available' && task.id !== roles.performer.activeTask) return false;
-                if (filter === 'all') return true;
-                if (filter === 'high-pay') return task.reward >= 250; // Example threshold for high pay
-                return task.platform === filter;
-            });
-
-            if (filteredTasks.length === 0) {
-                taskFeed.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-dash-secondary">No available tasks for this filter.</td></tr>`;
-                return;
-            }
-
-            filteredTasks.forEach(task => {
-                const isClaimed = task.id === roles.performer.activeTask;
-                const row = document.createElement('tr');
-                row.classList.add('border-b', 'border-dash', 'task-item');
-                row.innerHTML = `
-                    <td class="py-4 font-bold flex items-center gap-3">
-                        <i class="fa-brands fa-${task.platform} text-xl text-dash-secondary"></i>
-                        ${task.name}
-                    </td>
-                    <td class="py-4 text-dash-secondary">${task.requirement}</td>
-                    <td class="py-4 text-green-500 font-bold">₦${task.reward}</td>
-                    <td class="py-4 text-right">
-                        <button onclick="claimTask('${task.id}')" 
-                                class="${isClaimed ? 'bg-dash-secondary text-dash-secondary' : 'btn-orange'} px-4 py-2 rounded-xl text-xs font-bold hover:opacity-80" 
-                                id="claim-btn-${task.id}">${isClaimed ? 'TASK CLAIMED' : 'START TASK'}</button>
-                    </td>
-                `;
-                taskFeed.appendChild(row);
-            });
-        }
-
-        function claimTask(taskId) {
-            const task = roles.performer.items.find(t => t.id === taskId);
-            if (!task) return;
-
-            // Prevent claiming if another task is active
-            if (claimedTask) {
-                if (claimedTask.id === taskId) {
-                    openExecutionWorkspace(claimedTask);
-                } else {
-                    document.getElementById('active-task-warning-overlay').classList.remove('hidden');
-                }
-                return;
-            }
-
-            // New task start: clear previous proof inputs
-            document.getElementById('proof-username').value = '';
-            document.getElementById('proof-comment').value = '';
-            document.getElementById('proof-screenshot').value = '';
-
-            claimedTask = task;
-            task.status = 'claimed';
-            roles.performer.activeTask = taskId;
-            switchRole('performer'); // Refresh feed UI for button state
-
-            // Open execution workspace
-            openExecutionWorkspace(task);
-
-            // Start timer (20 minutes = 1200 seconds)
-            taskCountdownSeconds = 1200; 
-            updateTaskTimerDisplay();
-            taskTimerInterval = setInterval(() => {
-                taskCountdownSeconds--;
-                updateTaskTimerDisplay();
-                if (taskCountdownSeconds <= 0) {
-                    clearInterval(taskTimerInterval);
-                    alert("Time's up! The task has been released.");
-                    cancelTaskClaim(true); // true to indicate timer expiry
-                }
-            }, 1000);
-        }
-
-        function openExecutionWorkspace(task) {
-            document.getElementById('exec-task-name').innerText = task.name;
-            document.getElementById('exec-task-reward').innerText = `₦${task.reward}`;
-            document.getElementById('go-to-post-btn').href = task.targetUrl;
-            document.getElementById('exec-task-requirement').innerText = task.requirement;
-            document.getElementById('exec-brand-info').innerText = task.brandInfo;
-            document.getElementById('execution-workspace-overlay').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeExecutionWorkspace() {
-            document.getElementById('execution-workspace-overlay').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        function updateTaskTimerDisplay() {
-            const minutes = Math.floor(taskCountdownSeconds / 60);
-            const seconds = taskCountdownSeconds % 60;
-            document.getElementById('task-timer').innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function openActiveTask() {
-            closeActiveTaskWarning();
-            if (claimedTask) openExecutionWorkspace(claimedTask);
-        }
-
-        function closeActiveTaskWarning() {
-            document.getElementById('active-task-warning-overlay').classList.add('hidden');
-        }
-
-        function cancelActiveTaskFromWarning() {
-            closeActiveTaskWarning();
-            cancelTaskClaim();
-        }
-
-        function cancelTaskClaim(fromTimer = false) {
-            if (claimedTask) {
-                claimedTask.status = 'available'; // Release the task
-                claimedTask = null;
-                roles.performer.activeTask = null;
-                clearInterval(taskTimerInterval);
-                taskTimerInterval = null;
-                closeExecutionWorkspace();
-                
-                const activeBtn = document.querySelector('nav button.active-btn');
-                if (activeBtn && activeBtn.id === 'btn-performer') switchRole('performer');
-                
-                if (!fromTimer) console.log("Task claim cancelled.");
-            }
-        }
-
-        function submitProof() {
-            if (!claimedTask) return;
-
-            const username = document.getElementById('proof-username').value;
-            const comment = document.getElementById('proof-comment').value;
-            if (!username || !comment) {
-                alert("Submission Error: Details missing.");
-                return;
-            }
-
-            // Automated Word Count Check (Phase 3 inherited)
-            const wordCount = comment.trim().split(/\s+/).length;
-            if (wordCount < 10) {
-                alert("SaaS Bot-Killer: Rule of 10 not met. Submission rejected.");
-                roles.performer.fakeProofCount++;
-                if(roles.performer.fakeProofCount >= 3) alert("CRITICAL: Your account is flagged for review due to repeated low-quality submissions.");
-                return; 
-            }
-
-            // --- PHASE 4: AUTO-VERIFICATION SCRIPT SIMULATION ---
-            const isAutoApproved = roles.performer.reputationScore >= 95;
-            
-            if (isAutoApproved) {
-                // Direct API Verification (Simulated)
-                console.log(`Phase 4: API pinged ${claimedTask.platform}. Handle ${username} verified.`);
-                
-                window.triggerConfetti();
-                alert("SaaS Instant Pay: Comment verified via API. Funds added to your Available Balance!");
-            } else {
-                // Manual Queue for New/Low-Trust users
-                const submission = {
-                    id: 'sub-' + Date.now(),
-                    taskId: claimedTask.id,
-                    taskName: claimedTask.name,
-                    performerHandle: username,
-                    commentText: comment,
-                    reward: claimedTask.reward,
-                    targetUrl: claimedTask.targetUrl,
-                    timestamp: new Date().toISOString()
-                };
-                roles.performer.pendingBalance += claimedTask.reward;
-                window.triggerConfetti();
-                alert("Proof submitted! Manual verification required for your current Trust Score.");
-            }
-
-            claimedTask.status = 'under_review'; 
-            claimedTask = null;
-            roles.performer.activeTask = null;
-            clearInterval(taskTimerInterval);
-            taskTimerInterval = null;
-            
-            closeExecutionWorkspace();
-            switchRole('performer'); // Refresh performer view
-        }
-
         window.updateWalletDisplay = function() {
             const walletBtn = document.getElementById('wallet-action-btn');
-            if (currentRole === 'performer') {
-                document.getElementById('total-balance').innerText = `₦${roles.performer.totalBalance.toLocaleString()}`;
-                document.getElementById('pending-balance').innerText = `₦${roles.performer.pendingBalance.toLocaleString()}`;
-                document.getElementById('pending-balance-label').innerText = "Pending: ";
-                document.getElementById('trust-indicator').innerText = `Trust Score: ${roles.performer.reputationScore}%`;
-                if(roles.performer.reputationScore >= 95) document.getElementById('trust-indicator').innerHTML += " <span class='text-[#6a26da]'>[ELITE]</span>";
-                walletBtn.innerText = "Withdraw";
-                walletBtn.onclick = () => window.openWithdrawalModal();
-                walletBtn.disabled = roles.performer.totalBalance < 2000;
-            } else if (currentRole === 'creator') {
+
+            if (currentRole === 'creator') {
                 document.getElementById('total-balance').innerText = `₦${roles.creator.availableBalance.toLocaleString()}`;
                 document.getElementById('pending-balance').innerText = `₦${roles.creator.allocatedFunds.toLocaleString()}`;
                 document.getElementById('pending-balance-label').innerText = "Allocated: ";
@@ -2155,8 +1478,7 @@
             });
 
             const area = document.getElementById('settings-content-area');
-            const roleBtn = document.querySelector('nav button.active-btn');
-            const currentRole = roleBtn ? roleBtn.id.replace('btn-', '') : 'performer';
+            const currentRole = 'creator';
 
             let content = '';
 
@@ -2190,55 +1512,6 @@
                         </div>
                     `;
                     break;
-                case 'bank':
-                    const hasBank = roles.performer.bankDetails;
-                    content = `
-                        <h2 class="text-3xl font-bold mb-2">Bank Account</h2>
-                        <p class="text-dash-secondary mb-8">Manage where your earnings and reimbursements are sent.</p>
-                        ${hasBank ? `
-                            <div class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl max-w-md">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div><p class="text-[10px] font-bold text-dash-secondary uppercase mb-1">${hasBank.bank === 'Other' ? hasBank.otherBankName : hasBank.bank}</p><p class="text-lg font-bold">${hasBank.verifiedName}</p></div>
-                                    <i class="fa-solid fa-building-columns text-dash-secondary"></i>
-                                </div>
-                                <p class="text-sm font-mono tracking-widest text-dash-secondary">**** **** ${hasBank.account.slice(-4)}</p>
-                                <div class="flex gap-4 mt-6">
-                                    <button onclick="roles.performer.bankDetails = null; switchSettingsView('bank')" class="text-red-500 text-[10px] font-bold uppercase tracking-widest">Unlink</button>
-                                    <button onclick="openWithdrawalModal()" class="text-[var(--accent-primary)] text-[10px] font-bold uppercase tracking-widest">Edit Account</button>
-                                </div>
-                                <div class="mt-6 pt-4 border-t border-dash">
-                                    <p class="text-[10px] text-dash-secondary italic">Changes to bank details are subject to a 24-hour verification hold for security.</p>
-                                </div>
-                            </div>
-                        ` : `
-                            <div class="p-8 border-2 border-dashed border-dash rounded-3xl text-center max-w-md">
-                                <div class="w-12 h-12 bg-dash-secondary rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-plus text-dash-secondary"></i></div>
-                                <h4 class="font-bold mb-2">No Bank Linked</h4>
-                                <p class="text-xs text-dash-secondary mb-6">Link a Nigerian commercial bank or FinTech account to start receiving payouts.</p>
-                                <button onclick="openWithdrawalModal()" class="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-bold">Link New Bank</button>
-                            </div>
-                        `}
-                    `;
-                    break;
-                case 'id-verification':
-                    const isLevel2 = roles.performer.verificationLevel === 2;
-                    content = `
-                        <h2 class="text-3xl font-bold mb-2">Identity Verification</h2>
-                        <p class="text-dash-secondary mb-8">We verify all human taskers to maintain 100% engagement quality.</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl">
-                                <div class="flex justify-between items-center mb-4"><h4 class="font-bold">Level 1: Basic</h4><span class="text-[10px] font-bold text-green-500 bg-green-500/10 px-2 py-1 rounded-lg uppercase">Completed</span></div>
-                                <p class="text-xs text-dash-secondary mb-4">Phone number verified via OTP. Access to standard tasks.</p>
-                                <p class="text-sm font-bold">+234 810 **** 221</p>
-                            </div>
-                            <div class="p-6 bg-[var(--bg-card)] border ${isLevel2 ? 'border-green-500' : 'border-[var(--accent-primary)]'} rounded-2xl relative overflow-hidden">
-                                <div class="flex justify-between items-center mb-4"><h4 class="font-bold">Level 2: Elite</h4><span class="text-[10px] font-bold ${isLevel2 ? 'text-green-500 bg-green-500/10' : 'text-[var(--accent-primary)] bg-[var(--accent-primary)]/10'} px-2 py-1 rounded-lg uppercase">${isLevel2 ? 'Verified' : 'Action Required'}</span></div>
-                                <p class="text-xs text-dash-secondary mb-4">Upload ID + Liveness selfie. Access to high-paying "Viral Engine" tasks.</p>
-                                ${isLevel2 ? '<p class="text-sm font-bold text-green-500"><i class="fa-solid fa-circle-check"></i> Documents Approved</p>' : '<button onclick="simulateIDV()" class="accent-gradient w-full py-2.5 rounded-xl text-xs font-bold">Start Verification</button>'}
-                            </div>
-                        </div>
-                    `;
-                    break;
                 case 'security':
                     content = `
                         <h2 class="text-3xl font-bold mb-2">Security & Access</h2>
@@ -2261,14 +1534,12 @@
                     `;
                     break;
                 case 'notifications':
-                    const prefs = roles.performer.notificationPrefs;
                     content = `
                         <h2 class="text-3xl font-bold mb-2">Notifications</h2>
                         <p class="text-dash-secondary mb-8">Choose how you want to be alerted about task updates.</p>
                         <div class="space-y-6 max-w-xl">
-                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Email Alerts</p><p class="text-xs text-dash-secondary">Summary of tasks and payouts</p></div><label class="switch"><input type="checkbox" ${prefs.email ? 'checked' : ''} onchange="togglePref('email')"><span class="slider"></span></label></div>
-                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">In-App Push</p><p class="text-xs text-dash-secondary">Real-time task claims and review status</p></div><label class="switch"><input type="checkbox" ${prefs.push ? 'checked' : ''} onchange="togglePref('push')"><span class="slider"></span></label></div>
-                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Telegram Bot</p><p class="text-xs text-dash-secondary">Instant alerts for High-Pay gigs</p></div><label class="switch"><input type="checkbox" ${prefs.telegram ? 'checked' : ''} onchange="togglePref('telegram')"><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Email Alerts</p><p class="text-xs text-dash-secondary">Summary of campaigns and performance</p></div><label class="switch"><input type="checkbox" checked onchange="togglePref('email')"><span class="slider"></span></label></div>
+                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">In-App Push</p><p class="text-xs text-dash-secondary">Real-time milestone hits and task verification status</p></div><label class="switch"><input type="checkbox" checked onchange="togglePref('push')"><span class="slider"></span></label></div>
                         </div>
                     `;
                     break;
@@ -2307,17 +1578,6 @@
             }
         }
 
-        function simulateIDV() {
-            alert("Redirecting to Level 2 Verification Interface...\n\nPlease prepare your NIN/Driver's License and a clear camera for the liveness check.");
-            setTimeout(() => {
-                roles.performer.verificationLevel = 2;
-                roles.performer.reputationScore = 100;
-                alert("Elite Verification Successful! You now have access to Viral Engine tasks.");
-                switchSettingsView('id-verification');
-                updateWalletDisplay();
-            }, 3000);
-        }
-
         function updatePassword() {
             const cur = document.getElementById('cur-pass').value;
             const newP = document.getElementById('new-pass').value;
@@ -2327,15 +1587,7 @@
             document.getElementById('new-pass').value = '';
         }
 
-        function terminateSession() {
-            if(confirm("Are you sure you want to log out of this device?")) {
-                document.getElementById('session-card').style.opacity = '0.5';
-                alert("Session terminated. This device will be logged out on the next refresh.");
-            }
-        }
-
         function togglePref(key) {
-            roles.performer.notificationPrefs[key] = !roles.performer.notificationPrefs[key];
         }
 
         window.triggerConfetti = function() {
@@ -2381,6 +1633,7 @@
         let recentActions = [];
 
         function spawnPulseItem() {
+            // Try to find the feed in whichever dashboard is currently active
             const feed = document.getElementById('live-activity-feed');
             if (!feed) return;
 
@@ -2521,23 +1774,9 @@
         window.openDepositModal = openDepositModal;
         window.closeDepositModal = closeDepositModal;
         window.processDeposit = processDeposit;
-        window.openWithdrawalModal = openWithdrawalModal;
-        window.closeWithdrawModal = closeWithdrawModal;
-        window.verifyAndSaveBank = verifyAndSaveBank;
-        window.selectBank = selectBank;
-        window.processWithdrawal = processWithdrawal;
-        window.claimTask = claimTask;
-        window.cancelTaskClaim = cancelTaskClaim;
-        window.openActiveTask = openActiveTask;
-        window.closeActiveTaskWarning = closeActiveTaskWarning;
-        window.cancelActiveTaskFromWarning = cancelActiveTaskFromWarning;
-        window.submitProof = submitProof;
-        window.closeExecutionWorkspace = closeExecutionWorkspace;
         window.switchSettingsView = switchSettingsView;
         window.saveProfileSettings = saveProfileSettings;
-        window.simulateIDV = simulateIDV;
         window.updatePassword = updatePassword;
-        window.terminateSession = terminateSession;
         window.togglePref = togglePref;
 
         if (localStorage.getItem('theme') === 'light') {
@@ -2605,19 +1844,13 @@
         <!-- Reusing your exact Sidebar Content logic -->
         <div class="nav-container p-1 rounded-xl border flex flex-col gap-1 mb-8">
             <button onclick="switchRole('creator')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-left flex items-center gap-2" id="btn-creator-mobile"><i data-feather="plus-square" class="w-3.5"></i> Creator Mode</button>
-            <button onclick="switchRole('performer')" class="px-4 py-2 rounded-lg text-xs font-bold text-dash-secondary transition text-left flex items-center gap-2" id="btn-performer-mobile"><i data-feather="zap" class="w-3.5"></i> Performer Mode</button>
         </div>
+        
 
         <nav class="flex-1 space-y-1">
             <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account</p>
             <a href="#" onclick="openSettings('profile'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
-            </a>
-            <a href="#" onclick="openSettings('bank'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-building-columns w-4 text-center"></i> Bank Account
-            </a>
-            <a href="#" onclick="openSettings('id-verification'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-id-card-clip w-4 text-center"></i> ID Verification
             </a>
             <div class="my-4 border-t border-dash"></div>
             <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Support</p>

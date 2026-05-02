@@ -48,22 +48,23 @@ ul { list-style: none; }
 
 /* --- 2. COMMON COMPONENTS (Buttons & Badges) --- */
 .btn-orange { 
-    background: var(--accent); 
-    color: var(--white); 
+    background: linear-gradient(135deg, #45b96e 60%, #3daf65 40%); 
+    color: #0f172a !important; 
     padding: 25px 50px; 
     border-radius: 40px;
     font-weight: 700; 
-    border: none; 
+    border: 1px solid #45b96e !important; 
     cursor: pointer; 
     display: inline-block; 
     text-transform: uppercase; 
     font-size: 0.85rem; 
     letter-spacing: 0.5px;
+    transition: background 0.5s ease, transform 0.2s ease;
 }
 
 .btn-orange:hover { 
-    background: #000000; 
-    transform: translateY(-2px); 
+    background: linear-gradient(135deg, #45b96e 60%, #14913f 40%); 
+    transform: scale(1.05); 
 }
 
 .hiring-badge {
@@ -2644,18 +2645,20 @@ summary::-webkit-details-marker {
   display: inline-flex;
   align-items: center;
   gap: 15px;
-  background-color: var(--primary);
-  color: var(--white);
+  background: linear-gradient(135deg, #45b96e 60%, #3daf65 40%); 
+  color: #0f172a !important;
+  border: 1px solid #45b96e !important;
   text-decoration: none;
   padding: 18px 35px;
   border-radius: 50px;
   font-weight: 700;
   font-size: 1rem;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: background 0.5s ease, transform 0.2s ease;
 }
 
 .cta-btn:hover {
-  transform: scale(1.03);
+  background: linear-gradient(135deg, #45b96e 60%, #14913f 40%); 
+  transform: scale(1.05);
 }
 
 .btn-arrow {
