@@ -768,6 +768,35 @@
                 <button class="accent-gradient w-full py-4 rounded-2xl font-bold shadow-lg">Submit Feedback</button>
             </div>
 
+            <!-- SPA CONTAINER: Settings Hub View -->
+            <div id="settings-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
+                <div class="bento-card w-full h-auto overflow-hidden relative flex flex-col md:flex-row p-0 min-h-[600px]">
+                    <!-- Sidebar Navigation -->
+                    <aside class="w-full md:w-64 border-b md:border-b-0 md:border-r border-dash p-6 bg-dash-secondary/30 flex-shrink-0">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="font-bold">Settings Hub</h3>
+                            <button onclick="switchSPAView('dashboard-home')" class="text-dash-secondary hover:text-[var(--text-primary)] transition-colors md:hidden">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </button>
+                        </div>
+                        <nav class="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 no-scrollbar">
+                            <button onclick="switchSettingsView('profile')" class="settings-nav-btn active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition whitespace-nowrap w-full text-left" data-view="profile"><i class="fa-solid fa-user-gear w-5"></i> Profile</button>
+                            <button onclick="switchSettingsView('security')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="security"><i class="fa-solid fa-shield-halved w-5"></i> Login & Security</button>
+                            <button onclick="switchSettingsView('notifications')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="notifications"><i class="fa-solid fa-bell w-5"></i> Notifications</button>
+                            <button onclick="switchSettingsView('support')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="support"><i class="fa-solid fa-circle-question w-5"></i> Support Desk</button>
+                        </nav>
+                    </aside>
+
+                    <!-- Main Settings Content Area -->
+                    <div class="flex-1 p-6 md:p-10 relative bg-[var(--bg-card)]">
+                        <button onclick="switchSPAView('dashboard-home')" class="absolute top-8 right-10 text-dash-secondary hover:text-[var(--text-primary)] hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors group">
+                            <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> <span>Back to Dashboard</span>
+                        </button>
+                        <div id="settings-content-area"></div>
+                    </div>
+                </div>
+            </div>
+
             <div id="campaign-creation-view" class="spa-view hidden p-6 lg:p-8 max-w-4xl mx-auto">
 <div class="bento-card w-full relative p-6 md:p-8">
     <div class="flex items-center justify-between mb-10">
@@ -969,33 +998,6 @@
                 </div>
                 <button onclick="processDeposit()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Pay with Paystack</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Unified Settings Overlay -->
-    <div id="settings-overlay" class="hidden fixed inset-0 z-[250] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bento-card w-full max-w-5xl h-[85vh] md:h-[75vh] overflow-hidden relative flex flex-col md:flex-row p-0">
-            <!-- Sidebar Navigation -->
-            <aside class="w-full md:w-64 border-b md:border-b-0 md:border-r border-dash p-6 bg-dash-secondary/30 flex-shrink-0">
-                <h3 class="font-bold mb-6 hidden md:block">Settings Hub</h3>
-                <nav class="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 no-scrollbar">
-                    <button onclick="switchSettingsView('profile')" class="settings-nav-btn active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition whitespace-nowrap w-full text-left" data-view="profile"><i class="fa-solid fa-user-gear w-5"></i> Profile</button>
-                    <button onclick="switchSettingsView('security')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="security"><i class="fa-solid fa-shield-halved w-5"></i> Login & Security</button>
-                    <button onclick="switchSettingsView('notifications')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="notifications"><i class="fa-solid fa-bell w-5"></i> Notifications</button>
-                    <button onclick="switchSettingsView('support')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="support"><i class="fa-solid fa-circle-question w-5"></i> Support Desk</button>
-                </nav>
-                <button onclick="closeSettings()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)] md:hidden">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </aside>
-
-            <!-- Main Settings Content -->
-            <main class="flex-1 p-6 md:p-10 overflow-y-auto relative bg-[var(--bg-card)]">
-                <button onclick="closeSettings()" class="absolute top-8 right-10 text-dash-secondary hover:text-[var(--text-primary)] hidden md:block">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-                <div id="settings-content-area"></div>
-            </main>
         </div>
     </div>
 
@@ -1807,14 +1809,12 @@
 
         // --- PHASE 5: SETTINGS HUB & ACCOUNT MGMT ---
         function openSettings(initialView = 'profile') {
-            document.getElementById('settings-overlay').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+            switchSPAView('settings');
             switchSettingsView(initialView);
         }
 
         function closeSettings() {
-            document.getElementById('settings-overlay').classList.add('hidden');
-            document.body.style.overflow = 'auto';
+            switchSPAView('dashboard-home');
         }
 
         function switchSettingsView(view) {
