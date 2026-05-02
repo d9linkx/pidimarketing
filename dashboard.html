@@ -17,7 +17,7 @@
             --bg-header: #ffffff;
             --bg-card: #ffffff;
             --border-dash: #b1b1b173;
-            --text-primary: #1a1d23;
+            --text-primary: #1A1A1A;
             --text-secondary: #4a4a4a;
             --nav-bg: #f1f5f9;
             --btn-secondary: #f1f5f9;
@@ -249,12 +249,12 @@
 
         /* Animated Gradient for Primary Button */
         .btn-primary { 
-            background: linear-gradient(90deg, var(--accent-primary) 0%, #000000 100%); /* Initial gradient */
+            background: #a366ff;
             color: white; 
             transition: background 0.5s ease, transform 0.2s ease; /* Animate background property */
         }
         .btn-primary:hover {
-            background: linear-gradient(105deg, var(--accent-primary) 0%, #a366ff 100%); /* Shift angle by 15 degrees */
+            background: #7940cf; /* Shift angle by 15 degrees */
             transform: scale(1.05); /* Keep existing hover effect */
         }
 
@@ -270,7 +270,7 @@
             <div class="mb-8">
                 <a href="dashboard.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <img id="logo-img-sidebar" src="assets/pidiblack.png" alt="PIDI Logo" class="h-8 w-auto">
-                    <span class="text-lg font-bold">PIDI Tasks</span>
+                    <span class="text-lg font-normal">PIDI Tasks</span>
                 </a>
             </div>
 
@@ -307,15 +307,11 @@
         <!-- Main Content Area -->
         <main class="content-area flex-1 min-h-screen">
             <header class="flex justify-between items-center gap-4 p-4 lg:px-8 lg:py-5 bg-white border-b lg:border border-dash lg:rounded-2xl sticky top-0 z-[100]">
-                <div class="lg:hidden flex items-center gap-2">
-                    <a href="dashboard.html" class="flex items-center gap-2">
-                        <img id="logo-img-mobile" src="assets/pidiblack.png" alt="PIDI Logo" class="h-8 w-auto">
-                        <span class="text-base font-bold">PIDI Marketing</span>
-                    </a>
-                </div>
+
                 
-                <div class="flex-1 hidden lg:block">
-                    <h1 class="text-sm font-bold text-dash-secondary">Welcome back, <span class="user-name-display text-[var(--text-primary)]">Loading...</span></h1>
+                <div>
+                    <h1 class="font-normal text-dash-secondary">Welcome back, <span class="user-name-display text-[var(--text-primary)]">Loading...</span></h1>
+                    <p class="text-sm text-dash-secondary">This is your PIDItasks dashboard.</p>
                 </div> 
 
                 <!-- Search Bar (Desktop/Tablet) -->
@@ -378,7 +374,7 @@
                         <i data-feather="plus-circle"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-bold leading-tight">Create Campaign</h2>
+                        <h2 class="text-2xl font-normal leading-tight">Create Campaign</h2>
                         <p class="text-dash-secondary text-xs mt-1">Boost your engagement in minutes</p>
                     </div>
                     <div class="mt-6">
