@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
@@ -347,10 +348,14 @@
 
         .btn-secondary { background: white; border: 1px solid var(--border-dash); color: var(--text-primary); }
 
+        /* Expandable Table Styles */
+        .campaign-detail-row { transition: all 0.3s ease; }
+        .campaign-row.expanded { background: var(--nav-bg); }
+        .proof-img { aspect-ratio: 9/16; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-dash); }
+
     </style>
 </head>
 <body class="p-0">
-
     <div class="dashboard-layout">
         <!-- Desktop Sidebar -->
         <aside class="sidebar hidden lg:flex">
@@ -647,31 +652,114 @@
             </div>
 
             <!-- SPA CONTAINER: Analytics View -->
-            <div id="analytics-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-bold">Analytics Engine</h2>
-                    <button class="bg-dash-secondary px-4 py-2 rounded-xl text-xs font-bold border border-dash">Export CSV</button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bento-card h-[300px] flex items-center justify-center border-dashed">
-                        <p class="text-dash-secondary text-sm">Engagement Growth Chart Placeholder</p>
+            <div id="analytics-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold">Growth Radar</h2>
+                        <p class="text-dash-secondary text-sm">Real-time proof of human attention & engagement ROI</p>
                     </div>
-                    <div class="bento-card h-[300px] flex items-center justify-center border-dashed">
-                        <p class="text-dash-secondary text-sm">Audience Retention Chart Placeholder</p>
+                    <div class="flex gap-2">
+                        <button class="bg-dash-secondary px-4 py-2 rounded-xl text-xs font-bold border border-dash">Last 30 Days</button>
+                        <button class="accent-gradient px-4 py-2 rounded-xl text-xs font-bold">Generate PDF Report</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- ROI Stats -->
+                    <div class="bento-card card-azure flex flex-col justify-between">
+                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Aggregate Reach</p>
+                        <h3 class="text-4xl font-black mt-2" id="radar-total-reach">0</h3>
+                        <p class="text-[10px] text-green-500 font-bold mt-2"><i class="fa-solid fa-caret-up"></i> 24% vs last month</p>
+                    </div>
+
+                    <div class="bento-card card-indigo relative overflow-hidden">
+                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest mb-4">Engagement Velocity</p>
+                        <div class="h-24 w-full">
+                            <canvas id="velocityGauge"></canvas>
+                        </div>
+                        <div class="text-center mt-2">
+                            <span class="text-xl font-bold" id="radar-velocity">0</span>
+                            <p class="text-[9px] text-dash-secondary font-bold uppercase">Interactions / Hour</p>
+                        </div>
+                    </div>
+
+                    <div class="bento-card card-emerald">
+                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Cost Efficiency</p>
+                        <div class="flex items-end gap-3 mt-4">
+                            <div class="flex-1">
+                                <p class="text-[9px] font-bold text-dash-secondary uppercase">PIDI Avg</p>
+                                <p class="text-2xl font-black text-[var(--accent-primary)]">₦2.50</p>
+                            </div>
+                            <div class="w-px h-10 bg-dash-secondary"></div>
+                            <div class="flex-1 opacity-50">
+                                <p class="text-[9px] font-bold text-dash-secondary uppercase">Market Avg</p>
+                                <p class="text-xl font-bold line-through">₦45.00</p>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-dash-secondary mt-3">ROI Advantage: <span class="text-[var(--accent-primary)] font-bold">18x Cheaper</span> than IG Ads</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bento-card">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-dash-secondary mb-6">Retention Curve</h4>
+                        <div class="h-[250px]"><canvas id="retentionChart"></canvas></div>
+                    </div>
+                    <div class="bento-card">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-dash-secondary mb-6">Platform Heat breakdown</h4>
+                        <div class="h-[250px] flex items-center justify-center"><canvas id="platformDonut"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bento-card">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-dash-secondary mb-4">Demographic Heatmap</h4>
+                        <div id="nigeria-heatmap" class="space-y-4">
+                            <!-- Real-time distribution of Nigerian performers -->
+                        </div>
+                    </div>
+                    <div class="bento-card">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-dash-secondary mb-4">The Audit Trail (Verified)</h4>
+                        <div id="audit-trail-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-2 no-scrollbar">
+                            <p class="text-center text-xs text-dash-secondary py-10">Listening for interactions...</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- SPA CONTAINER: Campaigns View -->
-            <div id="campaigns-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-bold">Your Missions</h2>
-                    <button onclick="openCampaignWizard()" class="accent-gradient px-6 py-3 rounded-xl font-bold text-sm">New Campaign</button>
+            <div id="campaigns-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <h2 class="text-3xl font-bold">Mission Control</h2>
+                    <div class="flex p-1 bg-dash-secondary rounded-xl border border-dash" id="campaign-tabs">
+                        <button onclick="filterCampaignArchive('active')" class="px-4 py-2 rounded-lg text-xs font-bold transition active-btn">Active</button>
+                        <button onclick="filterCampaignArchive('pending_verification')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary">Verifying</button>
+                        <button onclick="filterCampaignArchive('completed')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary">Completed</button>
+                    </div>
                 </div>
-                <div class="bento-card">
-                    <table class="w-full text-left text-sm">
-                        <tbody id="full-campaign-list"></tbody>
+                <div class="bento-card p-0 overflow-hidden">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="text-dash-secondary border-b border-dash bg-dash-secondary/30">
+                                <th class="p-4 uppercase tracking-widest font-bold">Mission Name</th>
+                                <th class="p-4 uppercase tracking-widest font-bold">Platform</th>
+                                <th class="p-4 uppercase tracking-widest font-bold">Status</th>
+                                <th class="p-4 uppercase tracking-widest font-bold">Spend</th>
+                                <th class="p-4 uppercase tracking-widest font-bold">Progress</th>
+                                <th class="p-4 text-right"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="archive-campaign-list" class="divide-y divide-dash">
+                            <!-- Campaigns with expandable details injected here -->
+                        </tbody>
                     </table>
+                    <div class="p-4 flex items-center justify-between bg-dash-secondary/10">
+                        <p class="text-[10px] text-dash-secondary font-bold uppercase" id="archive-pagination-info">Showing 1-10 of ...</p>
+                        <div class="flex gap-2">
+                            <button onclick="changeArchivePage(-1)" class="w-8 h-8 rounded-lg border border-dash flex items-center justify-center hover:bg-dash-secondary transition"><i data-feather="chevron-left" class="w-4"></i></button>
+                            <button onclick="changeArchivePage(1)" class="w-8 h-8 rounded-lg border border-dash flex items-center justify-center hover:bg-dash-secondary transition"><i data-feather="chevron-right" class="w-4"></i></button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1022,6 +1110,8 @@
         // --- GLOBAL STATE ---
         let currentRole = 'creator';
         let selectedBank = null;
+        let archivePage = 0;
+        let archiveFilter = 'active';
         let roles = {
             creator: {
                 label: "Campaigns",
