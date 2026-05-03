@@ -353,6 +353,7 @@
         .campaign-row.expanded { background: var(--nav-bg); }
         .proof-img { aspect-ratio: 9/16; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-dash); }
 
+        #role-chevron.rotate-180, #role-chevron-mobile.rotate-180 { transform: rotate(180deg); }
     </style>
 </head>
 <body class="p-0">
@@ -366,8 +367,35 @@
                 </a>
             </div>
 
-            <div class="nav-container p-1 rounded-xl border flex flex-col gap-1 mb-8">
-                <button onclick="switchRole('creator')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-left flex items-center gap-2" id="btn-creator"><i data-feather="plus-square" class="w-3.5"></i> Creator Dashboard</button>
+            <!-- Desktop Role Switcher -->
+            <div class="relative mb-8 z-[1002]" id="role-switcher-container">
+                <button onclick="toggleRoleDropdown('desktop')" class="w-full p-2.5 rounded-xl border border-dash bg-dash-secondary/50 flex items-center justify-between group transition-all" id="role-dropdown-btn">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-[var(--accent-primary)] text-white flex items-center justify-center shadow-lg shadow-[var(--accent-primary)]/20 transition-colors" id="role-icon-box">
+                            <i data-feather="plus-square" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-[8px] font-black text-dash-secondary uppercase tracking-widest leading-none mb-1">Active Mode</p>
+                            <p class="text-[11px] font-bold truncate max-w-[110px]" id="current-role-label">Creator Dashboard</p>
+                        </div>
+                    </div>
+                    <i data-feather="chevron-down" class="w-3.5 h-3.5 text-dash-secondary transition-transform" id="role-chevron"></i>
+                </button>
+                
+                <div id="role-dropdown-menu" class="hidden absolute top-full left-0 w-full mt-2 bg-[var(--bg-card)] border border-dash rounded-xl shadow-2xl z-[1003] overflow-hidden">
+                    <button onclick="switchRole('creator')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors border-b border-dash text-left">
+                        <div class="w-7 h-7 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="plus-square" class="w-3.5 h-3.5"></i></div>
+                        <span class="text-[11px] font-bold">Creator Mode</span>
+                    </button>
+                    <button onclick="switchRole('performer')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors border-b border-dash text-left">
+                        <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="zap" class="w-3.5 h-3.5"></i></div>
+                        <span class="text-[11px] font-bold">Performer Mode</span>
+                    </button>
+                    <button onclick="switchRole('admin')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors text-left">
+                        <div class="w-7 h-7 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center"><i data-feather="shield" class="w-3.5 h-3.5"></i></div>
+                        <span class="text-[11px] font-bold">Admin Mode</span>
+                    </button>
+                </div>
             </div>
 
             <nav class="flex-1 space-y-1">
@@ -650,6 +678,89 @@
     </div>
 </div>
                 </div> <!-- End creator-dashboard-content -->
+
+                <!-- Performer Dashboard Layout -->
+                <div id="performer-dashboard-content" class="bento-grid p-4 mt-[-1rem] hidden gap-3 lg:gap-4">
+                    <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bento-card p-4 card-azure flex items-center gap-4">
+                            <div class="icon-box bg-blue-500/10 text-blue-500 mb-0 w-10 h-10"><i data-feather="dollar-sign" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Lifetime Earnings</p><h4 id="performer-stat-earnings" class="text-lg font-bold">₦0</h4></div>
+                        </div>
+                        <div class="bento-card p-4 card-emerald flex items-center gap-4">
+                            <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="check-circle" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Completed</p><h4 id="performer-stat-approved" class="text-lg font-bold">0</h4></div>
+                        </div>
+                        <div class="bento-card p-4 card-amber flex items-center gap-4">
+                            <div class="icon-box bg-amber-500/10 text-amber-500 mb-0 w-10 h-10"><i data-feather="clock" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">In Review</p><h4 id="performer-stat-pending" class="text-lg font-bold">0</h4></div>
+                        </div>
+                        <div class="bento-card p-4 card-indigo flex items-center gap-4">
+                            <div class="icon-box bg-indigo-500/10 text-indigo-500 mb-0 w-10 h-10"><i data-feather="award" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Rep Score</p><h4 id="performer-stat-rep" class="text-lg font-bold">98%</h4></div>
+                        </div>
+                    </div>
+
+                    <div class="bento-card col-span-2 relative group">
+                        <h2 class="text-2xl font-normal leading-tight mb-4">Available Gigs</h2>
+                        <div id="performer-available-tasks" class="space-y-3">
+                            <p class="text-xs text-dash-secondary text-center py-10">Searching for high-value missions...</p>
+                        </div>
+                    </div>
+
+                    <div class="bento-card col-span-1 relative group">
+                        <h2 class="text-2xl font-normal leading-tight mb-4">Daily Goal</h2>
+                        <div class="flex flex-col items-center justify-center h-48">
+                            <p class="text-3xl font-black text-[var(--accent-primary)]">6/15</p>
+                            <p class="text-[10px] font-bold text-dash-secondary uppercase mt-1">Tasks Completed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Dashboard Layout -->
+                <div id="admin-dashboard-content" class="bento-grid p-4 mt-[-1rem] hidden gap-3 lg:gap-4">
+                    <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bento-card p-4 card-slate flex items-center gap-4">
+                            <div class="icon-box bg-slate-100 text-slate-600 mb-0 w-10 h-10"><i data-feather="database" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Locked Escrow</p><h4 id="admin-stat-tvl" class="text-lg font-bold">₦0</h4></div>
+                        </div>
+                        <div class="bento-card p-4 card-slate flex items-center gap-4">
+                            <div class="icon-box bg-slate-100 text-slate-600 mb-0 w-10 h-10"><i data-feather="activity" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Global Missions</p><h4 id="admin-stat-active" class="text-lg font-bold">0</h4></div>
+                        </div>
+                        <div class="bento-card p-4 card-slate flex items-center gap-4">
+                            <div class="icon-box bg-slate-100 text-slate-600 mb-0 w-10 h-10"><i data-feather="user-plus" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">New Registrations</p><h4 id="admin-stat-users" class="text-lg font-bold">0</h4></div>
+                        </div>
+                        <div class="bento-card p-4 card-slate flex items-center gap-4">
+                            <div class="icon-box bg-red-100 text-red-600 mb-0 w-10 h-10"><i data-feather="alert-circle" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Pending Approval</p><h4 id="admin-stat-queue" class="text-lg font-bold" style="color: #ef4444">0</h4></div>
+                        </div>
+                    </div>
+
+                    <div class="bento-card col-span-full relative group">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-normal leading-tight">System Monitor: All Creator Missions</h2>
+                            <button onclick="switchSPAView('admin')" class="btn-fintech bg-dash-secondary text-[10px] font-black uppercase tracking-widest px-4 py-2 hover:opacity-80 transition">Verification Hub</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-dash-secondary border-b border-dash">
+                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Campaign</th>
+                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Creator</th>
+                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Platform</th>
+                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Value</th>
+                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Status</th>
+                                        <th class="pb-3 font-semibold text-right uppercase tracking-wider text-[10px]">Progress</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-global-campaigns" class="divide-y divide-dash">
+                                    <!-- Admin view injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- SPA CONTAINER: Analytics View -->
@@ -734,7 +845,7 @@
             <div id="campaigns-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                     <div>
-                        <h2 class="text-3xl font-bold tracking-tight">Mission Control</h2>
+                        <h2 class="text-3xl font-bold tracking-tight">Campaigns</h2>
                         <p class="text-dash-secondary text-sm">Real-time status of your marketing deployments</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -808,7 +919,7 @@
                 <div class="flex items-center justify-between mb-8">
                     <button onclick="switchSPAView('campaigns')" class="text-dash-secondary hover:text-[var(--text-primary)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors group">
                         <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> 
-                        <span>Back to Mission Control</span>
+                        <span>Back to Campaigns</span>
                     </button>
                     <div id="detail-status-badge"></div>
                 </div>
@@ -1331,6 +1442,90 @@
             requestAnimationFrame(update);
         }
 
+        window.toggleRoleDropdown = function(type = 'desktop') {
+            const menuId = type === 'desktop' ? 'role-dropdown-menu' : 'role-dropdown-menu-mobile';
+            const chevronId = type === 'desktop' ? 'role-chevron' : 'role-chevron-mobile';
+            const menu = document.getElementById(menuId);
+            const chevron = document.getElementById(chevronId);
+            const isHidden = menu.classList.contains('hidden');
+            
+            document.querySelectorAll('[id^="role-dropdown-menu"]').forEach(m => m.classList.add('hidden'));
+            document.querySelectorAll('[id^="role-chevron"]').forEach(c => c.classList.remove('rotate-180'));
+
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            }
+        }
+
+        window.fetchAdminDashboardData = async function() {
+            try {
+                const { data: allCamps } = await supabase.from('campaigns').select('*, profiles(full_name)');
+                const { data: allUsers } = await supabase.from('profiles').select('*');
+                const { data: transactions } = await supabase.from('transactions').select('*');
+
+                if (allCamps) {
+                    document.getElementById('admin-stat-active').innerText = allCamps.filter(c => c.status === 'active').length;
+                    document.getElementById('admin-stat-queue').innerText = allCamps.filter(c => c.status === 'pending_verification').length;
+                    
+                    const tbody = document.getElementById('admin-global-campaigns');
+                    tbody.innerHTML = allCamps.slice(0, 10).map(c => {
+                        const progress = Math.round((c.current_count / c.goal_count) * 100) || 0;
+                        return `
+                            <tr class="hover:bg-dash-secondary/20 transition-colors">
+                                <td class="py-3 font-bold truncate max-w-[150px]">${c.target_url}</td>
+                                <td class="py-3 text-dash-secondary font-semibold">${c.profiles?.full_name || 'System'}</td>
+                                <td class="py-3 uppercase font-bold text-[9px] text-dash-secondary">${c.platform}</td>
+                                <td class="py-3 font-bold">₦${c.total_cost.toLocaleString()}</td>
+                                <td class="py-3"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${c.status}</span></td>
+                                <td class="py-3 text-right font-mono">${progress}%</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+
+                if (allUsers) document.getElementById('admin-stat-users').innerText = allUsers.length;
+                if (transactions) {
+                    const tvl = transactions.filter(t => t.status === 'pending').reduce((acc, t) => acc + t.amount, 0);
+                    document.getElementById('admin-stat-tvl').innerText = `₦${tvl.toLocaleString()}`;
+                }
+            } catch (err) { console.error("Admin Sync Error:", err); }
+        }
+
+        window.fetchPerformerDashboardData = async function() {
+            try {
+                const { data: tasks } = await supabase.from('campaigns').select('*').eq('status', 'active').limit(5);
+                const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+
+                if (profile) {
+                    document.getElementById('performer-stat-earnings').innerText = `₦${(profile.balance || 0).toLocaleString()}`;
+                    document.getElementById('performer-stat-pending').innerText = profile.pending_balance || 0;
+                    document.getElementById('performer-stat-approved').innerText = profile.completed_tasks || 0;
+                }
+
+                const taskList = document.getElementById('performer-available-tasks');
+                if (tasks) {
+                    taskList.innerHTML = tasks.map(t => `
+                        <div class="p-4 bg-dash-secondary/30 border border-dash rounded-2xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${t.platform}"></i></div>
+                                <div><p class="font-bold text-xs truncate max-w-[120px]">${t.target_url}</p><p class="text-[9px] font-black text-green-500 uppercase">₦70 Reward</p></div>
+                            </div>
+                            <button class="bg-[var(--accent-primary)] text-white text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest">Claim</button>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) { console.error("Performer Sync Error:", err); }
+        }
+
+        // Update Identity & Global Listeners
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#role-switcher-container') && !e.target.closest('#mobile-drawer')) {
+                document.querySelectorAll('[id^="role-dropdown-menu"]').forEach(m => m.classList.add('hidden'));
+                document.querySelectorAll('[id^="role-chevron"]').forEach(c => c.classList.remove('rotate-180'));
+            }
+        });
+
         async function initializeUser() {
             const { data: { user }, error } = await supabase.auth.getUser();
             
@@ -1397,7 +1592,7 @@
         }
 
         window.switchRole = async function(role) {
-            currentRole = 'creator'; // Force creator role
+            currentRole = role;
 
             // Switch to the main dashboard SPA view
             switchSPAView('dashboard-home');
@@ -1407,27 +1602,56 @@
             if (creatorDiv) {
                 creatorDiv.classList.remove('hidden');
             }
-
-            // Update Sidebar UI buttons (Desktop & Mobile Drawer)
-            const navButtons = [
-                ...document.querySelectorAll('.sidebar .nav-container button'),
-                ...document.querySelectorAll('#mobile-drawer .nav-container button')
-            ];
             
-            navButtons.forEach(b => {
-                b.classList.remove('active-btn');
-                b.classList.add('text-dash-secondary');
-            });
+            // Update Switcher UI Config
+            const config = {
+                creator: { label: 'Creator Dashboard', icon: 'plus-square', color: 'var(--accent-primary)', cta: 'Create Campaign' },
+                performer: { label: 'Performer Dashboard', icon: 'zap', color: '#3b82f6', cta: 'Find New Task' },
+                admin: { label: 'Admin Console', icon: 'shield', color: '#ef4444', cta: 'Manage System' }
+            };
+            const c = config[role];
 
-            const desktopBtn = document.getElementById(`btn-${role}`);
-            const mobileBtn = document.getElementById(`btn-${role}-mobile`);
-            [desktopBtn, mobileBtn].forEach(btn => {
-                if (btn) {
-                    btn.classList.add('active-btn');
-                    btn.classList.remove('text-dash-secondary');
-                }
-            });
+            // Update Sidebar UI (Desktop)
+            const labelEl = document.getElementById('current-role-label');
+            const iconBox = document.getElementById('role-icon-box');
+            if (labelEl) labelEl.innerText = c.label;
+            if (iconBox) {
+                iconBox.style.backgroundColor = c.color;
+                iconBox.innerHTML = `<i data-feather="${c.icon}" class="w-4 h-4"></i>`;
+            }
+
+            // Update Sidebar UI (Mobile)
+            const mLabelEl = document.getElementById('current-role-label-mobile');
+            const mIconBox = document.getElementById('role-icon-box-mobile');
+            if (mLabelEl) mLabelEl.innerText = c.label;
+            if (mIconBox) {
+                mIconBox.style.backgroundColor = c.color;
+                mIconBox.innerHTML = `<i data-feather="${c.icon}" class="w-4 h-4"></i>`;
+            }
+
+            // Update Main CTA logic
+            const ctaBtn = document.getElementById('main-cta-btn');
+            const ctaText = document.getElementById('main-cta');
+            if (ctaText) ctaText.innerText = c.cta;
+            if (ctaBtn) {
+                if (role === 'creator') ctaBtn.onclick = () => openCampaignWizard();
+                else if (role === 'performer') ctaBtn.onclick = () => switchSPAView('tasks'); // Assuming a tasks view
+                else ctaBtn.onclick = () => switchSPAView('admin');
+            }
+
+            // Close dropdowns
+            document.querySelectorAll('[id^="role-dropdown-menu"]').forEach(m => m.classList.add('hidden'));
+            document.querySelectorAll('[id^="role-chevron"]').forEach(c => c.classList.remove('rotate-180'));
+
+            // Toggle content blocks
+            document.getElementById('creator-dashboard-content')?.classList.toggle('hidden', role !== 'creator');
+            document.getElementById('performer-dashboard-content')?.classList.toggle('hidden', role !== 'performer');
+            document.getElementById('admin-dashboard-content')?.classList.toggle('hidden', role !== 'admin');
             
+            feather.replace();
+            if (role === 'creator') fetchRoleData('creator');
+            if (role === 'admin') fetchAdminDashboardData();
+            if (role === 'performer') fetchPerformerDashboardData();
             if (role === 'creator') checkMilestones(roles.creator.totalGrowthMetric);
 
             updateWalletDisplay();
@@ -2489,10 +2713,35 @@
         </div>
 
         <!-- Reusing your exact Sidebar Content logic -->
-        <div class="nav-container p-1 rounded-xl border flex flex-col gap-1 mb-8">
-            <button onclick="switchRole('creator')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-left flex items-center gap-2" id="btn-creator-mobile"><i data-feather="plus-square" class="w-3.5"></i> Creator Dashboard</button>
+        <div class="relative mb-8 z-[1002]" id="role-switcher-container-mobile">
+            <button onclick="toggleRoleDropdown('mobile')" class="w-full p-2.5 rounded-xl border border-dash bg-dash-secondary/50 flex items-center justify-between group transition-all" id="role-dropdown-btn-mobile">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[var(--accent-primary)] text-white flex items-center justify-center shadow-lg shadow-[var(--accent-primary)]/20 transition-colors" id="role-icon-box-mobile">
+                        <i data-feather="plus-square" class="w-4 h-4"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-[8px] font-black text-dash-secondary uppercase tracking-widest leading-none mb-1">Active Mode</p>
+                        <p class="text-[11px] font-bold truncate max-w-[110px]" id="current-role-label-mobile">Creator Dashboard</p>
+                    </div>
+                </div>
+                <i data-feather="chevron-down" class="w-3.5 h-3.5 text-dash-secondary transition-transform" id="role-chevron-mobile"></i>
+            </button>
+            
+            <div id="role-dropdown-menu-mobile" class="hidden absolute top-full left-0 w-full mt-2 bg-[var(--bg-card)] border border-dash rounded-xl shadow-2xl z-[1003] overflow-hidden">
+                <button onclick="switchRole('creator')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors border-b border-dash text-left">
+                    <div class="w-7 h-7 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="plus-square" class="w-3.5 h-3.5"></i></div>
+                    <span class="text-[11px] font-bold">Creator Mode</span>
+                </button>
+                <button onclick="switchRole('performer')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors border-b border-dash text-left">
+                    <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="zap" class="w-3.5 h-3.5"></i></div>
+                    <span class="text-[11px] font-bold">Performer Mode</span>
+                </button>
+                <button onclick="switchRole('admin')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors text-left">
+                    <div class="w-7 h-7 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center"><i data-feather="shield" class="w-3.5 h-3.5"></i></div>
+                    <span class="text-[11px] font-bold">Admin Mode</span>
+                </button>
+            </div>
         </div>
-        
 
         <nav class="flex-1 space-y-1">
             <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
