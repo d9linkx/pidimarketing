@@ -370,17 +370,6 @@
                 <button onclick="switchRole('creator')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-left flex items-center gap-2" id="btn-creator"><i data-feather="plus-square" class="w-3.5"></i> Creator Mode</button>
             </div>
 
-            function switchRole(role) {
-    if (role === 'creator') {
-        // This sends the user to your creator dashboard landing page
-        window.location.href = 'https://avantaland.vercel.app/product-test.html';
-    } else {
-        // You can add logic here for other roles (like 'investor' or 'user')
-        console.log("Switching to:", role);
-    }
-}
-            
-
             <nav class="flex-1 space-y-1">
                 <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
                 <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
@@ -643,13 +632,13 @@
         <p class="text-[11px] text-dash-secondary leading-relaxed">Detailed center for tracking individual mission ROI, viewing verification logs, and managing active content links.</p>
     </div>
     
-    <h3 class="text-lg font-bold mb-6">Your Campaigns</h3>
+    <h2 class="text-2xl font-normal leading-tight">Your Campaigns</h2>
     
     <div class="overflow-x-auto">
         <table class="w-full text-left text-xs border-separate border-spacing-y-2">
             <thead>
                 <tr class="text-dash-secondary">
-                                <th class="pb-2 font-semibold uppercase tracking-widest text-[10px]">Mission ID</th>
+                    <th class="pb-2 font-semibold uppercase tracking-wider text-[10px]">Target URL</th>
                     <th class="pb-2 font-semibold uppercase tracking-wider text-[10px]">Status</th>
                     <th class="pb-2 font-semibold uppercase tracking-wider text-[10px]">Progress</th>
                     <th class="pb-2 font-semibold text-right uppercase tracking-wider text-[10px]">Action</th>
@@ -741,14 +730,49 @@
 
             <!-- SPA CONTAINER: Campaigns View -->
             <div id="campaigns-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <h2 class="text-3xl font-bold">Mission Control</h2>
-                    <div class="flex p-1 bg-dash-secondary rounded-xl border border-dash" id="campaign-tabs">
-                        <button onclick="filterCampaignArchive('active')" class="px-4 py-2 rounded-lg text-xs font-bold transition active-btn">Active</button>
-                        <button onclick="filterCampaignArchive('pending_verification')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary">Verifying</button>
-                        <button onclick="filterCampaignArchive('completed')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary">Completed</button>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight">Mission Control</h2>
+                        <p class="text-dash-secondary text-sm">Real-time status of your marketing deployments</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                        <div class="relative flex-1 md:flex-initial">
+                            <input type="text" id="campaign-search" placeholder="Search URL..." 
+                                class="w-full md:w-64 bg-dash-secondary border border-dash rounded-xl p-2.5 pl-10 text-xs focus:outline-none focus:border-[var(--accent-primary)] transition-all">
+                            <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-dash-secondary w-4 h-4"></i>
+                        </div>
+                        <div class="flex p-1 bg-dash-secondary rounded-xl border border-dash" id="campaign-tabs">
+                            <button onclick="filterCampaignArchive('all')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-all">All</button>
+                            <button onclick="filterCampaignArchive('active')" class="px-4 py-2 rounded-lg text-xs font-bold transition active-btn" id="tab-active">Active</button>
+                            <button onclick="filterCampaignArchive('pending_verification')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-verifying">Verifying</button>
+                            <button onclick="filterCampaignArchive('completed')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-completed">Completed</button>
+                        </div>
+                        <button onclick="openCampaignWizard()" class="btn-fintech btn-primary">
+                            <i data-feather="plus" class="w-4 h-4 mr-2"></i> New Mission
+                        </button>
                     </div>
                 </div>
+
+                <!-- Archive Quick Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bento-card p-4 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="layers" class="w-5"></i></div>
+                        <div><p class="text-[9px] font-bold text-dash-secondary uppercase">Lifetime Missions</p><h4 id="archive-stat-total" class="text-lg font-bold">0</h4></div>
+                    </div>
+                    <div class="bento-card p-4 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="check-circle" class="w-5"></i></div>
+                        <div><p class="text-[9px] font-bold text-dash-secondary uppercase">Completed</p><h4 id="archive-stat-completed" class="text-lg font-bold">0</h4></div>
+                    </div>
+                    <div class="bento-card p-4 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="clock" class="w-5"></i></div>
+                        <div><p class="text-[9px] font-bold text-dash-secondary uppercase">Avg. Pace</p><h4 class="text-lg font-bold">~14m</h4></div>
+                    </div>
+                    <div class="bento-card p-4 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center"><i data-feather="zap" class="w-5"></i></div>
+                        <div><p class="text-[9px] font-bold text-dash-secondary uppercase">Success Rate</p><h4 class="text-lg font-bold">99.2%</h4></div>
+                    </div>
+                </div>
+
                 <div class="bento-card p-0 overflow-hidden">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
@@ -762,14 +786,14 @@
                             </tr>
                         </thead>
                         <tbody id="archive-campaign-list" class="divide-y divide-dash">
-                            <!-- Campaigns with expandable details injected here -->
+                            <!-- Campaigns injected here -->
                         </tbody>
                     </table>
                     <div class="p-4 flex items-center justify-between bg-dash-secondary/10">
-                        <p class="text-[10px] text-dash-secondary font-bold uppercase" id="archive-pagination-info">Showing 1-10 of ...</p>
-                        <div class="flex gap-2" id="archive-pagination-controls">
-                            <button id="archive-prev-btn" onclick="changeArchivePage(-1)" class="w-8 h-8 rounded-lg border border-dash flex items-center justify-center hover:bg-dash-secondary transition disabled:opacity-50 disabled:cursor-not-allowed"><i data-feather="chevron-left" class="w-4"></i></button>
-                            <button id="archive-next-btn" onclick="changeArchivePage(1)" class="w-8 h-8 rounded-lg border border-dash flex items-center justify-center hover:bg-dash-secondary transition disabled:opacity-50 disabled:cursor-not-allowed"><i data-feather="chevron-right" class="w-4"></i></button>
+                        <p class="text-[10px] text-dash-secondary font-bold uppercase" id="archive-pagination-info">Showing 0 of 0</p>
+                        <div class="flex gap-2" id="pagination-controls">
+                            <button onclick="changeArchivePage(-1)" class="w-8 h-8 rounded-lg border border-dash flex items-center justify-center hover:bg-dash-secondary transition"><i data-feather="chevron-left" class="w-4"></i></button>
+                            <button onclick="changeArchivePage(1)" class="w-8 h-8 rounded-lg border border-dash flex items-center justify-center hover:bg-dash-secondary transition"><i data-feather="chevron-right" class="w-4"></i></button>
                         </div>
                     </div>
                 </div>
@@ -1120,10 +1144,6 @@
         import { supabase } from './supabaseClient.js';
 
         // --- GLOBAL STATE ---
-        const campaignsPerPage = 5;
-        let currentPage = 0;
-        let filteredCampaigns = [];
-        let expandedCampaignId = null;
         let currentRole = 'creator';
         let selectedBank = null;
         let archivePage = 0;
@@ -1265,6 +1285,12 @@
             document.querySelectorAll('.user-name-display').forEach(el => el.innerText = currentUser.fullName);
             document.querySelectorAll('.user-avatar-display').forEach(img => img.src = currentUser.avatar);
 
+            // Search listener for campaigns view
+            document.getElementById('campaign-search')?.addEventListener('input', () => {
+                archivePage = 0;
+                renderArchiveTable();
+            });
+
             // Fetch real user data from profiles table
             const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
             if (profile) {
@@ -1309,6 +1335,9 @@
         window.switchRole = async function(role) {
             currentRole = 'creator'; // Force creator role
 
+            // Switch to the main dashboard SPA view
+            switchSPAView('dashboard-home');
+
             // Toggle the two main dashboard sections
             const creatorDiv = document.getElementById('creator-dashboard-content');
             if (creatorDiv) {
@@ -1327,7 +1356,8 @@
             });
 
             const desktopBtn = document.getElementById(`btn-${role}`);
-            [desktopBtn].forEach(btn => {
+            const mobileBtn = document.getElementById(`btn-${role}-mobile`);
+            [desktopBtn, mobileBtn].forEach(btn => {
                 if (btn) {
                     btn.classList.add('active-btn');
                     btn.classList.remove('text-dash-secondary');
@@ -1337,7 +1367,102 @@
             if (role === 'creator') checkMilestones(roles.creator.totalGrowthMetric);
 
             updateWalletDisplay();
-            filterCampaignArchive('active'); // Initialize campaigns view with active filter
+            fetchRoleData('creator');
+        }
+
+        // --- MISSION CONTROL (CAMPAIGNS VIEW) LOGIC ---
+        window.filterCampaignArchive = function(filter) {
+            archiveFilter = filter;
+            archivePage = 0;
+            
+            document.querySelectorAll('#campaign-tabs button').forEach(btn => {
+                btn.classList.remove('active-btn');
+                btn.classList.add('text-dash-secondary');
+            });
+            
+            const filterIdMap = { all: 'all', active: 'active', pending_verification: 'verifying', completed: 'completed' };
+            const activeTab = document.getElementById(`tab-${filterIdMap[filter]}`);
+            if (activeTab) {
+                activeTab.classList.add('active-btn');
+                activeTab.classList.remove('text-dash-secondary');
+            }
+            
+            renderArchiveTable();
+        }
+
+        window.changeArchivePage = function(delta) {
+            const pageSize = 10;
+            const filtered = getFilteredCampaigns();
+            const maxPage = Math.max(0, Math.ceil(filtered.length / pageSize) - 1);
+            archivePage = Math.max(0, Math.min(maxPage, archivePage + delta));
+            renderArchiveTable();
+        }
+
+        function getFilteredCampaigns() {
+            const searchTerm = document.getElementById('campaign-search')?.value.toLowerCase() || '';
+            return (roles.creator.items || []).filter(c => {
+                const matchesFilter = archiveFilter === 'all' || c.status === archiveFilter;
+                const matchesSearch = c.target_url.toLowerCase().includes(searchTerm) || 
+                                     c.platform.toLowerCase().includes(searchTerm);
+                return matchesFilter && matchesSearch;
+            });
+        }
+
+        function renderArchiveTable() {
+            const list = document.getElementById('archive-campaign-list');
+            if (!list) return;
+
+            const filtered = getFilteredCampaigns();
+            const pageSize = 10;
+            const start = archivePage * pageSize;
+            const end = start + pageSize;
+            const pageItems = filtered.slice(start, end);
+
+            document.getElementById('archive-stat-total').innerText = roles.creator.items.length;
+            document.getElementById('archive-stat-completed').innerText = roles.creator.items.filter(c => c.status === 'completed').length;
+
+            const paginationInfo = document.getElementById('archive-pagination-info');
+            if (paginationInfo) {
+                paginationInfo.innerText = filtered.length > 0 
+                    ? `Showing ${start + 1}-${Math.min(end, filtered.length)} of ${filtered.length}`
+                    : `No missions found`;
+            }
+
+            if (pageItems.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" class="p-12 text-center text-dash-secondary opacity-40"><i data-feather="folder-minus" class="w-10 h-10 mx-auto mb-2"></i><p class="text-xs font-bold uppercase">No records found</p></td></tr>';
+                feather.replace();
+                return;
+            }
+
+            list.innerHTML = pageItems.map(c => {
+                const progress = Math.round((c.current_count / c.goal_count) * 100) || 0;
+                const statusColors = {
+                    active: 'bg-green-500/10 text-green-500',
+                    pending_verification: 'bg-amber-500/10 text-amber-500',
+                    completed: 'bg-blue-500/10 text-blue-500'
+                };
+                
+                return `
+                    <tr class="hover:bg-dash-secondary/20 transition-colors">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${c.platform} text-xs"></i></div>
+                                <div class="max-w-[180px] truncate"><p class="font-bold truncate">${c.target_url}</p><p class="text-[10px] text-dash-secondary">${new Date(c.created_at).toLocaleDateString()}</p></div>
+                            </div>
+                        </td>
+                        <td class="p-4 uppercase font-bold text-[10px] text-dash-secondary">${c.platform}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase ${statusColors[c.status] || 'bg-dash-secondary text-dash-secondary'}">${c.status === 'pending_verification' ? 'Verifying' : c.status}</span></td>
+                        <td class="p-4 font-bold">₦${(c.total_cost || 0).toLocaleString()}</td>
+                        <td class="p-4"><div class="flex items-center gap-3 min-w-[100px]"><div class="flex-1 bg-dash-secondary h-1 rounded-full overflow-hidden"><div class="bg-[var(--accent-primary)] h-full" style="width: ${progress}%"></div></div><span class="text-[9px] font-bold">${progress}%</span></div></td>
+                        <td class="p-4 text-right">
+                            <button onclick="window.open('${c.target_url}', '_blank')" class="w-8 h-8 rounded-lg hover:bg-white border border-transparent hover:border-dash flex items-center justify-center transition">
+                                <i data-feather="external-link" class="w-3.5 h-3.5 text-dash-secondary"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            feather.replace();
         }
 
         async function fetchRoleData(role) {
@@ -1364,6 +1489,9 @@
                         metric: `${c.current_count}/${c.goal_count}` 
                     })) || [], 'creator-campaign-list');
 
+                    // 4. Update Mission Control (Archive View)
+                    renderArchiveTable();
+
                     // 3. Update Analytics via Aggregated Stats
                     fetchAnalytics();
         async function fetchAnalytics() {
@@ -1379,16 +1507,6 @@
                 }
             } catch (err) {
                 console.error("Analytics Sync Error:", err);
-            }
-        }
-
-        function getFriendlyStatus(status) {
-            switch (status) {
-                case 'active': return { name: 'Active', color: 'bg-green-500/10 text-green-500' };
-                case 'pending_verification': return { name: 'Verifying', color: 'bg-amber-500/10 text-amber-500' };
-                case 'completed': return { name: 'Completed', color: 'bg-blue-500/10 text-blue-500' };
-                case 'rejected': return { name: 'Rejected', color: 'bg-red-500/10 text-red-500' };
-                default: return { name: status, color: 'bg-gray-500/10 text-gray-500' };
             }
         }
 
@@ -1435,152 +1553,12 @@
             }).join('');
         }
 
-        function calculateProgressBarWidth(current, goal) {
-            if (goal === 0) return 0;
-            return Math.min(100, Math.round((current / goal) * 100));
-        }
-
-        function renderCampaignArchive() {
-            const list = document.getElementById('archive-campaign-list');
-            if (!list) return;
-
-            // Filter campaigns based on current archiveFilter
-            filteredCampaigns = roles.creator.items.filter(c => {
-                if (archiveFilter === 'all') return true;
-                return c.status === archiveFilter;
-            });
-
-            const startIndex = currentPage * campaignsPerPage;
-            const endIndex = startIndex + campaignsPerPage;
-            const campaignsToRender = filteredCampaigns.slice(startIndex, endIndex);
-
-            if (!campaignsToRender || campaignsToRender.length === 0) {
-                list.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-dash-secondary">No campaigns found for this status.</td></tr>';
-                updateArchivePaginationInfo();
-                updatePaginationControls();
-                return;
-            }
-
-            list.innerHTML = campaignsToRender.map(c => {
-                const friendlyStatus = getFriendlyStatus(c.status);
-                const progressWidth = calculateProgressBarWidth(c.current_count, c.goal_count);
-                const isExpanded = c.id === expandedCampaignId;
-
-                return `
-                    <tr class="campaign-row group/row hover:bg-[var(--nav-bg)] transition-colors cursor-pointer ${isExpanded ? 'expanded' : ''}" data-campaign-id="${c.id}">
-                        <td class="p-4 font-bold text-[var(--text-primary)]">
-                            <button class="flex items-center gap-2 text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors" data-action="toggle-details">
-                                <i data-feather="chevron-right" class="w-3 h-3 transition-transform ${isExpanded ? 'rotate-90' : ''}"></i>
-                                ${c.id.substring(0, 8)}...
-                            </button>
-                        </td>
-                        <td class="p-4 capitalize">${c.platform}</td>
-                        <td class="p-4">
-                            <span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase ${friendlyStatus.color}">
-                                ${friendlyStatus.name}
-                            </span>
-                        </td>
-                        <td class="p-4">₦${c.total_cost.toLocaleString()}</td>
-                        <td class="p-4">
-                            <div class="flex flex-col gap-1">
-                                <div class="flex justify-between text-[9px] font-bold text-dash-secondary">
-                                    <span>Progress</span>
-                                    <span>${progressWidth}%</span>
-                                </div>
-                                <div class="w-24 bg-dash-secondary h-1 rounded-full overflow-hidden">
-                                    <div class="bg-gradient-to-r from-green-400 to-emerald-500 h-full" style="width: ${progressWidth}%"></div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="p-4 text-right">
-                            <button class="hover:text-[var(--accent-primary)] text-dash-secondary"><i data-feather="more-vertical" class="w-4 h-4"></i></button>
-                        </td>
-                    </tr>
-                    <tr class="campaign-detail-row ${isExpanded ? '' : 'hidden'}">
-                        <td colspan="6" class="p-4 bg-[var(--bg-sidebar)] border-t border-dash">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                                <div>
-                                    <p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Target URL</p>
-                                    <a href="${c.target_url}" target="_blank" class="text-[var(--accent-primary)] hover:underline">${c.target_url}</a>
-                                </div>
-                                <div>
-                                    <p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Goal / Current</p>
-                                    <p>${c.goal_count} / ${c.current_count} Engagements</p>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Instructions</p>
-                                    <p class="text-dash-secondary">${c.instructions || 'No specific instructions provided.'}</p>
-                                </div>
-                                ${c.payment_proof_url ? `
-                                <div class="md:col-span-2">
-                                    <p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Payment Proof</p>
-                                    <img src="${c.payment_proof_url}" class="w-32 h-auto rounded-lg border border-dash mt-2 cursor-pointer" onclick="window.open('${c.payment_proof_url}', '_blank')">
-                                </div>
-                                ` : ''}
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            feather.replace(); // Re-render feather icons for new content
-            updateArchivePaginationInfo();
-            updatePaginationControls();
-        }
-
-        function toggleCampaignDetails(campaignId) {
-            if (expandedCampaignId === campaignId) {
-                expandedCampaignId = null; // Collapse if already expanded
-            } else {
-                expandedCampaignId = campaignId; // Expand new one
-            }
-            renderCampaignArchive(); // Re-render to apply changes
-        }
-
-        function filterCampaignArchive(status) {
-            archiveFilter = status;
-            currentPage = 0; // Reset to first page on filter change
-            renderCampaignArchive();
-
-            // Update active tab styling
-            document.querySelectorAll('#campaign-tabs button').forEach(btn => {
-                btn.classList.remove('active-btn');
-                btn.classList.add('text-dash-secondary');
-            });
-            document.querySelector(`#campaign-tabs button[onclick="filterCampaignArchive('${status}')"]`).classList.add('active-btn');
-            document.querySelector(`#campaign-tabs button[onclick="filterCampaignArchive('${status}')"]`).classList.remove('text-dash-secondary');
-        }
-
-        function changeArchivePage(direction) {
-            const newPage = currentPage + direction;
-            const totalPages = Math.ceil(filteredCampaigns.length / campaignsPerPage);
-            if (newPage >= 0 && newPage < totalPages) {
-                currentPage = newPage;
-                renderCampaignArchive();
-            }
-        }
-
-        function updateArchivePaginationInfo() {
-            const infoEl = document.getElementById('archive-pagination-info');
-            const totalCampaigns = filteredCampaigns.length;
-            const start = totalCampaigns > 0 ? currentPage * campaignsPerPage + 1 : 0;
-            const end = Math.min(start + campaignsPerPage - 1, totalCampaigns);
-            infoEl.innerText = `Showing ${start}-${end} of ${totalCampaigns} campaigns`;
-        }
-
-        function updatePaginationControls() {
-            const prevBtn = document.getElementById('archive-prev-btn');
-            const nextBtn = document.getElementById('archive-next-btn');
-            const totalPages = Math.ceil(filteredCampaigns.length / campaignsPerPage);
-
-            if (prevBtn) prevBtn.disabled = currentPage === 0;
-            if (nextBtn) nextBtn.disabled = currentPage >= totalPages - 1;
-        }
-
         function addToLiveFeed(activity) {
             const feed = document.getElementById('live-activity-feed');
             if (!feed) return;
             
             const avatar = activity.user_avatar || `https://ui-avatars.com/api/?name=${activity.user_handle || 'User'}&background=random&color=fff`;
+
             const item = document.createElement('div');
             item.className = 'flex gap-3 items-start opacity-0 translate-y-4 transition-all duration-500 py-1';
             item.innerHTML = `
@@ -1599,11 +1577,56 @@
             
             if (feed.children.length > 15) feed.lastElementChild.remove();
         }
+                    
+                    if (campaigns?.length > 0) {
+                        const totalGoals = campaigns.reduce((acc, c) => acc + c.goal_count, 0);
+                        const totalCurrent = campaigns.reduce((acc, c) => acc + c.current_count, 0);
+                        const avgCompletion = Math.round((totalCurrent / totalGoals) * 100) || 0;
+                        updateEngagementUI(avgCompletion);
+                    } else {
+                        updateEngagementUI(0);
+                    }
+                }
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                const listId = 'creator-campaign-list';
+                renderTable([], listId); 
+            }
+        }
+
+        function updateEngagementUI(score) {
+            const valueEl = document.getElementById('engagement-score-value');
+            const barEl = document.getElementById('engagement-progress-bar');
+            if (valueEl) valueEl.innerText = `${score}%`;
+            if (barEl) barEl.style.width = `${score}%`;
         }
 
         window.scrollToTasks = function() {
             const table = document.querySelector('.bento-grid .col-span-3');
             if (table) table.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderTable(items, listId) {
+            const list = document.getElementById(listId);
+            
+            if (!list) return;
+            if (!items || !items.length) {
+                list.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-dash-secondary">No records found.</td></tr>';
+                return;
+            }
+            list.innerHTML = items.map(item => `
+                <tr class="border-b border-dash task-item">
+                    <td class="py-4 font-bold">
+                        ${item.isTask ? 
+                            `<button onclick="claimTask('${item.id}')" class="text-[#6a26da] hover:underline">${item.name}</button>` : 
+                            item.name
+                        }
+                    </td>
+                    <td class="py-4"><span class="bg-dash-secondary px-2 py-1 rounded-lg text-[10px] uppercase font-bold">${item.status}</span></td>
+                    <td class="py-4 text-dash-secondary">${item.metric}</td>
+                    <td class="py-4 text-right"><button class="hover:text-[#6a26da] text-dash-secondary"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+                </tr>
+            `).join('');
         }
 
         async function refreshActivityFeed() {
@@ -1684,7 +1707,7 @@
                 if (viewId === 'wallet') fetchWalletData();
                 if (viewId === 'admin') fetchAdminPendingMissions();
                 if (viewId === 'campaigns') fetchRoleData('creator');
-            } // Removed redundant fetchRoleData('creator') here, as filterCampaignArchive handles it.
+            }
 
             // Special case logic
             if (viewId === 'dashboard-home') {
@@ -1692,7 +1715,7 @@
                 if (grid) grid.classList.remove('hidden');
             }
             
-            // Auto-close mobile menu if open (Corrected to use toggleMobileMenu)
+            // Auto-close mobile menu if open
             const menu = document.getElementById('mobile-menu');
             if (menu && !menu.classList.contains('hidden')) toggleMobileMenu();
         }
@@ -1706,7 +1729,7 @@
                 const totalPaid = campaigns.filter(c => c.status !== 'rejected').reduce((acc, c) => acc + c.total_cost, 0);
                 const working = campaigns.filter(c => c.status === 'active').reduce((acc, c) => acc + c.total_cost, 0);
                 const spent = campaigns.filter(c => c.status === 'completed').reduce((acc, c) => acc + c.total_cost, 0);
-                
+
                 document.getElementById('wallet-total-paid').innerText = `₦${totalPaid.toLocaleString()}`;
                 document.getElementById('wallet-working-funds').innerText = `₦${working.toLocaleString()}`;
                 document.getElementById('wallet-spent-funds').innerText = `₦${spent.toLocaleString()}`;
@@ -1714,7 +1737,7 @@
 
             const ledger = document.getElementById('wallet-ledger-body');
             if (transactions && transactions.length > 0) {
-                ledger.innerHTML = transactions.map(t => ` 
+                ledger.innerHTML = transactions.map(t => `
                     <tr class="border-b border-dash hover:bg-dash-secondary/30 transition-colors">
                         <td class="py-4 font-mono text-[10px]">${t.id.slice(0, 8)}...</td>
                         <td class="py-4">
@@ -1722,7 +1745,7 @@
                             <p class="text-[9px] text-dash-secondary">${new Date(t.created_at).toLocaleDateString()}</p>
                         </td>
                         <td class="py-4 font-bold">₦${t.amount.toLocaleString()}</td>
-                        <td class="py-4 text-right"> 
+                        <td class="py-4 text-right">
                             <span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase ${t.status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}">
                                 ${t.status}
                             </span>
@@ -1775,7 +1798,7 @@
                 if (campError) throw campError;
 
                 // 2. Update linked Transaction Status
-                const { error: transError } = await supabase 
+                const { error: transError } = await supabase
                     .from('transactions')
                     .update({ status: newStatus === 'active' ? 'completed' : 'failed' })
                     .eq('campaign_id', campaignId);
@@ -1798,7 +1821,7 @@
             }
         }
 
-        window.openCampaignWizard = () => { switchSPAView('campaign-creation'); resetWizard(); };
+        window.openCampaignWizard = () => switchSPAView('campaign-creation');
         window.closeCampaignWizard = () => { switchSPAView('dashboard-home'); resetWizard(); };
 
         window.toggleRefundPolicy = function(show) {
@@ -1832,7 +1855,7 @@
                 toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#6a26da] text-white px-6 py-3 rounded-2xl shadow-2xl z-[500] font-bold text-sm transition-all transform translate-y-20 flex items-center gap-2 border border-white/10';
                 toast.innerHTML = '<i class="fa-solid fa-copy"></i> Account number copied to clipboard!';
                 document.body.appendChild(toast);
-                
+
                 setTimeout(() => toast.style.transform = 'translateY(0) translateX(-50%)', 10);
 
                 setTimeout(() => {
@@ -1847,7 +1870,7 @@
             selectedPlatform = plt;
             document.querySelectorAll('.platform-btn').forEach(b => {
                 b.classList.remove('active', 'border-[#6a26da]', 'bg-[#6a26da]/5');
-                b.classList.add('border-dash'); // Restore default border 
+                b.classList.add('border-dash'); // Restore default border
             });
             const activeBtn = document.getElementById(`plt-${plt}`);
             if (activeBtn) {
@@ -1870,7 +1893,7 @@
             if (currentStep < 4) {
                 document.getElementById(`step-${currentStep}`).classList.add('hidden');
                 document.getElementById(`node-${currentStep}`).classList.add('completed');
-                currentStep++; 
+                currentStep++;
                 document.getElementById(`step-${currentStep}`).classList.remove('hidden');
                 document.getElementById(`node-${currentStep}`).classList.add('active');
                 updateWizardUI();
@@ -1881,7 +1904,7 @@
             if (currentStep > 1) {
                 document.getElementById(`step-${currentStep}`).classList.add('hidden');
                 document.getElementById(`node-${currentStep}`).classList.remove('active');
-                currentStep--; 
+                currentStep--;
                 document.getElementById(`step-${currentStep}`).classList.remove('hidden');
                 document.getElementById(`node-${currentStep}`).classList.remove('completed');
                 updateWizardUI();
@@ -1912,7 +1935,7 @@
             const totalCost = qty * 100;
 
             if (!url) {
-                alert("Please provide a target URL."); 
+                alert("Please provide a target URL.");
                 btnSpan.innerText = originalText;
                 finishBtn.disabled = false;
                 return;
@@ -1929,7 +1952,7 @@
                     const filePath = `receipts/${fileName}`;
 
                     const { error: uploadError } = await supabase.storage
-                        .from('proofs') 
+                        .from('proofs')
                         .upload(filePath, file);
 
                     if (uploadError) throw uploadError;
@@ -1939,7 +1962,7 @@
 
                 // 2. Save Campaign details and capture returned ID for ledger
                 const { data: campaignData, error: dbError } = await supabase
-                    .from('campaigns') 
+                    .from('campaigns')
                     .insert([{
                         creator_id: currentUser.id,
                         platform: selectedPlatform,
@@ -1955,7 +1978,7 @@
 
                 // 3. Create relational link in transactions ledger for balance reconciliation
                 if (campaignData && campaignData[0]) {
-                    await supabase.from('transactions').insert([{ 
+                    await supabase.from('transactions').insert([{
                         user_id: currentUser.id,
                         campaign_id: campaignData[0].id,
                         amount: totalCost,
@@ -1966,7 +1989,7 @@
                 }
 
                 alert("Campaign deployed! Status: Pending Verification.");
-                closeCampaignWizard(); 
+                closeCampaignWizard();
                 switchRole('creator');
 
             } catch (err) {
@@ -1979,7 +2002,7 @@
         }
 
         function resetWizard() {
-            document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden')); 
+            document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
             document.getElementById('step-1').classList.remove('hidden');
             currentStep = 1;
             updateWizardUI();
@@ -1989,7 +2012,7 @@
         function openDepositModal() {
             document.getElementById('deposit-overlay').classList.remove('hidden');
         }
-        function closeDepositModal() { 
+        function closeDepositModal() {
             document.getElementById('deposit-overlay').classList.add('hidden');
         }
         function processDeposit() {
@@ -2016,7 +2039,7 @@
                 walletBtn.onclick = () => window.openCampaignWizard();
                 walletBtn.disabled = false;
             }
-        } 
+        }
 
         // --- PHASE 5: SETTINGS HUB & ACCOUNT MGMT ---
         function openSettings(initialView = 'profile') {
@@ -2033,7 +2056,7 @@
             document.querySelectorAll('.settings-nav-btn').forEach(btn => {
                 const isActive = btn.getAttribute('data-view') === view;
                 btn.classList.toggle('active', isActive);
-                btn.classList.toggle('text-dash-secondary', !isActive); 
+                btn.classList.toggle('text-dash-secondary', !isActive);
             });
 
             const area = document.getElementById('settings-content-area');
@@ -2049,7 +2072,7 @@
                         <div class="space-y-6 max-w-xl">
                             <div class="flex items-center gap-6 mb-8">
                                 <div class="relative group cursor-pointer">
-                                    <img src="${currentUser.avatar}" class="w-24 h-24 rounded-3xl border-4 border-dash"> 
+                                    <img src="${currentUser.avatar}" class="w-24 h-24 rounded-3xl border-4 border-dash">
                                     <div class="absolute inset-0 bg-black/40 rounded-3xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-camera text-white"></i></div>
                                 </div>
                                 <div>
@@ -2058,13 +2081,13 @@
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 gap-5">
-                                <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Full Legal Name</label><input type="text" id="set-full-name" value="${currentUser.fullName}" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div> 
+                                <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Full Legal Name</label><input type="text" id="set-full-name" value="${currentUser.fullName}" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
                                 ${currentRole === 'creator' ? `
                                     <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Business Name</label><input type="text" value="${currentUser.fullName}'s Brand" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
                                     <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Website URL</label><input type="url" value="https://pidimarketing.com" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
                                 ` : `
                                     <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Social Handles (Instagram, X)</label><input type="text" value="@princedike, @pidihq" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Performer Bio</label><textarea class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]" rows="3">Performance marketer specializing in high-velocity organic engagement.</textarea></div> 
+                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Performer Bio</label><textarea class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]" rows="3">Performance marketer specializing in high-velocity organic engagement.</textarea></div>
                                 `}
                             </div>
                             <button onclick="saveProfileSettings()" class="accent-gradient px-8 py-3 rounded-xl font-bold text-sm mt-4">Save Changes</button>
@@ -2077,7 +2100,7 @@
                         <p class="text-dash-secondary mb-8">Protect your wallet and login credentials.</p>
                         <div class="space-y-8">
                             <div class="max-w-xl"><h4 class="font-bold mb-4">Change Password</h4>
-                                <div class="space-y-3"> 
+                                <div class="space-y-3">
                                     <input type="password" id="cur-pass" placeholder="Current Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
                                     <input type="password" id="new-pass" placeholder="New Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
                                     <button onclick="updatePassword()" class="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-bold">Update Password</button>
@@ -2085,7 +2108,7 @@
                             </div>
                             <div><h4 class="font-bold mb-4">Active Sessions</h4>
                                 <div id="session-card" class="p-4 bg-dash-secondary/50 border border-dash rounded-2xl flex items-center justify-between">
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-mobile-screen-button text-2xl text-dash-secondary"></i><div><p class="text-sm font-bold">iPhone 15 Pro • Lagos, NG</p><p class="text-[10px] text-green-500 uppercase font-bold">Current Device</p></div></div> 
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-mobile-screen-button text-2xl text-dash-secondary"></i><div><p class="text-sm font-bold">iPhone 15 Pro • Lagos, NG</p><p class="text-[10px] text-green-500 uppercase font-bold">Current Device</p></div></div>
                                     <button onclick="terminateSession()" class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Logout</button>
                                 </div>
                             </div>
@@ -2097,7 +2120,7 @@
                         <h2 class="text-3xl font-bold mb-2">Notifications</h2>
                         <p class="text-dash-secondary mb-8">Choose how you want to be alerted about task updates.</p>
                         <div class="space-y-6 max-w-xl">
-                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Email Alerts</p><p class="text-xs text-dash-secondary">Summary of campaigns and performance</p></div><label class="switch"><input type="checkbox" checked onchange="togglePref('email')"><span class="slider"></span></label></div> 
+                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Email Alerts</p><p class="text-xs text-dash-secondary">Summary of campaigns and performance</p></div><label class="switch"><input type="checkbox" checked onchange="togglePref('email')"><span class="slider"></span></label></div>
                             <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">In-App Push</p><p class="text-xs text-dash-secondary">Real-time milestone hits and task verification status</p></div><label class="switch"><input type="checkbox" checked onchange="togglePref('push')"><span class="slider"></span></label></div>
                         </div>
                     `;
@@ -2108,7 +2131,7 @@
                         <p class="text-dash-secondary mb-8">Need help? We typically respond within 15 minutes.</p>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                             <div onclick="alert('Support Ticket System Initialized. Please describe your issue.')" class="p-6 bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/30 rounded-2xl text-center cursor-pointer hover:bg-[var(--accent-primary)]/20 transition"><i class="fa-solid fa-ticket text-xl text-[var(--accent-primary)] mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Open Ticket</p></div>
-                            <div onclick="window.open('https://pidimarketing.com/blog', '_blank')" class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl text-center cursor-pointer hover:bg-dash-secondary transition"><i class="fa-solid fa-book-open text-xl text-dash-secondary mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Knowledge Base</p></div>
+                            <div onclick="window.open('https://pidimarketing.com/guides', '_blank')" class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl text-center cursor-pointer hover:bg-dash-secondary transition"><i class="fa-solid fa-book-open text-xl text-dash-secondary mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Knowledge Base</p></div>
                             <div onclick="alert('Connecting to WhatsApp Live Support...')" class="p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center cursor-pointer hover:bg-green-500/20 transition"><i class="fa-brands fa-whatsapp text-xl text-green-500 mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Live Chat</p></div>
                         </div>
                         <h4 class="font-bold mb-4 text-sm uppercase tracking-widest text-dash-secondary">Quick FAQ</h4>
@@ -2126,7 +2149,7 @@
         // --- SETTINGS HANDLERS ---
         function saveProfileSettings() {
             const name = document.getElementById('set-full-name')?.value;
-            if (name) { 
+            if (name) {
                 currentUser.fullName = name;
                 currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=059669&color=fff`;
                 
@@ -2139,7 +2162,7 @@
 
         function updatePassword() {
             const cur = document.getElementById('cur-pass').value;
-            const newP = document.getElementById('new-pass').value; 
+            const newP = document.getElementById('new-pass').value;
             if(!cur || !newP) return alert("Please fill in both password fields.");
             alert("Security check passed. Your password has been updated.");
             document.getElementById('cur-pass').value = '';
@@ -2338,10 +2361,6 @@
         window.updatePassword = updatePassword;
         window.togglePref = togglePref;
 
-        window.filterCampaignArchive = filterCampaignArchive;
-        window.changeArchivePage = changeArchivePage;
-        window.toggleCampaignDetails = toggleCampaignDetails;
-
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
             updateThemeIcon();
@@ -2361,18 +2380,6 @@
             }, delay);
         }
         // Global Pulse is now driven by real-time database events from Nigerian taskers
-
-        // Event delegation for campaign archive table
-        document.getElementById('archive-campaign-list').addEventListener('click', (event) => {
-            const targetRow = event.target.closest('tr.campaign-row');
-            if (targetRow) {
-                const campaignId = targetRow.dataset.campaignId;
-                if (event.target.closest('[data-action="toggle-details"]')) {
-                    toggleCampaignDetails(campaignId);
-                }
-            }
-        });
-
         feather.replace();
 
     function toggleMobileMenu() {
