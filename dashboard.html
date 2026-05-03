@@ -1627,6 +1627,14 @@
             // Initialize View based on query param OR user's stored role preference
             const urlParams = new URLSearchParams(window.location.search);
             const initialRole = urlParams.get('view') || user.user_metadata.user_role || 'creator';
+            
+            // Security: If user tries to access admin view, verify role
+            if (initialRole === 'admin' && profile.user_role !== 'admin') {
+                alert("Access Denied: You do not have administrator privileges.");
+                switchRole('creator');
+                return;
+            }
+
             switchRole(initialRole);
         }
 

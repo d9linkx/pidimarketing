@@ -65,13 +65,13 @@
                 <p class="text-dash-secondary mt-2">Access your workspace.</p>
             </div>
 
-            <form onsubmit="handleLogin(event)" class="space-y-6">
+            <form onsubmit="handleAuthAction(event)" class="space-y-6">
                 <div>
                     <label for="login-email" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Email Address</label>
                     <input type="email" id="login-email" placeholder="name@company.com" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#6a26da] transition">
                 </div>
 
-                <div>
+                <div id="password-field">
                     <div class="flex justify-between items-center mb-1.5 px-1">
                         <label for="login-password" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest">Password</label>
                         <a href="#" class="text-[10px] uppercase font-bold text-[#6a26da] tracking-widest">Forgot?</a>
@@ -84,9 +84,21 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition active:scale-[0.98] mt-4">
+                <div id="otp-field" class="hidden">
+                    <label for="login-otp" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Verification Code</label>
+                    <input type="text" id="login-otp" placeholder="6-digit code" class="w-full bg-dash-secondary border border-dash rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#6a26da] transition">
+                    <p class="text-[10px] text-dash-secondary mt-2 px-1">Check your inbox for the login code.</p>
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition active:scale-[0.98] mt-4">
                     Login
                 </button>
+
+                <div class="text-center mt-4">
+                    <button type="button" onclick="toggleAuthMode()" id="auth-mode-toggle" class="text-[10px] uppercase font-black text-[#6a26da] tracking-widest hover:underline">
+                        Switch to Admin Code Login
+                    </button>
+                </div>
             </form>
 
             <div class="mt-8 pt-8 border-t border-dash text-center">
@@ -114,26 +126,73 @@
             button.innerHTML = isLoading ? `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Logging in...` : originalText;
         };
 
-        async function handleLogin(e) {
+        let isOTPMode = false;
+        let otpSent = false;
+
+        window.toggleAuthMode = () => {
+            isOTPMode = !isOTPMode;
+            document.getElementById('password-field').classList.toggle('hidden', isOTPMode);
+            document.getElementById('otp-field').classList.add('hidden');
+            document.getElementById('auth-mode-toggle').innerText = isOTPMode ? "Switch to Password Login" : "Switch to Admin Code Login";
+            document.getElementById('auth-submit-btn').innerText = isOTPMode ? "Send Code" : "Login";
+            otpSent = false;
+        };
+
+        async function handleAuthAction(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
             const submitButton = e.target.querySelector('button[type="submit"]');
-
-            setButtonLoading(submitButton, true, 'Login');
             const msgDiv = document.getElementById('login-message');
+
             if (msgDiv) msgDiv.classList.add('hidden');
 
-            const { error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                displayAuthMessage('login-message', error.message, 'error');
-                setButtonLoading(submitButton, false, 'Login');
+            if (!isOTPMode) {
+                // Password Login
+                const password = document.getElementById('login-password').value;
+                setButtonLoading(submitButton, true, 'Login');
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    displayAuthMessage('login-message', error.message, 'error');
+                    setButtonLoading(submitButton, false, 'Login');
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
             } else {
-                window.location.href = 'dashboard.html';
+                // OTP Login
+                if (!otpSent) {
+                    // Step 1: Send the code
+                    setButtonLoading(submitButton, true, 'Sending...');
+                    const { error } = await supabase.auth.signInWithOtp({ 
+                        email,
+                        options: { shouldCreateUser: false } // Only allow existing whitelisted users
+                    });
+                    
+                    if (error) {
+                        displayAuthMessage('login-message', "Login failed. Ensure you are a whitelisted admin.", 'error');
+                        setButtonLoading(submitButton, false, 'Send Code');
+                    } else {
+                        otpSent = true;
+                        document.getElementById('otp-field').classList.remove('hidden');
+                        setButtonLoading(submitButton, false, 'Verify Code');
+                        displayAuthMessage('login-message', "Code sent! Please check your email.", 'success');
+                    }
+                } else {
+                    // Step 2: Verify the code
+                    const token = document.getElementById('login-otp').value.trim();
+                    setButtonLoading(submitButton, true, 'Verifying...');
+                    const { error } = await supabase.auth.verifyOtp({
+                        email,
+                        token,
+                        type: 'email'
+                    });
+
+                    if (error) {
+                        displayAuthMessage('login-message', "Invalid or expired code.", 'error');
+                        setButtonLoading(submitButton, false, 'Verify Code');
+                    } else {
+                        window.location.href = 'dashboard.html?view=admin';
+                    }
+                }
             }
         }
 
