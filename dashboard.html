@@ -464,9 +464,9 @@
             <div id="dashboard-home-view" class="spa-view">
                 <div id="welcome-section" class="p-6 lg:p-4 mt-0 mb-0 flex flex-col md:flex-row md:justify-between md:items-center gap-6 md:gap-4">
                     <div class="space-y-1">
-                        <h1 class="text-lg md:text-xl font-bold text-3xl text-dash-secondary">
+                        <h2 class="text-lg md:text-xl font-bold text-3xl text-dash-secondary">
                             Welcome back, <span class="user-name-display text-[var(--text-primary)] font-semibold"></span>
-                        </h1>
+                        </h2>
                         <p class="text-xs md:text-sm text-dash-secondary opacity-80">
                             Here's what's happening with your account today.
                         </p>
@@ -502,7 +502,7 @@
                                     Real-time performance tracking for your latest tasks
                                 </p>
                             </div>
-                            <span id="ongoing-count" class="bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] text-[14px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                            <span id="ongoing-count" class="bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] text-sm font-bold px-3 py-1.5 rounded-full shadow-md shadow-[var(--emerald-vibrant)]/30">
                                 0 Active
                             </span>
                         </div>
@@ -512,7 +512,7 @@
                                 <tbody id="ongoing-campaigns-list" class="divide-y divide-dash"></tbody>
                             </table>
                         </div>
-                        <a href="#" onclick="scrollToTasks()" class="block p-4 text-center text-[11px] font-bold uppercase tracking-widest text-dash-secondary hover:text-[#8b5cf6] border-t border-dash transition-all bg-white/50">
+                        <a href="#" onclick="switchSPAView('campaigns')" class="block p-4 text-center text-[11px] font-bold uppercase tracking-widest text-dash-secondary hover:text-[#8b5cf6] border-t border-dash transition-all bg-white/50">
                             View All Campaigns <i data-feather="arrow-right" class="w-3 h-3 inline ml-1"></i>
                         </a>
                     </div>
@@ -1346,7 +1346,7 @@
             currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.fullName)}&background=6a26da&color=fff`;
 
             // Update Identity in DOM
-            document.querySelectorAll('.user-name-display').forEach(el => el.innerText = currentUser.fullName);
+            document.querySelectorAll('.user-name-display').forEach(el => el.innerText = currentUser.fullName.split(' ')[0]);
             document.querySelectorAll('.user-avatar-display').forEach(img => img.src = currentUser.avatar);
 
             // Search listener for campaigns view
@@ -1617,31 +1617,50 @@
             }
         };
 
-        async function fetchAnalytics() {
-            try {
-                const { data, error } = await supabase.rpc('get_creator_analytics', { creator_id: currentUser.id });
-                if (error) throw error;
-                if (data) {
-                    // Update Dashboard Stats Strip
-                    if(document.getElementById('total-reach-val')) document.getElementById('total-reach-val').innerText = (data.total_reach || 0).toLocaleString();
-                    if(document.getElementById('accuracy-score-val')) document.getElementById('accuracy-score-val').innerText = (data.accuracy || 0) + '%';
-                    if(document.getElementById('avg-cpe-val')) document.getElementById('avg-cpe-val').innerText = '₦' + (data.avg_cpe || 0);
-                    if(document.getElementById('live-workforce-val')) document.getElementById('live-workforce-val').innerText = (data.live_workforce || 0);
-                    
-                    // Update Growth Radar View
-                    if(document.getElementById('radar-total-reach')) document.getElementById('radar-total-reach').innerText = (data.total_reach || 0).toLocaleString();
-                }
-            } catch (err) {
-                console.error("Analytics Sync Error:", err);
+        function renderOngoingTable(campaigns) {
+            const list = document.getElementById('ongoing-campaigns-list');
+            if (!list) return;
+
+            const latestThreeCampaigns = campaigns.slice(0, 3); // Limit to the latest 3 campaigns
+
+            if (!latestThreeCampaigns.length) {
+                list.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-xs text-dash-secondary">No active missions running.</td></tr>';
+                return;
             }
-        }
-
-
-        function updateEngagementUI(score) {
-            const valueEl = document.getElementById('engagement-score-value');
-            const barEl = document.getElementById('engagement-progress-bar');
-            if (valueEl) valueEl.innerText = `${score}%`;
-            if (barEl) barEl.style.width = `${score}%`;
+            list.innerHTML = latestThreeCampaigns.map(c => {
+                const progress = Math.round((c.current_count / c.goal_count) * 100) || 0;
+                return `
+                    <tr class="group/row hover:bg-[var(--nav-bg)] transition-colors cursor-pointer" onclick="viewCampaignDetails('${c.id}')">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)] flex items-center justify-center">
+                                    <i class="fa-solid fa-trending-up w-4 h-4 text-center"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold text-[var(--text-primary)]">${c.platform.toUpperCase()} Mission</p>
+                                    <p class="text-[10px] text-dash-secondary">${c.target_url.split('/')[2] || 'Campaign'}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 hidden md:table-cell">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex justify-between text-[9px] font-bold text-dash-secondary">
+                                    <span>Progress</span>
+                                    <span>${progress}%</span>
+                                </div>
+                                <div class="w-28 bg-dash-secondary h-1 rounded-full overflow-hidden">
+                                    <div class="bg-[var(--accent-primary)] h-full" style="width: ${progress}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 text-right">
+                            <button class="text-[10px] font-bold text-dash-secondary group-hover/row:text-[#8b5cf6] transition-colors flex items-center gap-1 ml-auto">
+                                DETAILS <i class="fa-solid fa-chevron-right w-3 h-3"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         window.scrollToTasks = function() {
@@ -2200,7 +2219,7 @@
                 currentUser.fullName = name;
                 currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=059669&color=fff`;
                 
-                document.querySelectorAll('.user-name-display').forEach(el => el.innerText = name);
+                document.querySelectorAll('.user-name-display').forEach(el => el.innerText = name.split(' ')[0]);
                 document.querySelectorAll('.user-avatar-display').forEach(img => img.src = currentUser.avatar);
                 
                 alert(`Profile updated successfully!`);
