@@ -398,17 +398,19 @@
                 </div>
             </div>
 
-            <nav class="flex-1 space-y-1">
-                <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
-                <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i class="fa-solid fa-chart-line w-4 text-center"></i> Analytics
-                </a>
-                <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i class="fa-solid fa-layer-group w-4 text-center"></i> Campaigns
-                </a>
-                <a href="#" onclick="switchSPAView('wallet')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i class="fa-solid fa-wallet w-4 text-center"></i> Money Cycle
-                </a>
+            <nav class="flex-1 space-y-1" id="desktop-sidebar-nav">
+                <div id="role-workspace-nav">
+                    <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
+                    <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="bar-chart-2" class="w-4 text-center"></i> Analytics
+                    </a>
+                    <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="layers" class="w-4 text-center"></i> Campaigns
+                    </a>
+                    <a href="#" onclick="switchSPAView('wallet')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="dollar-sign" class="w-4 text-center"></i> Money Cycle
+                    <!-- Role-specific workspace navigation will be injected here -->
+                </div>
                 <div class="my-4 border-t border-dash"></div>
                 <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Tools</p>
                 <a href="academy.html" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
@@ -760,6 +762,60 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Performer Gigs View -->
+            <div id="performer-gigs-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold tracking-tight mb-4">My Gigs (Performer)</h2>
+                <p class="text-dash-secondary text-sm mb-8">View and manage your available tasks.</p>
+                <div class="bento-card p-6">
+                    <p class="text-dash-secondary">Content for Performer Gigs will go here.</p>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Performer Earnings View -->
+            <div id="performer-earnings-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold tracking-tight mb-4">My Earnings (Performer)</h2>
+                <p class="text-dash-secondary text-sm mb-8">Track your payouts and completed tasks.</p>
+                <div class="bento-card p-6">
+                    <p class="text-dash-secondary">Content for Performer Earnings will go here.</p>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Performer Performance View -->
+            <div id="performer-performance-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold tracking-tight mb-4">My Performance (Performer)</h2>
+                <p class="text-dash-secondary text-sm mb-8">Review your task accuracy and reputation score.</p>
+                <div class="bento-card p-6">
+                    <p class="text-dash-secondary">Content for Performer Performance will go here.</p>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Admin Overview View -->
+            <div id="admin-overview-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold tracking-tight mb-4">System Overview (Admin)</h2>
+                <p class="text-dash-secondary text-sm mb-8">Global statistics and system health.</p>
+                <div class="bento-card p-6">
+                    <p class="text-dash-secondary">Content for Admin Overview will go here.</p>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Admin Users View -->
+            <div id="admin-users-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold tracking-tight mb-4">User Management (Admin)</h2>
+                <p class="text-dash-secondary text-sm mb-8">Manage user accounts, roles, and permissions.</p>
+                <div class="bento-card p-6">
+                    <p class="text-dash-secondary">Content for Admin Users will go here.</p>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Admin Finance View -->
+            <div id="admin-finance-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold tracking-tight mb-4">Financial Audit (Admin)</h2>
+                <p class="text-dash-secondary text-sm mb-8">Review all transactions and payouts.</p>
+                <div class="bento-card p-6">
+                    <p class="text-dash-secondary">Content for Admin Finance will go here.</p>
                 </div>
             </div>
 
@@ -1610,6 +1666,53 @@
                 admin: { label: 'Admin Console', icon: 'shield', color: '#ef4444', cta: 'Manage System' }
             };
             const c = config[role];
+
+            // Define role-specific workspace navigation HTML
+            let workspaceNavHTML = '';
+            if (role === 'creator') {
+                workspaceNavHTML = `
+                    <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
+                    <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="bar-chart-2" class="w-4 text-center"></i> Analytics
+                    </a>
+                    <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="layers" class="w-4 text-center"></i> Campaigns
+                    </a>
+                    <a href="#" onclick="switchSPAView('wallet')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="dollar-sign" class="w-4 text-center"></i> Money Cycle
+                    </a>
+                `;
+            } else if (role === 'performer') {
+                workspaceNavHTML = `
+                    <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">My Work</p>
+                    <a href="#" onclick="switchSPAView('performer-gigs')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="briefcase" class="w-4 text-center"></i> My Gigs
+                    </a>
+                    <a href="#" onclick="switchSPAView('performer-earnings')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="credit-card" class="w-4 text-center"></i> Earnings
+                    </a>
+                    <a href="#" onclick="switchSPAView('performer-performance')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="activity" class="w-4 text-center"></i> Performance
+                    </a>
+                `;
+            } else if (role === 'admin') {
+                workspaceNavHTML = `
+                    <p class="text-[9px] font-bold text-red-500 uppercase tracking-widest px-2 mb-2">Admin Control</p>
+                    <a href="#" onclick="switchSPAView('admin-overview')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-red-500 hover:bg-red-500/10 transition font-bold">
+                        <i data-feather="monitor" class="w-4 text-center"></i> System Overview
+                    </a>
+                    <a href="#" onclick="switchSPAView('admin-users')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-red-500 hover:bg-red-500/10 transition font-bold">
+                        <i data-feather="users" class="w-4 text-center"></i> User Management
+                    </a>
+                    <a href="#" onclick="switchSPAView('admin-finance')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-red-500 hover:bg-red-500/10 transition font-bold">
+                        <i data-feather="dollar-sign" class="w-4 text-center"></i> Financial Audit
+                    </a>
+                `;
+            }
+
+            // Update the workspace navigation for both desktop and mobile
+            document.getElementById('role-workspace-nav').innerHTML = workspaceNavHTML;
+            document.getElementById('role-workspace-nav-mobile').innerHTML = workspaceNavHTML;
 
             // Update Sidebar UI (Desktop)
             const labelEl = document.getElementById('current-role-label');
