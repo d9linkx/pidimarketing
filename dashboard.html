@@ -464,7 +464,7 @@
             <div id="dashboard-home-view" class="spa-view">
                 <div id="welcome-section" class="p-6 lg:p-4 mt-0 mb-0 flex flex-col md:flex-row md:justify-between md:items-center gap-6 md:gap-4">
                     <div class="space-y-1">
-                        <h1 class="text-lg md:text-xl font-normal text-dash-secondary">
+                        <h1 class="text-lg md:text-xl font-bold text-3xl text-dash-secondary">
                             Welcome back, <span class="user-name-display text-[var(--text-primary)] font-semibold"></span>
                         </h1>
                         <p class="text-xs md:text-sm text-dash-secondary opacity-80">
@@ -661,7 +661,9 @@
                     </div>
                     <div class="flex gap-2">
                         <button class="bg-dash-secondary px-4 py-2 rounded-xl text-xs font-bold border border-dash">Last 30 Days</button>
-                        <button class="accent-gradient px-4 py-2 rounded-xl text-xs font-bold">Generate PDF Report</button>
+                        <button class="btn-fintech btn-primary py-3 px-6 text-xs shadow-lg shadow-blue-500/20">
+                            <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Generate PDF Report
+                        </button>
                     </div>
                 </div>
 
@@ -747,7 +749,7 @@
                             <button onclick="filterCampaignArchive('pending_verification')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-verifying">Verifying</button>
                             <button onclick="filterCampaignArchive('completed')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-completed">Completed</button>
                         </div>
-                        <button onclick="openCampaignWizard()" class="btn-fintech btn-primary">
+                        <button onclick="openCampaignWizard()" class="btn-fintech btn-primary shadow-lg shadow-blue-500/20">
                             <i data-feather="plus" class="w-4 h-4 mr-2"></i> New Mission
                         </button>
                     </div>
@@ -773,27 +775,89 @@
                     </div>
                 </div>
 
-                <div class="bento-card p-0 overflow-hidden">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="text-dash-secondary border-b border-dash bg-dash-secondary/30">
-                                <th class="p-4 uppercase tracking-widest font-bold">Mission Name</th>
-                                <th class="p-4 uppercase tracking-widest font-bold">Platform</th>
-                                <th class="p-4 uppercase tracking-widest font-bold">Status</th>
-                                <th class="p-4 uppercase tracking-widest font-bold">Spend</th>
-                                <th class="p-4 uppercase tracking-widest font-bold">Progress</th>
-                                <th class="p-4 text-right"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="archive-campaign-list" class="divide-y divide-dash">
-                            <!-- Campaigns injected here -->
-                        </tbody>
-                    </table>
+                <div class="bento-card p-0">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="text-dash-secondary border-b border-dash bg-dash-secondary/30">
+                                    <th class="p-4 uppercase tracking-widest font-bold">Mission Name</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Platform</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Status</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Spend</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Progress</th>
+                                    <th class="p-4 text-right"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="archive-campaign-list" class="divide-y divide-dash">
+                                <!-- Campaigns injected here -->
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="p-4 flex items-center justify-between bg-dash-secondary/10">
                         <p class="text-[10px] text-dash-secondary font-bold uppercase" id="archive-pagination-info">Showing 0 of 0</p>
                         <div class="flex gap-2" id="pagination-controls">
                             <button onclick="changeArchivePage(-1)" class="w-8 h-8 rounded-lg border border-dash flex items-center justify-center hover:bg-dash-secondary transition"><i data-feather="chevron-left" class="w-4"></i></button>
                             <button onclick="changeArchivePage(1)" class="w-8 h-8 rounded-lg border border-dash flex items-center justify-center hover:bg-dash-secondary transition"><i data-feather="chevron-right" class="w-4"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Campaign Detail View (Drill-down) -->
+            <div id="campaign-detail-view" class="spa-view hidden p-4 lg:p-8 max-w-5xl mx-auto">
+                <div class="flex items-center justify-between mb-8">
+                    <button onclick="switchSPAView('campaigns')" class="text-dash-secondary hover:text-[var(--text-primary)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors group">
+                        <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> 
+                        <span>Back to Mission Control</span>
+                    </button>
+                    <div id="detail-status-badge"></div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bento-card p-8">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div id="detail-platform-icon" class="w-12 h-12 rounded-2xl bg-dash-secondary flex items-center justify-center text-xl"></div>
+                                <div class="min-w-0 flex-1">
+                                    <h2 id="detail-target-url" class="text-2xl font-bold truncate"></h2>
+                                    <p id="detail-created-at" class="text-[10px] text-dash-secondary font-bold uppercase tracking-wider mt-1"></p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-6 py-8 border-y border-dash">
+                                <div><p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Target Engagement</p><h4 id="detail-goal-count" class="text-xl font-bold">0</h4></div>
+                                <div><p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Current Progress</p><h4 id="detail-current-count" class="text-xl font-bold">0</h4></div>
+                                <div><p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Total Spend</p><h4 id="detail-total-cost" class="text-xl font-bold">₦0</h4></div>
+                            </div>
+
+                            <div class="mt-8">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[10px] font-bold uppercase text-dash-secondary tracking-widest">Deployment Velocity</span>
+                                    <span id="detail-progress-percent" class="text-xs font-black text-[var(--accent-primary)]">0%</span>
+                                </div>
+                                <div class="w-full bg-dash-secondary h-3 rounded-full overflow-hidden">
+                                    <div id="detail-progress-bar" class="bg-[var(--accent-primary)] h-full transition-all duration-1000 shadow-[0_0_12px_rgba(69,185,110,0.3)]"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-card p-8">
+                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary mb-4">Mission Instructions</h4>
+                            <div id="detail-instructions" class="bg-dash-secondary/30 p-6 rounded-2xl text-sm leading-relaxed italic text-dash-secondary"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bento-card p-6">
+                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary mb-6">Management</h4>
+                            <div class="space-y-3">
+                                <button id="detail-open-link" class="w-full btn-fintech btn-primary justify-center py-4 text-xs font-black uppercase"><i data-feather="external-link" class="mr-2 w-4"></i> Open Content</button>
+                                <button onclick="window.triggerConfetti()" class="w-full btn-fintech bg-dash-secondary border border-dash justify-center py-4 hover:opacity-80 text-xs font-black uppercase text-dash-secondary"><i data-feather="share-2" class="mr-2 w-4"></i> Export Report</button>
+                            </div>
+                        </div>
+                        <div id="detail-proof-card" class="bento-card p-6 hidden">
+                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary mb-4">Payment Proof</h4>
+                            <img id="detail-proof-img" src="" class="w-full rounded-xl border border-dash cursor-pointer hover:opacity-90 transition" onclick="window.open(this.src)">
                         </div>
                     </div>
                 </div>
@@ -806,8 +870,8 @@
                         <h2 class="text-3xl font-bold">Creator Treasury</h2>
                         <p class="text-dash-secondary text-sm">Financial overview of your marketing spend</p>
                     </div>
-                    <button onclick="openCampaignWizard()" class="btn-fintech btn-primary">
-                        <i class="fa-solid fa-plus mr-2"></i> Fund New Mission
+                    <button onclick="openCampaignWizard()" class="btn-fintech btn-primary shadow-lg shadow-blue-500/20">
+                        <i data-feather="plus" class="w-4 h-4 mr-2"></i> Fund New Mission
                     </button>
                 </div>
 
@@ -889,7 +953,7 @@
                 <h2 class="text-3xl font-bold mb-4">Help us improve</h2>
                 <p class="text-dash-secondary mb-10">Spotted a bug or have a feature request? Let our engineering team know.</p>
                 <textarea class="w-full bg-dash-secondary border border-dash rounded-3xl p-6 text-sm mb-6" rows="6" placeholder="Tell us anything..."></textarea>
-                <button class="accent-gradient w-full py-4 rounded-2xl font-bold shadow-lg">Submit Feedback</button>
+                <button class="btn-fintech btn-primary w-full py-4 justify-center shadow-lg shadow-blue-500/20">Submit Feedback</button>
             </div>
 
             <!-- SPA CONTAINER: Settings Hub View -->
@@ -1075,7 +1139,7 @@
                             </div>
 
 <button onclick="finishCreation()" 
-    class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+    class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
     <span>Submit & Launch Campaign</span>
     <i data-feather="arrow-up-right" class="ml-2 w-4 h-4"></i>
 </button>
@@ -1091,12 +1155,12 @@
     </button>
 
     <button onclick="nextStep()" id="next-btn" 
-        class="flex-[2] btn-fintech btn-primary justify-center py-4 shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+        class="flex-[2] btn-fintech btn-primary justify-center py-4 shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
         Continue <i data-feather="arrow-right" class="ml-2"></i>
     </button>
 
 <button onclick="toggleProofSubmission(true)" id="finish-btn" 
-    class="hidden flex-[2] btn-fintech btn-primary justify-center py-4 shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all">
+    class="hidden flex-[2] btn-fintech btn-primary justify-center py-4 shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
     <span>I've Made the Transfer</span>
     <i data-feather="check-circle" class="ml-2"></i>
 </button>
@@ -1443,14 +1507,14 @@
                 };
                 
                 return `
-                    <tr class="hover:bg-dash-secondary/20 transition-colors">
+                    <tr class="hover:bg-dash-secondary/40 transition-colors cursor-pointer group border-b border-dash" onclick="viewCampaignDetails('${c.id}')">
                         <td class="p-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${c.platform} text-xs"></i></div>
-                                <div class="max-w-[180px] truncate"><p class="font-bold truncate">${c.target_url}</p><p class="text-[10px] text-dash-secondary">${new Date(c.created_at).toLocaleDateString()}</p></div>
+                                <div class="max-w-[180px] truncate"><p class="font-bold truncate group-hover:text-[var(--accent-primary)] transition-colors">${c.target_url}</p><p class="text-[10px] text-dash-secondary">${new Date(c.created_at).toLocaleDateString()}</p></div>
                             </div>
                         </td>
-                        <td class="p-4 uppercase font-bold text-[10px] text-dash-secondary">${c.platform}</td>
+                        <td class="p-4 uppercase font-bold text-[9px] text-dash-secondary tracking-widest hidden md:table-cell">${c.platform}</td>
                         <td class="p-4"><span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase ${statusColors[c.status] || 'bg-dash-secondary text-dash-secondary'}">${c.status === 'pending_verification' ? 'Verifying' : c.status}</span></td>
                         <td class="p-4 font-bold">₦${(c.total_cost || 0).toLocaleString()}</td>
                         <td class="p-4"><div class="flex items-center gap-3 min-w-[100px]"><div class="flex-1 bg-dash-secondary h-1 rounded-full overflow-hidden"><div class="bg-[var(--accent-primary)] h-full" style="width: ${progress}%"></div></div><span class="text-[9px] font-bold">${progress}%</span></div></td>
@@ -1465,134 +1529,113 @@
             feather.replace();
         }
 
-        async function fetchRoleData(role) {
+        window.viewCampaignDetails = async function(campaignId) {
+            const campaign = roles.creator.items.find(c => c.id === campaignId);
+            if (!campaign) return;
+
+            // Populate Detail View
+            document.getElementById('detail-target-url').innerText = campaign.target_url;
+            document.getElementById('detail-created-at').innerText = `Deployed on ${new Date(campaign.created_at).toLocaleDateString()} at ${new Date(campaign.created_at).toLocaleTimeString()}`;
+            document.getElementById('detail-goal-count').innerText = campaign.goal_count.toLocaleString();
+            document.getElementById('detail-current-count').innerText = campaign.current_count.toLocaleString();
+            document.getElementById('detail-total-cost').innerText = `₦${campaign.total_cost.toLocaleString()}`;
+            document.getElementById('detail-instructions').innerText = campaign.instructions || "No specific instructions provided for this mission.";
+            
+            const progress = Math.round((campaign.current_count / campaign.goal_count) * 100) || 0;
+            document.getElementById('detail-progress-percent').innerText = `${progress}%`;
+            document.getElementById('detail-progress-bar').style.width = `${progress}%`;
+            
+            // Platform Icon
+            document.getElementById('detail-platform-icon').innerHTML = `<i class="fa-brands fa-${campaign.platform}"></i>`;
+            
+            // Status Badge
+            const statusColors = { active: 'bg-green-500/10 text-green-500', pending_verification: 'bg-amber-500/10 text-amber-500', completed: 'bg-blue-500/10 text-blue-500' };
+            document.getElementById('detail-status-badge').innerHTML = `<span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${statusColors[campaign.status]}">${campaign.status === 'pending_verification' ? 'Verifying' : campaign.status}</span>`;
+            
+            // Action Link
+            document.getElementById('detail-open-link').onclick = () => window.open(campaign.target_url, '_blank');
+
+            // Proof Image
+            const proofCard = document.getElementById('detail-proof-card');
+            const proofImg = document.getElementById('detail-proof-img');
+            if (campaign.payment_proof_url) {
+                proofImg.src = campaign.payment_proof_url;
+                proofCard.classList.remove('hidden');
+            } else {
+                proofCard.classList.add('hidden');
+            }
+
+            // Switch View
+            switchSPAView('campaign-detail');
+            
+            // Refresh icons in the newly shown view
+            feather.replace();
+        }
+
+        window.fetchRoleData = async function(role) {
+            if (role !== 'creator') return;
+            
             try {
-                if (role === 'creator') {
-                    // 1. Fetch Missions (SELECT query filtered by user's ID)
-                    const { data: campaigns } = await supabase
-                        .from('campaigns')
-                        .select('*')
-                        .eq('creator_id', currentUser.id)
-                        .order('created_at', { ascending: false });
-                    
-                    roles.creator.items = campaigns || [];
+                // 1. Fetch all Campaigns for this creator
+                const { data: campaigns, error } = await supabase
+                    .from('campaigns')
+                    .select('*')
+                    .eq('creator_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                roles.creator.items = campaigns || [];
 
-                    // 2. Populate Ongoing & Your Campaigns cards
-                    const activeCampaigns = (campaigns || []).filter(c => c.status === 'active');
-                    const ongoingCountEl = document.getElementById('ongoing-count');
-                    if (ongoingCountEl) ongoingCountEl.innerText = `${activeCampaigns.length} Active`;
-                    renderOngoingTable(activeCampaigns);
+                // 2. Update Dashboard Home View Components
+                const activeCampaigns = roles.creator.items.filter(c => c.status === 'active');
+                const ongoingCountEl = document.getElementById('ongoing-count');
+                if (ongoingCountEl) ongoingCountEl.innerText = `${activeCampaigns.length} Active`;
+                
+                renderOngoingTable(activeCampaigns);
+                
+                // Management Center List (Compact rows on home page)
+                const managementList = document.getElementById('creator-campaign-list');
+                if (managementList) {
+                    managementList.innerHTML = roles.creator.items.slice(0, 5).map(c => `
+                        <tr class="border-b border-dash hover:bg-dash-secondary/20 transition-colors cursor-pointer" onclick="viewCampaignDetails('${c.id}')">
+                            <td class="py-3 font-bold text-[11px] truncate max-w-[150px]">${c.target_url}</td>
+                            <td class="py-3"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${c.status}</span></td>
+                            <td class="py-3 font-mono text-[10px]">${c.current_count}/${c.goal_count}</td>
+                            <td class="py-3 text-right"><i data-feather="chevron-right" class="w-3 h-3 inline"></i></td>
+                        </tr>
+                    `).join('');
+                    feather.replace();
+                }
 
-                    renderTable(campaigns?.map(c => ({ 
-                        name: c.target_url, 
-                        status: c.status === 'pending_verification' ? 'Verifying' : c.status, 
-                        metric: `${c.current_count}/${c.goal_count}` 
-                    })) || [], 'creator-campaign-list');
+                // 3. Sync Other Views
+                renderArchiveTable(); // Campaigns View
+                fetchAnalytics();      // Stats Strip & Radar
+                fetchWalletData();     // Wallet View
 
-                    // 4. Update Mission Control (Archive View)
-                    renderArchiveTable();
+            } catch (err) {
+                console.error("Critical Dashboard Sync Error:", err);
+            }
+        };
 
-                    // 3. Update Analytics via Aggregated Stats
-                    fetchAnalytics();
         async function fetchAnalytics() {
             try {
-                // RPC to aggregate data from engagements and campaigns tables
                 const { data, error } = await supabase.rpc('get_creator_analytics', { creator_id: currentUser.id });
                 if (error) throw error;
                 if (data) {
-                    document.getElementById('total-reach-val').innerText = data.total_reach || '0';
-                    document.getElementById('accuracy-score-val').innerText = (data.accuracy || '0') + '%';
-                    document.getElementById('avg-cpe-val').innerText = '₦' + (data.avg_cpe || '0');
-                    document.getElementById('live-workforce-val').innerText = data.live_workforce || '0';
+                    // Update Dashboard Stats Strip
+                    if(document.getElementById('total-reach-val')) document.getElementById('total-reach-val').innerText = (data.total_reach || 0).toLocaleString();
+                    if(document.getElementById('accuracy-score-val')) document.getElementById('accuracy-score-val').innerText = (data.accuracy || 0) + '%';
+                    if(document.getElementById('avg-cpe-val')) document.getElementById('avg-cpe-val').innerText = '₦' + (data.avg_cpe || 0);
+                    if(document.getElementById('live-workforce-val')) document.getElementById('live-workforce-val').innerText = (data.live_workforce || 0);
+                    
+                    // Update Growth Radar View
+                    if(document.getElementById('radar-total-reach')) document.getElementById('radar-total-reach').innerText = (data.total_reach || 0).toLocaleString();
                 }
             } catch (err) {
                 console.error("Analytics Sync Error:", err);
             }
         }
 
-        function renderOngoingTable(campaigns) {
-            const list = document.getElementById('ongoing-campaigns-list');
-            if (!list) return;
-            if (!campaigns.length) {
-                list.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-xs text-dash-secondary">No active missions running.</td></tr>';
-                return;
-            }
-            list.innerHTML = campaigns.map(c => {
-                const progress = Math.round((c.current_count / c.goal_count) * 100) || 0;
-                return `
-                    <tr class="group/row hover:bg-[var(--nav-bg)] transition-colors cursor-pointer">
-                        <td class="p-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)] flex items-center justify-center">
-                                    <i class="fa-solid fa-trending-up w-4 h-4 text-center"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-semibold text-[var(--text-primary)]">${c.platform.toUpperCase()} Mission</p>
-                                    <p class="text-[10px] text-dash-secondary">${c.target_url.split('/')[2] || 'Campaign'}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="p-4 hidden md:table-cell">
-                            <div class="flex flex-col gap-1">
-                                <div class="flex justify-between text-[9px] font-bold text-dash-secondary">
-                                    <span>Progress</span>
-                                    <span>${progress}%</span>
-                                </div>
-                                <div class="w-28 bg-dash-secondary h-1 rounded-full overflow-hidden">
-                                    <div class="bg-[var(--accent-primary)] h-full" style="width: ${progress}%"></div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="p-4 text-right">
-                            <button class="text-[10px] font-bold text-dash-secondary group-hover/row:text-[#8b5cf6] transition-colors flex items-center gap-1 ml-auto">
-                                DETAILS <i class="fa-solid fa-chevron-right w-3 h-3"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function addToLiveFeed(activity) {
-            const feed = document.getElementById('live-activity-feed');
-            if (!feed) return;
-            
-            const avatar = activity.user_avatar || `https://ui-avatars.com/api/?name=${activity.user_handle || 'User'}&background=random&color=fff`;
-
-            const item = document.createElement('div');
-            item.className = 'flex gap-3 items-start opacity-0 translate-y-4 transition-all duration-500 py-1';
-            item.innerHTML = `
-                <div class="relative">
-                    <img src="${avatar}" class="w-7 h-7 rounded-lg border border-dash flex-shrink-0">
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-[11px] leading-tight text-[var(--text-primary)]">
-                        <span class="font-bold">${activity.user_handle || 'Pidian'}</span> ${activity.message || 'completed a task'}
-                    </p>
-                    <p class="text-[9px] text-dash-secondary mt-1">Just now</p>
-                </div>
-            `;
-            feed.prepend(item);
-            setTimeout(() => item.classList.remove('opacity-0', 'translate-y-4'), 50);
-            
-            if (feed.children.length > 15) feed.lastElementChild.remove();
-        }
-                    
-                    if (campaigns?.length > 0) {
-                        const totalGoals = campaigns.reduce((acc, c) => acc + c.goal_count, 0);
-                        const totalCurrent = campaigns.reduce((acc, c) => acc + c.current_count, 0);
-                        const avgCompletion = Math.round((totalCurrent / totalGoals) * 100) || 0;
-                        updateEngagementUI(avgCompletion);
-                    } else {
-                        updateEngagementUI(0);
-                    }
-                }
-            } catch (err) {
-                console.error("Fetch Error:", err);
-                const listId = 'creator-campaign-list';
-                renderTable([], listId); 
-            }
-        }
 
         function updateEngagementUI(score) {
             const valueEl = document.getElementById('engagement-score-value');
@@ -1718,6 +1761,9 @@
             // Auto-close mobile menu if open
             const menu = document.getElementById('mobile-menu');
             if (menu && !menu.classList.contains('hidden')) toggleMobileMenu();
+
+            // Refresh icons for dynamically shown/updated content
+            setTimeout(() => feather.replace(), 10);
         }
 
         // --- WALLET DATA LOGIC ---
@@ -2090,7 +2136,7 @@
                                     <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Performer Bio</label><textarea class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]" rows="3">Performance marketer specializing in high-velocity organic engagement.</textarea></div>
                                 `}
                             </div>
-                            <button onclick="saveProfileSettings()" class="accent-gradient px-8 py-3 rounded-xl font-bold text-sm mt-4">Save Changes</button>
+                            <button onclick="saveProfileSettings()" class="btn-fintech btn-primary px-8 py-3 shadow-lg shadow-blue-500/20 mt-4">Save Changes</button>
                         </div>
                     `;
                     break;
@@ -2144,6 +2190,7 @@
             }
 
             area.innerHTML = content;
+            feather.replace();
         }
 
         // --- SETTINGS HANDLERS ---
