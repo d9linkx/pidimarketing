@@ -382,7 +382,7 @@
                     <i data-feather="chevron-down" class="w-3.5 h-3.5 text-dash-secondary transition-transform" id="role-chevron"></i>
                 </button>
                 
-                <div id="role-dropdown-menu" class="hidden relative w-full mt-2 bg-[var(--bg-card)] border border-dash rounded-xl overflow-hidden">
+                <div id="role-dropdown-menu" class="hidden relative w-full mt-2 bg-[var(--bg-card)] border border-dash rounded-xl shadow-2xl overflow-hidden">
                     <button onclick="switchRole('creator')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors border-b border-dash text-left">
                         <div class="w-7 h-7 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="plus-square" class="w-3.5 h-3.5"></i></div>
                         <span class="text-[11px] font-bold">Creator Mode</span>
@@ -400,15 +400,6 @@
 
             <nav class="flex-1 space-y-1" id="desktop-sidebar-nav">
                 <div id="role-workspace-nav">
-                    <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
-                    <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                        <i data-feather="bar-chart-2" class="w-4 text-center"></i> Analytics
-                    </a>
-                    <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                        <i data-feather="layers" class="w-4 text-center"></i> Campaigns
-                    </a>
-                    <a href="#" onclick="switchSPAView('wallet')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                        <i data-feather="dollar-sign" class="w-4 text-center"></i> Money Cycle
                     <!-- Role-specific workspace navigation will be injected here -->
                 </div>
                 <div class="my-4 border-t border-dash"></div>
@@ -709,14 +700,6 @@
                         </div>
                     </div>
 
-                    <div class="bento-card col-span-1 relative group">
-                        <h2 class="text-2xl font-normal leading-tight mb-4">Daily Goal</h2>
-                        <div class="flex flex-col items-center justify-center h-48">
-                            <p class="text-3xl font-black text-[var(--accent-primary)]">6/15</p>
-                            <p class="text-[10px] font-bold text-dash-secondary uppercase mt-1">Tasks Completed</p>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Admin Dashboard Layout -->
                 <div id="admin-dashboard-content" class="bento-grid p-4 mt-[-1rem] hidden gap-3 lg:gap-4">
@@ -1654,11 +1637,6 @@
             switchSPAView('dashboard-home');
 
             // Toggle the two main dashboard sections
-            const creatorDiv = document.getElementById('creator-dashboard-content');
-            if (creatorDiv) {
-                creatorDiv.classList.remove('hidden');
-            }
-            
             // Update Switcher UI Config
             const config = {
                 creator: { label: 'Creator Dashboard', icon: 'plus-square', color: 'var(--accent-primary)', cta: 'Create Campaign' },
@@ -1712,7 +1690,7 @@
 
             // Update the workspace navigation for both desktop and mobile
             document.getElementById('role-workspace-nav').innerHTML = workspaceNavHTML;
-            document.getElementById('role-workspace-nav-mobile').innerHTML = workspaceNavHTML;
+            document.getElementById('mobile-role-workspace-nav').innerHTML = workspaceNavHTML;
 
             // Update Sidebar UI (Desktop)
             const labelEl = document.getElementById('current-role-label');
@@ -1738,7 +1716,7 @@
             if (ctaText) ctaText.innerText = c.cta;
             if (ctaBtn) {
                 if (role === 'creator') ctaBtn.onclick = () => openCampaignWizard();
-                else if (role === 'performer') ctaBtn.onclick = () => switchSPAView('tasks'); // Assuming a tasks view
+                else if (role === 'performer') ctaBtn.onclick = () => switchSPAView('performer-gigs');
                 else ctaBtn.onclick = () => switchSPAView('admin');
             }
 
@@ -1753,12 +1731,10 @@
             
             feather.replace();
             if (role === 'creator') fetchRoleData('creator');
-            if (role === 'admin') fetchAdminDashboardData();
-            if (role === 'performer') fetchPerformerDashboardData();
-            if (role === 'creator') checkMilestones(roles.creator.totalGrowthMetric);
-
-            updateWalletDisplay();
-            fetchRoleData('creator');
+            else if (role === 'admin') fetchAdminDashboardData();
+            else if (role === 'performer') fetchPerformerDashboardData();
+            
+            if (role === 'creator') checkMilestones(roles.creator.totalGrowthMetric); // Only for creator
         }
 
         // --- MISSION CONTROL (CAMPAIGNS VIEW) LOGIC ---
@@ -2847,16 +2823,19 @@
         </div>
 
         <nav class="flex-1 space-y-1">
-            <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
-            <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-chart-line w-4 text-center"></i> Analytics
-            </a>
-            <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-layer-group w-4 text-center"></i> Campaigns
-            </a>
-            <a href="#" onclick="switchSPAView('wallet')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-wallet w-4 text-center"></i> Money Cycle
-            </a>
+            <div id="mobile-role-workspace-nav">
+                <!-- Role-specific workspace navigation will be injected here -->
+                <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
+                <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i data-feather="bar-chart-2" class="w-4 text-center"></i> Analytics
+                </a>
+                <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i data-feather="layers" class="w-4 text-center"></i> Campaigns
+                </a>
+                <a href="#" onclick="switchSPAView('wallet')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i data-feather="dollar-sign" class="w-4 text-center"></i> Money Cycle
+                </a>
+            </div>
             <div class="my-4 border-t border-dash"></div>
             <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Tools</p>
             <a href="academy.html" onclick="toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
