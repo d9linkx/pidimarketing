@@ -113,6 +113,9 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
+        // STRICT ADMIN LIST
+        const AUTHORIZED_ADMINS = ['officialprincedike@gmail.com', 'officialpidimarketing@gmail.com'];
+
         const displayAuthMessage = (elementId, message, type = 'info') => {
             const msgDiv = document.getElementById(elementId);
             if (!msgDiv) return;
@@ -123,7 +126,7 @@
 
         const setButtonLoading = (button, isLoading, originalText) => {
             button.disabled = isLoading;
-            button.innerHTML = isLoading ? `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Logging in...` : originalText;
+            button.innerHTML = isLoading ? `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...` : originalText;
         };
 
         let isOTPMode = false;
@@ -140,14 +143,14 @@
 
         async function handleAuthAction(e) {
             e.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
             const submitButton = e.target.querySelector('button[type="submit"]');
             const msgDiv = document.getElementById('login-message');
 
             if (msgDiv) msgDiv.classList.add('hidden');
 
             if (!isOTPMode) {
-                // Password Login
+                // REGULAR LOGIN (Performers/Creators)
                 const password = document.getElementById('login-password').value;
                 setButtonLoading(submitButton, true, 'Login');
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -158,27 +161,39 @@
                     window.location.href = 'dashboard.html';
                 }
             } else {
-                // OTP Login
+                // ADMIN OTP LOGIN
+                
+                // 1. Unauthorized email check
+                if (!AUTHORIZED_ADMINS.includes(email)) {
+                    displayAuthMessage('login-message', "Access Denied: You are not an authorized admin.", 'error');
+                    return;
+                }
+
                 if (!otpSent) {
-                    // Step 1: Send the code
-                    setButtonLoading(submitButton, true, 'Sending...');
+                    // Step 1: Send the 6-digit code to email
+                    setButtonLoading(submitButton, true, 'Sending Code...');
                     const { error } = await supabase.auth.signInWithOtp({ 
                         email,
-                        options: { shouldCreateUser: false } // Only allow existing whitelisted users
+                        options: { shouldCreateUser: false } 
                     });
                     
                     if (error) {
-                        displayAuthMessage('login-message', "Login failed. Ensure you are a whitelisted admin.", 'error');
+                        displayAuthMessage('login-message', "Error sending code. Ensure you have an account.", 'error');
                         setButtonLoading(submitButton, false, 'Send Code');
                     } else {
                         otpSent = true;
                         document.getElementById('otp-field').classList.remove('hidden');
                         setButtonLoading(submitButton, false, 'Verify Code');
-                        displayAuthMessage('login-message', "Code sent! Please check your email.", 'success');
+                        displayAuthMessage('login-message', "A verification code has been sent to your inbox.", 'success');
                     }
                 } else {
-                    // Step 2: Verify the code
+                    // Step 2: Verify the 6-digit code
                     const token = document.getElementById('login-otp').value.trim();
+                    if (!token) {
+                        displayAuthMessage('login-message', "Please enter the verification code.", 'error');
+                        return;
+                    }
+
                     setButtonLoading(submitButton, true, 'Verifying...');
                     const { error } = await supabase.auth.verifyOtp({
                         email,
@@ -187,7 +202,7 @@
                     });
 
                     if (error) {
-                        displayAuthMessage('login-message', "Invalid or expired code.", 'error');
+                        displayAuthMessage('login-message', "Invalid code. Please try again.", 'error');
                         setButtonLoading(submitButton, false, 'Verify Code');
                     } else {
                         window.location.href = 'dashboard.html?view=admin';
@@ -196,7 +211,6 @@
             }
         }
 
-        // Theme toggle and logo update functions (kept for consistency with dashboard/signup)
         const toggleTheme = () => {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
@@ -213,6 +227,7 @@
         
         const updateThemeIcon = () => {
             const icon = document.querySelector('#theme-icon');
+            if (!icon) return;
             icon.classList.toggle('fa-moon', !document.body.classList.contains('light-mode'));
             icon.classList.toggle('fa-sun', document.body.classList.contains('light-mode'));
         }
@@ -235,8 +250,7 @@
             updateLogo();
         }
         
-        // Expose handleLogin to the global scope for onsubmit
-        window.handleLogin = handleLogin;
+        window.handleAuthAction = handleAuthAction;
         window.toggleTheme = toggleTheme;
         window.togglePassword = togglePassword;
     </script>

@@ -194,21 +194,45 @@
             } else {
                 // Optional: Manual profile creation if no trigger exists
                 if (data.user) {
-                    await supabase
-                        .from('profiles')
-                        .upsert({ 
-                            id: data.user.id, 
-                            full_name: fullName, 
+                    // If Supabase returns a session (no confirmation required), create the profile now.
+                    if (data.session) {
+                        await supabase
+                            .from('profiles')
+                            .upsert({
+                                id: data.user.id,
+                                full_name: fullName,
+                                email: email.trim(),
+                                user_role: role,
+                                balance: 0,
+                                pending_balance: 0,
+                                completed_tasks: 0
+                            });
+
+                        displayAuthMessage('signup-message', 'Account created and signed in — redirecting...', 'success');
+                        // Redirect to dashboard for their role
+                        setTimeout(() => window.location.href = `dashboard.html?view=${role}`, 800);
+                        return;
+                    }
+                }
+
+                // Otherwise, email confirmation is required (common). Persist the profile locally
+                // so we can create the profile automatically after the user confirms and logs in.
+                try {
+                    if (data.user) {
+                        const pending = {
+                            id: data.user.id,
+                            full_name: fullName,
                             email: email.trim(),
                             user_role: role,
                             balance: 0,
                             pending_balance: 0,
-                            reputation_score: 80,
-                            allocated_funds: 0
-                        });
-                }
+                            completed_tasks: 0
+                        };
+                        localStorage.setItem('pendingProfile', JSON.stringify(pending));
+                    }
+                } catch (e) { /* ignore localStorage errors */ }
 
-                displayAuthMessage('signup-message', 'Account created! Please check your email to confirm, then return to log in.', 'success');
+                displayAuthMessage('signup-message', 'Account created! Please check your email to confirm your address before logging in. After confirmation you will be able to continue to your dashboard.', 'success');
                 // For immediate redirection (e.g., if email confirmation is off), use:
                 // window.location.href = `dashboard.html?view=${role}`;
             }

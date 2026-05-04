@@ -1,0 +1,14 @@
+# Local Supabase config (contains secrets)
+supabase/supabase.config.js
+
+# Node artifacts (if any)
+node_modules/
+
+# Environment files
+.env
+
+# MacOS
+.DS_Store
+
+# VSCode
+.vscode/

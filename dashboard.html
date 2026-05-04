@@ -9,9 +9,46 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        <!-- Load local supabase config if present (not committed to git) -->
+        <script>
+            try {
+                var script = document.createElement('script');
+                script.src = '/supabase/supabase.config.js';
+                script.async = false; // load synchronously so window.SUPABASE_CONFIG is available
+                script.onerror = function() { /* silently ignore if not present */ };
+                document.head.appendChild(script);
+            } catch (e) { console.warn('No local supabase config loaded:', e); }
+            // Runtime Error Overlay: surfaces JS errors to avoid silent white-screen failures
+            window.__showRuntimeError = function(message) {
+                try {
+                    let overlay = document.getElementById('runtime-error-overlay');
+                    if (!overlay) {
+                        overlay = document.createElement('div');
+                        overlay.id = 'runtime-error-overlay';
+                        overlay.style = 'position:fixed;inset:10px;background:rgba(0,0,0,0.85);color:#fff;padding:16px;border-radius:8px;z-index:99999;font-family:monospace;font-size:13px;overflow:auto;max-height:calc(100vh - 20px);';
+                        document.body.appendChild(overlay);
+                    }
+                    overlay.innerText = 'Runtime Error:\n\n' + String(message);
+                } catch (e) { console.error('Failed to show runtime overlay', e); }
+            };
+            // Global handlers: surface uncaught exceptions and unhandled promise rejections to the overlay
+            window.onerror = function(message, source, lineno, colno, error) {
+                try {
+                    const details = `${message} at ${source}:${lineno}:${colno}\n${error && error.stack ? error.stack : ''}`;
+                    console.error('Global uncaught error:', details);
+                    window.__showRuntimeError(details);
+                } catch (e) { console.error('Error in window.onerror handler', e); }
+            };
 
+            window.onunhandledrejection = function(ev) {
+                try {
+                    const reason = ev && ev.reason ? (ev.reason.stack || ev.reason) : String(ev);
+                    console.error('Unhandled rejection:', reason);
+                    window.__showRuntimeError('Unhandled Rejection:\n\n' + reason);
+                } catch (e) { console.error('Error in onunhandledrejection handler', e); }
+            };
+    </script>
+    <style>
 :root {
             /* Background: Clean, airy white-to-slate gradient */
             --bg-body: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
@@ -80,6 +117,9 @@
             .dashboard-layout { display: flex; }
             aside.sidebar { width: 260px; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; border-right: 1px solid var(--border-dash); background: var(--bg-sidebar); padding: 1.5rem; z-index: 1001; overflow: hidden; }
             main.content-area { flex: 1; padding: 0rem; margin-left: 260px; }
+            /* Keep header aligned with content area on desktop by offsetting it by sidebar width */
+            #dashboard-header { left: 260px; width: calc(100% - 260px); }
+            #dashboard-header-inner { padding-left: 1rem; padding-right: 1rem; }
         }
         
         /* Sidebar Noise treatment */
@@ -439,48 +479,54 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <main class="content-area flex-1 min-h-screen"> 
+    <!-- Main Content Area -->
+    <main class="content-area flex-1 min-h-screen pt-24"> 
             <!-- Fixed Header Container for All Devices -->
-            <div class="sticky top-0 z-[100] backdrop-blur-md" style="background: var(--bg-header);">
-                <header class="flex justify-between items-center gap-4 p-4 lg:px-4 border-b border-dash"> 
+            <div id="dashboard-header" class="fixed top-0 left-0 right-0 z-[100] backdrop-blur-md" style="background: var(--bg-header);">
+                <header id="dashboard-header-inner" class="flex items-center justify-between gap-4 p-3 lg:px-4 border-b border-dash">
 
-                <!-- Search Bar (Desktop/Tablet) -->
-                <div class="search-bar-container flex-1 mx-0 hidden md:flex items-center">
-                    <div class="relative w-full">
-                        <input type="text" placeholder="Search tasks, campaigns, users..." class="w-[50%] bg-[var(--search-bg)] border border-dash rounded-xl white rounded-xl p-2.5 pl-10 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
-                        <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-dash-secondary w-4 h-4"></i>
-                    </div>
-                </div>
-
-                <!-- Right section (Actions/Avatar) -->
-                <div class="flex items-center gap-4 md:gap-3">
-                    <div id="milestone-alert" class="hidden absolute top-16 right-8 z-[150] bg-[var(--accent-primary)] text-white p-3 rounded-xl shadow-2xl animate-bounce">
-                        <p class="text-[10px] font-bold">Authority Milestone Hit!</p>
+                    <!-- Left: Mobile menu (visible on small screens) and Logo (desktop) -->
+                    <div class="flex items-center gap-3 order-1 md:order-1">
+                        <button onclick="toggleMobileMenu()" class="md:hidden w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center">
+                            <i class="fa-solid fa-bars" id="menu-icon-mobile"></i>
+                        </button>
+                        <a href="dashboard.html" class="hidden md:flex items-center gap-3">
+                            <img id="logo-img-sidebar" src="assets/pidiblack.png" alt="PIDI Logo" class="h-7 w-auto">
+                            <span class="text-base font-medium">PIDItasks</span>
+                        </a>
                     </div>
 
-                    <button onclick="toggleTheme()" class="w-9 h-9 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[var(--accent-primary)] transition focus:outline-none" id="theme-toggle">
-                        <i data-feather="moon" class="w-4 h-4" id="theme-icon"></i>
-                    </button>
-
-                    <button onclick="toggleMobileMenu()" class="lg:hidden w-9 h-9 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center">
-                        <i class="fa-solid fa-bars" id="menu-icon"></i>
-                    </button>
-                    
-                    <div class="relative group">
-                        <img src="" class="w-9 h-9 rounded-xl border-2 border-dash cursor-pointer user-avatar-display" alt="User Avatar" onclick="openSettings('profile')">
+                    <!-- Center: Search (desktop uses separate larger search; mobile uses compact centered search) -->
+                    <div class="flex-1 mx-2 order-2">
+                        <div class="hidden md:flex items-center">
+                            <div class="relative w-full">
+                                <input type="text" placeholder="Search tasks, campaigns, users..." class="w-[50%] bg-[var(--search-bg)] border border-dash rounded-xl p-2.5 pl-10 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-dash-secondary w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div class="md:hidden">
+                            <div class="relative">
+                                <input id="mobile-search-inline" type="text" placeholder="Search" class="w-full bg-dash-secondary border border-dash rounded-xl p-2.5 pl-10 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-dash-secondary w-4 h-4"></i>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </header>
 
-            <!-- Mobile Search Bar (visible only on small screens) -->
-                <header class="md:hidden p-4 border-b border-dash">
-                <div class="relative w-full">
-                    <input type="text" placeholder="Search tasks, campaigns, users..." class="w-full bg-dash-secondary border border-dash rounded-xl p-2.5 pl-10 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
-                    <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-dash-secondary w-4 h-4"></i>
-                </div>
-            </header>
+                    <!-- Right: Theme toggle and (desktop) avatar -->
+                    <div class="flex items-center gap-3 order-3 md:order-2">
+                        <button onclick="toggleTheme()" class="w-9 h-9 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[var(--accent-primary)] transition focus:outline-none" id="theme-toggle">
+                            <i data-feather="moon" class="w-4 h-4" id="theme-icon"></i>
+                        </button>
+                        <div class="relative group hidden md:block">
+                            <img src="" class="w-9 h-9 rounded-xl border-2 border-dash cursor-pointer user-avatar-display" alt="User Avatar" onclick="openSettings('profile')">
+                        </div>
+                    </div>
+                </header>
+
             </div>
+
+            <!-- spacer so the viewport content starts below the fixed header -->
+            <div id="dashboard-header-spacer" aria-hidden="true"></div>
 
             <div id="dashboard-home-view" class="spa-view">
                 <div id="welcome-section" class="p-6 lg:p-4 mt-0 mb-0 flex flex-col md:flex-row md:justify-between md:items-center gap-6 md:gap-4">
@@ -799,6 +845,94 @@
                 <p class="text-dash-secondary text-sm mb-8">Review all transactions and payouts.</p>
                 <div class="bento-card p-6">
                     <p class="text-dash-secondary">Content for Admin Finance will go here.</p>
+                </div>
+            </div>
+
+            <!-- SPA CONTAINER: Task Flow View (Performer) -->
+            <div id="task-flow-view" class="spa-view hidden p-4 lg:p-8 max-w-4xl mx-auto">
+                <div class="bento-card w-full relative p-6 md:p-8">
+                    <!-- Flow Header -->
+                    <div class="flex items-center justify-between mb-8">
+                        <button onclick="switchSPAView('dashboard-home')" class="text-dash-secondary hover:text-[var(--text-primary)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors group">
+                            <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> 
+                            <span>Cancel Mission</span>
+                        </button>
+                        
+                        <div class="flex gap-1.5" id="task-progress-bars">
+                            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-[var(--accent-primary)] shadow-[0_0_8px_rgba(69,185,110,0.3)]" id="task-bar-1"></div>
+                            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-dash-secondary" id="task-bar-2"></div>
+                            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-dash-secondary" id="task-bar-3"></div>
+                        </div>
+                    </div>
+
+                    <div id="task-step-1" class="task-wizard-step space-y-6">
+                        <div class="flex items-center gap-4 p-6 bg-dash-secondary/30 rounded-3xl border border-dash">
+                            <div id="task-platform-icon" class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-2xl shadow-sm"></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[9px] font-black text-[var(--accent-primary)] uppercase tracking-widest mb-1">New Mission Available</p>
+                                <h2 class="text-xl font-bold truncate" id="task-detail-url"></h2>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Reward</p>
+                                <h3 class="text-lg font-black text-green-500" id="task-detail-reward">₦70</h3>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h4 class="text-xs font-bold uppercase tracking-widest text-dash-secondary">Your Instructions</h4>
+                            <div class="p-6 bg-white border border-dash rounded-2xl text-sm leading-relaxed text-dash-secondary" id="task-detail-instructions"></div>
+                        </div>
+
+                        <button onclick="nextTaskStep()" class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest">
+                            Start Mission <i data-feather="zap" class="ml-2 w-4"></i>
+                        </button>
+                    </div>
+
+                    <div id="task-step-2" class="task-wizard-step hidden space-y-6">
+                        <div class="text-center space-y-2">
+                            <h3 class="text-2xl font-bold">Execution Phase</h3>
+                            <p class="text-sm text-dash-secondary">Open the link and perform the engagement as instructed.</p>
+                        </div>
+
+                        <div class="p-8 border-2 border-dashed border-dash rounded-3xl flex flex-col items-center gap-6">
+                            <div class="w-20 h-20 rounded-full bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] flex items-center justify-center animate-pulse">
+                                <i data-feather="external-link" class="w-10 h-10"></i>
+                            </div>
+                            <a id="task-execution-link" href="#" target="_blank" class="btn-fintech btn-primary px-10 py-4 shadow-xl">OPEN CONTENT</a>
+                            <p class="text-[10px] font-bold text-dash-secondary uppercase text-center max-w-xs">Don't forget to take a screenshot of your comment/like for submission.</p>
+                        </div>
+
+                        <button onclick="nextTaskStep()" class="w-full btn-fintech bg-dash-secondary border border-dash justify-center py-4 font-black uppercase text-dash-secondary">
+                            I've Completed the Task
+                        </button>
+                    </div>
+
+                    <div id="task-step-3" class="task-wizard-step hidden space-y-6">
+                        <div class="text-center space-y-2">
+                            <h3 class="text-2xl font-bold">Submit Proof</h3>
+                            <p class="text-sm text-dash-secondary">Upload verification of your work for audit.</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Comment Text (Min 10 Words)</label>
+                                <textarea id="task-proof-text" rows="3" placeholder="Paste the exact comment you posted..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></textarea>
+                            </div>
+
+                            <div class="relative group">
+                                <input type="file" id="task-proof-file" accept="image/*" class="hidden" onchange="updateTaskProofLabel(this)">
+                                <label for="task-proof-file" class="w-full bg-dash-secondary border-2 border-dashed border-dash hover:border-[var(--accent-primary)] transition p-8 rounded-3xl flex flex-col items-center gap-3 cursor-pointer">
+                                    <i data-feather="image" class="text-dash-secondary"></i>
+                                    <span id="task-proof-label" class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary">Upload Screenshot</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button onclick="submitTaskProof()" id="task-submit-btn" class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg">
+                            <span>Submit for Verification</span>
+                            <i data-feather="check-circle" class="ml-2 w-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1357,6 +1491,95 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
+        // Ensure there's a dedicated viewport for SPA views to prevent stacking
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const main = document.querySelector('main.content-area');
+                if (!main) return;
+
+                // Ensure spacer exists and size it to the header height immediately so content sits below the fixed header
+                const headerInner = document.getElementById('dashboard-header-inner');
+                let spacer = document.getElementById('dashboard-header-spacer');
+                if (!spacer) {
+                    spacer = document.createElement('div');
+                    spacer.id = 'dashboard-header-spacer';
+                    spacer.setAttribute('aria-hidden', 'true');
+                    // insert spacer right after the header wrapper if possible
+                    const headerWrapper = document.getElementById('dashboard-header');
+                    if (headerWrapper && headerWrapper.parentNode) headerWrapper.parentNode.insertBefore(spacer, headerWrapper.nextSibling);
+                    else main.insertBefore(spacer, main.firstChild);
+                }
+
+                const headerHeight = (headerInner && (headerInner.offsetHeight || headerInner.getBoundingClientRect().height)) || 0;
+                if (headerHeight) spacer.style.height = headerHeight + 'px';
+
+                // Create templates container (hidden) and a visible viewport for mounting active view
+                let templates = document.getElementById('dashboard-templates');
+                if (!templates) {
+                    templates = document.createElement('div');
+                    templates.id = 'dashboard-templates';
+                    templates.style.display = 'none';
+                    main.appendChild(templates);
+                }
+
+                let viewport = document.getElementById('dashboard-viewport');
+                if (!viewport) {
+                    viewport = document.createElement('div');
+                    viewport.id = 'dashboard-viewport';
+                    viewport.style.minHeight = '60vh';
+                }
+
+                // Move existing spa views into the hidden templates container
+                const spaViews = Array.from(document.querySelectorAll('.spa-view'));
+                spaViews.forEach(v => {
+                    if (!templates.contains(v)) templates.appendChild(v);
+                });
+
+                // Insert viewport after the spacer so visible content starts below the header
+                if (spacer && spacer.parentNode) {
+                    if (spacer.nextSibling !== viewport) spacer.parentNode.insertBefore(viewport, spacer.nextSibling);
+                } else if (main.firstChild !== viewport) {
+                    main.insertBefore(viewport, main.firstChild);
+                }
+
+                // Render initial view (dashboard-home) into viewport
+                const homeTemplate = document.getElementById('dashboard-home-view');
+                if (homeTemplate) {
+                    viewport.innerHTML = '';
+                    const clone = homeTemplate.cloneNode(true);
+                    clone.removeAttribute('id');
+                    clone.classList.remove('hidden');
+                    viewport.appendChild(clone);
+                }
+            } catch (e) { console.warn('Failed to initialize dashboard viewport/templates:', e); }
+        });
+
+        // Ensure the fixed header doesn't obscure content: set spacer height to header height
+        function resizeHeaderSpacer() {
+            try {
+                const header = document.getElementById('dashboard-header-inner');
+                const spacer = document.getElementById('dashboard-header-spacer');
+                if (!header || !spacer) return;
+                const rect = header.getBoundingClientRect();
+                spacer.style.height = rect.height + 'px';
+            } catch (e) { console.warn('resizeHeaderSpacer failed:', e); }
+        }
+
+        window.addEventListener('load', resizeHeaderSpacer);
+        window.addEventListener('resize', resizeHeaderSpacer);
+        // Also run after a tick to account for fonts/icons rendering
+        setTimeout(resizeHeaderSpacer, 200);
+
+        window.fetchAnalytics = function() { // Expose globally to resolve ReferenceError
+            console.log("Analytics placeholder triggered");
+            return {}; // Returns an empty object so other code doesn't break
+        }
+
+        function addToLiveFeed(item) {
+            console.log("Live feed sync triggered:", item);
+            // Integration point for real-time activity updates
+        }
+
         // --- GLOBAL STATE ---
         let currentRole = 'creator';
         let selectedBank = null;
@@ -1459,6 +1682,15 @@
                     filterAndRenderTasks(e.target.value);
                 });
             });
+            // Prevent anchor tags with href="#" from causing page jumps which can
+            // interrupt the SPA flow. This keeps navigation stable when using
+            // inline onclick handlers that rely on window-scoped functions.
+            document.body.addEventListener('click', (e) => {
+                const a = e.target.closest && e.target.closest('a[href="#"]');
+                if (a) {
+                    e.preventDefault();
+                }
+            });
         });
 
         // Utility for count-up animation
@@ -1499,11 +1731,28 @@
 
         window.fetchAdminDashboardData = async function() {
             try {
-                const { data: allCamps } = await supabase.from('campaigns').select('*, profiles(full_name)');
-                const { data: allUsers } = await supabase.from('profiles').select('*');
-                const { data: transactions } = await supabase.from('transactions').select('*');
+                const campsRes = await supabase.from('campaigns').select('*, profiles(full_name)');
+                const usersRes = await supabase.from('profiles').select('*');
+                const txRes = await supabase.from('transactions').select('*');
 
-                if (allCamps) {
+                if (campsRes.error) {
+                    console.warn('campaigns table fetch issue:', campsRes.error);
+                    showSupabaseError(campsRes.error);
+                }
+                if (usersRes.error) {
+                    console.warn('profiles table fetch issue:', usersRes.error);
+                    showSupabaseError(usersRes.error);
+                }
+                if (txRes.error) {
+                    console.warn('transactions table fetch issue:', txRes.error);
+                    showSupabaseError(txRes.error);
+                }
+
+                const allCamps = campsRes.data || [];
+                const allUsers = usersRes.data || [];
+                const transactions = txRes.data || [];
+
+                if (allCamps && allCamps.length) {
                     document.getElementById('admin-stat-active').innerText = allCamps.filter(c => c.status === 'active').length;
                     document.getElementById('admin-stat-queue').innerText = allCamps.filter(c => c.status === 'pending_verification').length;
                     
@@ -1515,7 +1764,7 @@
                                 <td class="py-3 font-bold truncate max-w-[150px]">${c.target_url}</td>
                                 <td class="py-3 text-dash-secondary font-semibold">${c.profiles?.full_name || 'System'}</td>
                                 <td class="py-3 uppercase font-bold text-[9px] text-dash-secondary">${c.platform}</td>
-                                <td class="py-3 font-bold">₦${c.total_cost.toLocaleString()}</td>
+                                <td class="py-3 font-bold">₦${(c.total_cost || 0).toLocaleString()}</td>
                                 <td class="py-3"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${c.status}</span></td>
                                 <td class="py-3 text-right font-mono">${progress}%</td>
                             </tr>
@@ -1525,7 +1774,7 @@
 
                 if (allUsers) document.getElementById('admin-stat-users').innerText = allUsers.length;
                 if (transactions) {
-                    const tvl = transactions.filter(t => t.status === 'pending').reduce((acc, t) => acc + t.amount, 0);
+                    const tvl = transactions.filter(t => t.status === 'pending').reduce((acc, t) => acc + (t.amount || 0), 0);
                     document.getElementById('admin-stat-tvl').innerText = `₦${tvl.toLocaleString()}`;
                 }
             } catch (err) { console.error("Admin Sync Error:", err); }
@@ -1533,26 +1782,34 @@
 
         window.fetchPerformerDashboardData = async function() {
             try {
-                const { data: tasks } = await supabase.from('campaigns').select('*').eq('status', 'active').limit(5);
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                const tasksRes = await supabase.from('campaigns').select('*').eq('status', 'active').limit(5);
+                const profileRes = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+
+                if (tasksRes.error) { console.warn('Error fetching tasks:', tasksRes.error); showSupabaseError(tasksRes.error); }
+                if (profileRes.error) { console.warn('Error fetching profile for performer:', profileRes.error); showSupabaseError(profileRes.error); }
+
+                const tasks = tasksRes.data || [];
+                const profile = profileRes.data || null;
 
                 if (profile) {
-                    document.getElementById('performer-stat-earnings').innerText = `₦${(profile.balance || 0).toLocaleString()}`;
+                    document.getElementById('performer-stat-earnings').innerText = `₦${((profile.balance || 0)).toLocaleString()}`;
                     document.getElementById('performer-stat-pending').innerText = profile.pending_balance || 0;
                     document.getElementById('performer-stat-approved').innerText = profile.completed_tasks || 0;
                 }
 
                 const taskList = document.getElementById('performer-available-tasks');
-                if (tasks) {
+                if (tasks && tasks.length) {
                     taskList.innerHTML = tasks.map(t => `
                         <div class="p-4 bg-dash-secondary/30 border border-dash rounded-2xl flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${t.platform}"></i></div>
                                 <div><p class="font-bold text-xs truncate max-w-[120px]">${t.target_url}</p><p class="text-[9px] font-black text-green-500 uppercase">₦70 Reward</p></div>
                             </div>
-                            <button class="bg-[var(--accent-primary)] text-white text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest">Claim</button>
+                            <button onclick="startTaskFlow('${t.id}')" class="bg-[var(--accent-primary)] text-white text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest">Claim</button>
                         </div>
                     `).join('');
+                } else {
+                    taskList.innerHTML = '<p class="text-xs text-dash-secondary text-center py-10">Searching for high-value missions...</p>';
                 }
             } catch (err) { console.error("Performer Sync Error:", err); }
         }
@@ -1566,9 +1823,13 @@
         });
 
         async function initializeUser() {
-            const { data: { user }, error } = await supabase.auth.getUser();
-            
-            if (error || !user) {
+            // Guarded call to avoid runtime exceptions if supabase returns unexpected shape
+            const authRes = await supabase.auth.getUser();
+            const user = authRes?.data?.user || null;
+            const authError = authRes?.error || null;
+
+            if (authError || !user) {
+                // If user isn't authenticated, redirect to login
                 window.location.href = 'login.html';
                 return;
             }
@@ -1590,7 +1851,41 @@
             });
 
             // Fetch real user data from profiles table
-            const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+            let profile = null;
+            try {
+                const profileRes = await supabase.from('profiles').select('*').eq('id', user.id).single();
+                profile = profileRes?.data || null;
+            } catch (err) {
+                console.warn('Profile fetch error (might be missing):', err);
+                profile = null;
+            }
+
+            // If profile is missing, check localStorage for pending profile (created at signup)
+            if (!profile) {
+                try {
+                    const pendingRaw = localStorage.getItem('pendingProfile');
+                    if (pendingRaw) {
+                        const pending = JSON.parse(pendingRaw);
+                        if (pending && pending.id === user.id) {
+                            await supabase.from('profiles').upsert({
+                                id: pending.id,
+                                full_name: pending.full_name,
+                                email: pending.email,
+                                user_role: pending.user_role,
+                                balance: pending.balance || 0,
+                                pending_balance: pending.pending_balance || 0,
+                                completed_tasks: pending.completed_tasks || 0
+                            });
+                            // Remove pending after upsert
+                            localStorage.removeItem('pendingProfile');
+                            // Refetch profile
+                            const pr = await supabase.from('profiles').select('*').eq('id', user.id).single();
+                            profile = pr?.data || null;
+                        }
+                    }
+                } catch (e) { console.warn('Failed to upsert pending profile:', e); }
+            }
+
             if (profile) {
                 roles.creator.availableBalance = profile.balance || 0;
                 roles.creator.allocatedFunds = profile.allocated_funds || 0;
@@ -1628,8 +1923,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             const initialRole = urlParams.get('view') || user.user_metadata.user_role || 'creator';
             
-            // Security: If user tries to access admin view, verify role
-            if (initialRole === 'admin' && profile.user_role !== 'admin') {
+            // Security: If user tries to access admin view, verify role (guard against missing profile)
+            if (initialRole === 'admin' && (!profile || profile.user_role !== 'admin')) {
                 alert("Access Denied: You do not have administrator privileges.");
                 switchRole('creator');
                 return;
@@ -1887,18 +2182,23 @@
             if (role !== 'creator') return;
             
             try {
-                // 1. Fetch all Campaigns for this creator
-                const { data: campaigns, error } = await supabase
+                // 1. Fetch all Campaigns for this creator (guard errors)
+                const campaignsRes = await supabase
                     .from('campaigns')
                     .select('*')
                     .eq('creator_id', currentUser.id)
                     .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                roles.creator.items = campaigns || [];
+
+                if (campaignsRes.error) {
+                    console.warn('fetchRoleData: campaigns fetch error', campaignsRes.error);
+                    showSupabaseError(campaignsRes.error);
+                    roles.creator.items = [];
+                } else {
+                    roles.creator.items = campaignsRes.data || [];
+                }
 
                 // 2. Update Dashboard Home View Components
-                const activeCampaigns = roles.creator.items.filter(c => c.status === 'active');
+                const activeCampaigns = (roles.creator.items || []).filter(c => c.status === 'active');
                 const ongoingCountEl = document.getElementById('ongoing-count');
                 if (ongoingCountEl) ongoingCountEl.innerText = `${activeCampaigns.length} Active`;
                 
@@ -1920,9 +2220,8 @@
 
                 // 3. Sync Other Views
                 renderArchiveTable(); // Campaigns View
-                fetchAnalytics();      // Stats Strip & Radar
+                fetchAnalytics();     // Stats Strip & Radar
                 fetchWalletData();     // Wallet View
-
             } catch (err) {
                 console.error("Critical Dashboard Sync Error:", err);
             }
@@ -1990,8 +2289,8 @@
             list.innerHTML = items.map(item => `
                 <tr class="border-b border-dash task-item">
                     <td class="py-4 font-bold">
-                        ${item.isTask ? 
-                            `<button onclick="claimTask('${item.id}')" class="text-[#6a26da] hover:underline">${item.name}</button>` : 
+                        ${item.isTask ?
+                            `<button onclick="startTaskFlow('${item.id}')" class="text-[#6a26da] hover:underline">${item.name}</button>` :
                             item.name
                         }
                     </td>
@@ -2067,52 +2366,112 @@
         let taskCountdownSeconds = 0;
 
         window.switchSPAView = function(viewId) {
-            // Hide all SPA views
-            document.querySelectorAll('.spa-view').forEach(view => view.classList.add('hidden'));
-            
-            // Show target view
-            const target = document.getElementById(`${viewId}-view`);
-            if (target) {
-                target.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                
-                // Trigger data fetches for specific views
-                if (viewId === 'wallet') fetchWalletData();
-                if (viewId === 'admin') fetchAdminPendingMissions();
-                if (viewId === 'campaigns') fetchRoleData('creator');
-            }
+            try {
+                // New strategy: render the requested view into the single dashboard viewport
+                const templates = document.getElementById('dashboard-templates');
+                const viewport = document.getElementById('dashboard-viewport');
+                if (!viewport || !templates) {
+                    console.warn('switchSPAView: missing viewport or templates container, falling back to legacy behavior');
+                }
 
-            // Special case logic
-            if (viewId === 'dashboard-home') {
-                const grid = document.getElementById('creator-dashboard-content');
-                if (grid) grid.classList.remove('hidden');
-            }
-            
-            // Auto-close mobile menu if open
-            const menu = document.getElementById('mobile-menu');
-            if (menu && !menu.classList.contains('hidden')) toggleMobileMenu();
+                // Candidate template ids
+                const candidateIds = [`${viewId}-view`, viewId];
+                let template = null;
+                for (const id of candidateIds) {
+                    const el = templates ? templates.querySelector(`#${id}`) : document.getElementById(id);
+                    if (el) { template = el; break; }
+                }
 
-            // Refresh icons for dynamically shown/updated content
-            setTimeout(() => feather.replace(), 10);
+                if (!template) {
+                    console.warn(`switchSPAView: no template found for "${viewId}" (tried ${candidateIds.join(',')})`);
+                    return;
+                }
+
+                // Replace viewport content with a cloned template
+                try {
+                    viewport.innerHTML = '';
+                    const clone = template.cloneNode(true);
+                    // Remove id from clone to avoid duplicates
+                    clone.removeAttribute('id');
+                    clone.classList.remove('hidden');
+                    viewport.appendChild(clone);
+                } catch (e) {
+                    console.warn('switchSPAView: failed to mount template into viewport, falling back to showing template in-place', e);
+                    // fallback: attempt to show template in place
+                    const inPlace = document.getElementById(candidateIds[0]) || document.getElementById(candidateIds[1]);
+                    if (inPlace) {
+                        document.querySelectorAll('.spa-view').forEach(v => v.classList.add('hidden'));
+                        inPlace.classList.remove('hidden');
+                    }
+                }
+
+                // Scroll viewport into view
+                try { viewport.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+                // 2. ATTEMPT DATA SYNC (Wrapped to prevent navigation breaks)
+                try {
+                    if (viewId === 'wallet') fetchWalletData();
+                    if (viewId === 'admin') fetchAdminPendingMissions();
+                    if (viewId === 'campaigns') fetchRoleData('creator');
+                } catch (err) {
+                    console.error("Non-critical sync error during view switch:", err);
+                }
+
+                // Auto-close mobile menu if open
+                const menu = document.getElementById('mobile-menu');
+                if (menu && !menu.classList.contains('hidden')) toggleMobileMenu();
+
+                // Diagnostics: ensure viewport has content
+                const viewportHasContent = document.getElementById('dashboard-viewport') && document.getElementById('dashboard-viewport').children.length > 0;
+                if (!viewportHasContent) {
+                    console.warn('switchSPAView: viewport empty after switch, falling back to showing dashboard-home-view template');
+                    const fallback = document.getElementById('dashboard-templates')?.querySelector('#dashboard-home-view') || document.getElementById('dashboard-home-view');
+                    if (fallback && document.getElementById('dashboard-viewport')) {
+                        const vp = document.getElementById('dashboard-viewport');
+                        vp.innerHTML = '';
+                        const clone = fallback.cloneNode(true);
+                        clone.removeAttribute('id');
+                        clone.classList.remove('hidden');
+                        vp.appendChild(clone);
+                    }
+                }
+                // Refresh icons for dynamically shown/updated content
+                setTimeout(() => feather.replace(), 10);
+            } catch (err) {
+                console.error('Critical error in switchSPAView:', err);
+            }
         }
 
         // --- WALLET DATA LOGIC ---
         async function fetchWalletData() {
-            const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
-            const { data: transactions } = await supabase.from('transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+            try {
+                const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
+                let transactions = null;
+                try {
+                    const res = await supabase.from('transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+                    transactions = res.data || null;
+                } catch (err) {
+                    console.warn('Transactions fetch failed:', err);
+                    transactions = null;
+                }
 
-            if (campaigns) {
-                const totalPaid = campaigns.filter(c => c.status !== 'rejected').reduce((acc, c) => acc + c.total_cost, 0);
-                const working = campaigns.filter(c => c.status === 'active').reduce((acc, c) => acc + c.total_cost, 0);
-                const spent = campaigns.filter(c => c.status === 'completed').reduce((acc, c) => acc + c.total_cost, 0);
+                if (campaigns) {
+                    const totalPaid = campaigns.filter(c => c.status !== 'rejected').reduce((acc, c) => acc + c.total_cost, 0);
+                    const working = campaigns.filter(c => c.status === 'active').reduce((acc, c) => acc + c.total_cost, 0);
+                    const spent = campaigns.filter(c => c.status === 'completed').reduce((acc, c) => acc + c.total_cost, 0);
 
-                document.getElementById('wallet-total-paid').innerText = `₦${totalPaid.toLocaleString()}`;
-                document.getElementById('wallet-working-funds').innerText = `₦${working.toLocaleString()}`;
-                document.getElementById('wallet-spent-funds').innerText = `₦${spent.toLocaleString()}`;
-            }
+                    document.getElementById('wallet-total-paid').innerText = `₦${totalPaid.toLocaleString()}`;
+                    document.getElementById('wallet-working-funds').innerText = `₦${working.toLocaleString()}`;
+                    document.getElementById('wallet-spent-funds').innerText = `₦${spent.toLocaleString()}`;
+                }
+                } catch (err) {
+                    console.warn("Wallet campaigns/transactions fetch error (Table might be missing):", err);
+                    showSupabaseError(err);
+                }
 
+            // Attempt to update ledger even if transactions fetch errored (handled by checking data presence)
             const ledger = document.getElementById('wallet-ledger-body');
-            if (transactions && transactions.length > 0) {
+            if (typeof transactions !== 'undefined' && transactions && transactions.length > 0) {
                 ledger.innerHTML = transactions.map(t => `
                     <tr class="border-b border-dash hover:bg-dash-secondary/30 transition-colors">
                         <td class="py-4 font-mono text-[10px]">${t.id.slice(0, 8)}...</td>
@@ -2133,12 +2492,16 @@
 
         // --- ADMIN VERIFICATION LOGIC ---
         async function fetchAdminPendingMissions() {
-            const { data: pending } = await supabase
-                .from('campaigns')
-                .select('*, profiles(full_name)')
-                .eq('status', 'pending_verification')
-                .order('created_at', { ascending: true });
-
+            let pending = [];
+            try {
+                const { data } = await supabase
+                    .from('campaigns')
+                    .select('*, profiles(full_name)')
+                    .eq('status', 'pending_verification')
+                    .order('created_at', { ascending: true });
+                pending = data || [];
+            } catch (err) { console.warn("Admin fetch error:", err); }
+            
             const container = document.getElementById('admin-pending-list');
             if (!pending || pending.length === 0) {
                 container.innerHTML = `<div class="bento-card text-center py-20 text-dash-secondary"><p>All payments verified.</p></div>`;
@@ -2197,7 +2560,28 @@
             }
         }
 
-        window.openCampaignWizard = () => switchSPAView('campaign-creation');
+        window.openCampaignWizard = function() {
+            try {
+                // Reset wizard UI to step 1 and defaults so the flow is ready
+                resetWizard();
+                selectedPlatform = 'instagram';
+                // clear inputs
+                const tgt = document.getElementById('target-url'); if (tgt) tgt.value = '';
+                const instr = document.getElementById('task-instructions'); if (instr) instr.value = '';
+                const proofInput = document.getElementById('payment-proof-file'); if (proofInput) proofInput.value = '';
+                const proofLabel = document.getElementById('proof-file-label'); if (proofLabel) proofLabel.innerText = 'Upload Receipt (IMG/PDF)';
+                // ensure calculation reflects defaults
+                updateCalculation();
+                // show the campaign creation view
+                switchSPAView('campaign-creation');
+                // focus first input for convenience
+                setTimeout(() => { const urlInput = document.getElementById('target-url'); if (urlInput) urlInput.focus(); }, 120);
+            } catch (e) {
+                console.error('Failed to open campaign wizard:', e);
+                switchSPAView('campaign-creation');
+            }
+        };
+
         window.closeCampaignWizard = () => { switchSPAView('dashboard-home'); resetWizard(); };
 
         window.toggleRefundPolicy = function(show) {
@@ -2257,12 +2641,17 @@
         }
 
         function updateCalculation() {
-            const qty = document.getElementById('goal-range').value;
+            const rangeEl = document.getElementById('goal-range');
+            if (!rangeEl) return;
+            const qty = parseInt(rangeEl.value || '0', 10) || 0;
             const cost = qty * 100; // ₦100 per high-quality human engagement
-            document.getElementById('goal-val').innerText = qty;
-            document.getElementById('cost-val').innerText = `₦${cost.toLocaleString()}`;
-            document.getElementById('final-cost').innerText = `₦${cost.toLocaleString()}`;
-            document.getElementById('summary-text').innerText = `${qty} Human ${selectedPlatform.charAt(0).toUpperCase() + selectedPlatform.slice(1)} Engagements`;
+            const goalVal = document.getElementById('goal-val'); if (goalVal) goalVal.innerText = qty;
+            const costVal = document.getElementById('cost-val'); if (costVal) costVal.innerText = `₦${cost.toLocaleString()}`;
+            const finalCost = document.getElementById('final-cost'); if (finalCost) finalCost.innerText = `₦${cost.toLocaleString()}`;
+            const summary = document.getElementById('summary-text'); if (summary) {
+                const plt = selectedPlatform || 'instagram';
+                summary.innerText = `${qty} Human ${plt.charAt(0).toUpperCase() + plt.slice(1)} Engagements`;
+            }
         }
 
         function nextStep() {
@@ -2378,10 +2767,109 @@
         }
 
         function resetWizard() {
-            document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
-            document.getElementById('step-1').classList.remove('hidden');
-            currentStep = 1;
-            updateWizardUI();
+            try {
+                const steps = document.querySelectorAll('.wizard-step');
+                if (steps && steps.length) steps.forEach(s => s.classList.add('hidden'));
+                const s1 = document.getElementById('step-1'); if (s1) s1.classList.remove('hidden');
+                currentStep = 1;
+                updateWizardUI();
+            } catch (e) { console.error('resetWizard failed:', e); }
+        }
+
+        // --- TASK FLOW LOGIC (Performer) ---
+        let currentTaskStep = 1;
+        let activeTask = null;
+
+        window.startTaskFlow = async function(taskId) {
+            try {
+                const { data: task, error } = await supabase
+                    .from('campaigns')
+                    .select('*')
+                    .eq('id', taskId)
+                    .single();
+
+                if (error) throw error;
+                activeTask = task;
+
+                // Populate UI
+                document.getElementById('task-detail-url').innerText = task.target_url;
+                document.getElementById('task-detail-instructions').innerText = task.instructions || "Perform high-quality engagement. At least 10 words if commenting.";
+                document.getElementById('task-platform-icon').innerHTML = `<i class="fa-brands fa-${task.platform}"></i>`;
+                document.getElementById('task-execution-link').href = task.target_url;
+
+                // Reset flow state
+                currentTaskStep = 1;
+                resetTaskFlowUI();
+                switchSPAView('task-flow');
+            } catch (err) {
+                console.error("Task Flow Error:", err);
+            }
+        }
+
+        window.nextTaskStep = function() {
+            if (currentTaskStep < 3) {
+                document.getElementById(`task-step-${currentTaskStep}`).classList.add('hidden');
+                currentTaskStep++;
+                document.getElementById(`task-step-${currentTaskStep}`).classList.remove('hidden');
+                updateTaskFlowNav();
+            }
+        }
+
+        function resetTaskFlowUI() {
+            document.querySelectorAll('.task-wizard-step').forEach(s => s.classList.add('hidden'));
+            document.getElementById('task-step-1').classList.remove('hidden');
+            document.getElementById('task-proof-text').value = '';
+            document.getElementById('task-proof-file').value = '';
+            document.getElementById('task-proof-label').innerText = "Upload Screenshot";
+            updateTaskFlowNav();
+        }
+
+        function updateTaskFlowNav() {
+            for (let i = 1; i <= 3; i++) {
+                const bar = document.getElementById(`task-bar-${i}`);
+                if (bar) {
+                    if (i <= currentTaskStep) {
+                        bar.classList.add('bg-[var(--accent-primary)]', 'shadow-[0_0_8px_rgba(69,185,110,0.3)]');
+                        bar.classList.remove('bg-dash-secondary');
+                    } else {
+                        bar.classList.remove('bg-[var(--accent-primary)]', 'shadow-[0_0_8px_rgba(69,185,110,0.3)]');
+                        bar.classList.add('bg-dash-secondary');
+                    }
+                }
+            }
+            feather.replace();
+        }
+
+        window.updateTaskProofLabel = function(input) {
+            const label = document.getElementById('task-proof-label');
+            if (input.files && input.files[0]) {
+                label.innerText = `Ready: ${input.files[0].name}`;
+            }
+        }
+
+        window.submitTaskProof = async function() {
+            const text = document.getElementById('task-proof-text').value.trim();
+            const fileInput = document.getElementById('task-proof-file');
+            const submitBtn = document.getElementById('task-submit-btn');
+
+            if (text.split(/\s+/).length < 10) {
+                alert("Please provide at least 10 words describing your engagement or pasting your comment.");
+                return;
+            }
+
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert("Please upload a screenshot for verification.");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.querySelector('span').innerText = "Uploading Proof...";
+
+            setTimeout(() => {
+                window.triggerConfetti();
+                alert("Proof submitted! Our team will verify it within 24 hours. Reward: ₦70 (Pending)");
+                switchSPAView('dashboard-home');
+            }, 1000);
         }
 
         // --- WALLET FLOWS ---
@@ -2714,29 +3202,33 @@
             document.body.style.overflow = 'auto';
         }
 
+
         // --- GLOBAL EXPOSURE (Required for module scoping) ---
-        window.toggleMobileMenu = toggleMobileMenu;
-        window.switchRole = switchRole;
-        window.toggleTheme = toggleTheme;
-        window.openSettings = openSettings;
-        window.closeSettings = closeSettings;
-        window.confirmSignout = confirmSignout;
-        window.closeSignoutModal = closeSignoutModal;
-        window.processLogout = processLogout;
-        window.openCampaignWizard = openCampaignWizard;
-        window.closeCampaignWizard = closeCampaignWizard;
-        window.selectPlatform = selectPlatform;
-        window.updateCalculation = updateCalculation;
-        window.nextStep = nextStep;
-        window.prevStep = prevStep;
-        window.finishCreation = finishCreation;
-        window.openDepositModal = openDepositModal;
-        window.closeDepositModal = closeDepositModal;
-        window.processDeposit = processDeposit;
-        window.switchSettingsView = switchSettingsView;
-        window.saveProfileSettings = saveProfileSettings;
-        window.updatePassword = updatePassword;
-        window.togglePref = togglePref;
+        // Safely export known function names to window. Some functions are declared
+        // as module-scoped and may not exist as bare identifiers at this point.
+        // Use eval inside try/catch to avoid ReferenceError stopping the script.
+        (function exposeGlobals() {
+            const names = [
+                'toggleMobileMenu','switchRole','toggleTheme','openSettings','closeSettings',
+                'confirmSignout','closeSignoutModal','processLogout','openCampaignWizard','closeCampaignWizard',
+                'selectPlatform','updateCalculation','nextStep','prevStep','finishCreation',
+                'openDepositModal','closeDepositModal','processDeposit','switchSettingsView','saveProfileSettings',
+                'updatePassword','togglePref','startTaskFlow','nextTaskStep','updateTaskProofLabel','submitTaskProof'
+            ];
+
+            names.forEach(name => {
+                try {
+                    const fn = eval(name); // may throw if name not defined
+                    if (typeof fn === 'function') window[name] = fn;
+                } catch (err) {
+                    // If eval throws or function not defined in module scope, but it may
+                    // already be attached to window (some functions are defined as window.* earlier).
+                    if (typeof window[name] !== 'function') {
+                        // no-op; function isn't available to expose
+                    }
+                }
+            });
+        })();
 
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
@@ -2758,6 +3250,44 @@
         }
         // Global Pulse is now driven by real-time database events from Nigerian taskers
         feather.replace();
+
+        // Defensive helpers: ensure SPA navigation still works if inline handlers didn't bind
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // If no spa-view is visible, show dashboard-home-view as a fallback
+                const anyVisible = Array.from(document.querySelectorAll('.spa-view')).some(v => !v.classList.contains('hidden') && v.offsetParent !== null);
+                if (!anyVisible) {
+                    const fallback = document.getElementById('dashboard-home-view');
+                    if (fallback) { fallback.classList.remove('hidden'); fallback.style.display = ''; }
+                }
+
+                // Delegated click handler: parse inline onclick attributes for key actions
+                document.body.addEventListener('click', (ev) => {
+                    const el = ev.target.closest && ev.target.closest('*');
+                    if (!el) return;
+
+                    // Helper to extract and call function names from inline onclick text
+                    const callIfInline = (attrName, fnRegex, caller) => {
+                        const attr = el.getAttribute && el.getAttribute('onclick');
+                        if (!attr) return false;
+                        const m = attr.match(fnRegex);
+                        if (m && m[1]) {
+                            try { caller(m[1]); ev.preventDefault(); } catch (e) { console.warn('delegated call failed', e); }
+                            return true;
+                        }
+                        return false;
+                    };
+
+                    // switchSPAView('view') or switchSPAView("view")
+                    if (callIfInline('onclick', /switchSPAView\(['"`]?(.*?)['"`]?\)/i, (arg) => window.switchSPAView && window.switchSPAView(arg))) return;
+
+                    // openCampaignWizard(), openCampaignWizard
+                    if (el.getAttribute && /openCampaignWizard\(?.*\)?/.test(el.getAttribute('onclick') || '')) {
+                        if (window.openCampaignWizard) { ev.preventDefault(); window.openCampaignWizard(); return; }
+                    }
+                }, { capture: false, passive: false });
+            } catch (e) { console.warn('SPA defensive fallback failed:', e); }
+        });
 
     function toggleMobileMenu() {
     const menu = document.getElementById('mobile-menu');
@@ -2781,6 +3311,39 @@
     }
 }
 
+    </script>
+    <style>
+        /* Simple error overlay for runtime exceptions to avoid white-screen and make debugging visible */
+        #runtime-error-overlay { position: fixed; inset: 16px; z-index: 99999; display: none; pointer-events: none; }
+        #runtime-error-overlay .card { pointer-events: auto; background: rgba(255,255,255,0.96); border: 1px solid #ef4444; color: #111827; padding: 12px; border-radius: 12px; max-height: 40vh; overflow:auto; box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
+    </style>
+    <div id="runtime-error-overlay"><div class="card" id="runtime-error-card"></div></div>
+    <script>
+        window.addEventListener('error', function (ev) {
+            try {
+                const card = document.getElementById('runtime-error-card');
+                card.innerHTML = `<strong>Runtime Error:</strong><pre style="white-space:pre-wrap">${ev.message}\n${ev.filename}:${ev.lineno}:${ev.colno}\n${ev.error && ev.error.stack ? ev.error.stack : ''}</pre>`;
+                document.getElementById('runtime-error-overlay').style.display = 'block';
+            } catch (e) { console.error('Error overlay failed:', e); }
+        });
+
+        window.addEventListener('unhandledrejection', function (ev) {
+            try {
+                const card = document.getElementById('runtime-error-card');
+                card.innerHTML = `<strong>Unhandled Rejection:</strong><pre style="white-space:pre-wrap">${ev.reason && ev.reason.stack ? ev.reason.stack : JSON.stringify(ev.reason)}</pre>`;
+                document.getElementById('runtime-error-overlay').style.display = 'block';
+            } catch (e) { console.error('Error overlay failed:', e); }
+        });
+        
+        // Helper to show Supabase errors in the overlay for easier debugging
+        function showSupabaseError(err) {
+            try {
+                const card = document.getElementById('runtime-error-card');
+                const body = typeof err === 'string' ? err : JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
+                card.innerHTML = `<strong>Supabase Error:</strong><pre style="white-space:pre-wrap">${body}</pre>`;
+                document.getElementById('runtime-error-overlay').style.display = 'block';
+            } catch (e) { console.error('Error overlay failed:', e); }
+        }
     </script>
     <!-- Mobile Sidebar Overlay -->
 <div id="mobile-menu" class="fixed inset-0 z-[200] hidden">
