@@ -493,7 +493,7 @@
         </aside>
 
     <!-- Main Content Area -->
-    <main class="content-area flex-1 min-h-screen pt-24"> 
+    <main class="content-area flex-1 min-h-screen" style="visibility: hidden;">
         
             <!-- Fixed Header Container for All Devices -->
             <div id="dashboard-header" class="fixed top-0 left-0 right-0 z-[100] backdrop-blur-md" style="background: var(--bg-header);">
@@ -1945,6 +1945,7 @@
             }
 
             switchRole(initialRole);
+            document.querySelector('main.content-area').style.visibility = 'visible'; // Make main content visible
         }
 
         window.switchRole = async function(role) {
