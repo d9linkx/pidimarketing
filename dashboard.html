@@ -246,33 +246,46 @@
             opacity: 0.08;
         }
         
-        /* Atmospheric Background Blobs */
+/* Atmospheric Background Blobs */
         main.content-area {
-            position: relative; /* Needed for absolute positioning of pseudo-elements */
-            overflow: hidden; /* Ensures blobs don't spill out */
+            position: relative; 
+            overflow: hidden; 
+            
+            /* FIX 1: Add padding equal to your header height (usually 80px-100px) */
+            padding-top: 100px; 
+            
+            /* FIX 2: Ensure it doesn't jump during load */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
         main.content-area::before,
         main.content-area::after {
             content: '';
-            position: absolute;
+            /* FIX 3: Change to fixed so blobs stay in place while scrolling, 
+               or keep absolute but ensure they start after the padding */
+            position: absolute; 
             border-radius: 50%;
-            filter: blur(100px); /* Soft blur */
-            opacity: 0.3; /* Subtle */
-            z-index: -1; /* Behind content */
-            transition: all 0.8s ease-out; /* Smooth transition for potential future animations */
+            filter: blur(100px);
+            opacity: 0.3;
+            z-index: -1;
+            transition: all 0.8s ease-out;
+            pointer-events: none; /* Ensures blobs don't block clicks */
         }
+
         main.content-area::before {
             width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(106, 38, 218, 0.5), transparent 70%); /* Purple */
-            top: 10%; left: 15%;
+            background: radial-gradient(circle, rgba(106, 38, 218, 0.5), transparent 70%);
+            /* Start below the header area */
+            top: 15%; left: 15%;
         }
+
         main.content-area::after {
             width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(0, 128, 128, 0.5), transparent 70%); /* Teal */
+            background: radial-gradient(circle, rgba(0, 128, 128, 0.5), transparent 70%);
             bottom: 5%; right: 10%;
         }
-
-
 
         .icon-box {
             width: 42px;
@@ -481,6 +494,7 @@
 
     <!-- Main Content Area -->
     <main class="content-area flex-1 min-h-screen pt-24"> 
+        
             <!-- Fixed Header Container for All Devices -->
             <div id="dashboard-header" class="fixed top-0 left-0 right-0 z-[100] backdrop-blur-md" style="background: var(--bg-header);">
                 <header id="dashboard-header-inner" class="flex items-center justify-between gap-4 p-3 lg:px-4 border-b border-dash">
@@ -492,7 +506,7 @@
                         </button>
                         <a href="dashboard.html" class="hidden md:flex items-center gap-3">
                             <img id="logo-img-sidebar" src="assets/pidiblack.png" alt="PIDI Logo" class="h-7 w-auto">
-                            <span class="text-base font-medium">PIDItasks</span>
+
                         </a>
                     </div>
 
