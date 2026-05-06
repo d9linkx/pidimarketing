@@ -1384,24 +1384,16 @@
                     <div id="step-4" class="wizard-step hidden space-y-6">
                         <div id="payment-details-view" class="space-y-6">
                             <div class="p-8 border-2 border-dashed border-dash rounded-3xl text-center space-y-6">
-                                <p class="text-sm text-dash-secondary">Please make a direct payment of <span class="font-bold text-[var(--text-primary)]" id="final-cost">₦1,000</span> to the account below. Your campaign will launch immediately upon verification.</p>
+                                <p class="text-sm text-dash-secondary">Secure your deployment by completing payment for your <span class="font-bold text-[var(--text-primary)]" id="tier-label">Starter Tier</span> order.</p>
                                 
-                                <div class="bg-dash-secondary p-6 rounded-2xl text-left space-y-4 border border-dash">
-                                    <div class="flex justify-between items-center">
-                                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Account Number</p>
-                                        <button onclick="copyAccountNumber()" class="text-[10px] font-bold text-[var(--accent-primary)] hover:underline">COPY</button>
+                                <div class="p-6 bg-dash-secondary rounded-2xl border border-dash flex flex-col items-center gap-4">
+                                    <div class="text-center">
+                                        <p class="text-3xl font-bold tracking-tighter text-[var(--text-primary)]" id="final-cost">₦3,500</p>
+                                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest mt-1">Total Amount Payable</p>
                                     </div>
-                                    <p class="text-2xl font-bold tracking-tighter">3000487237</p>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-dash">
-                                        <div>
-                                            <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest">Bank</p>
-                                            <p class="text-xs font-bold">KUDA MFB</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest">Name</p>
-                                            <p class="text-xs font-bold">Prince Chidera Dike</p>
-                                        </div>
-                                    </div>
+                                    <a id="paystack-link" href="https://paystack.shop/pay/pidistarter" target="_blank" class="w-full btn-fintech btn-primary justify-center py-4 text-sm shadow-xl">
+                                        PAY WITH PAYSTACK <i data-feather="external-link" class="ml-2 w-4"></i>
+                                    </a>
                                 </div>
 
                                 <div class="py-4 px-6 bg-dash-secondary/50 rounded-2xl flex items-center justify-between text-left border border-dash">
@@ -1413,7 +1405,7 @@
                                 </div>
 
                                 <div>
-                                    <p class="text-[11px] text-dash-secondary italic">Payments are processed manually by our compliance team.</p>
+                                    <p class="text-[11px] text-dash-secondary italic">Secure payments powered by Paystack. Your campaign launches after verification.</p>
                                     <button onclick="toggleRefundPolicy(true)" class="text-[11px] text-[var(--accent-primary)] font-bold hover:underline mt-2">View Refund Policy</button>
                                 </div>
                             </div>
@@ -2774,6 +2766,24 @@
             document.getElementById('prev-btn').classList.toggle('hidden', currentStep === 1);
             document.getElementById('next-btn').classList.toggle('hidden', currentStep === 4);
             document.getElementById('finish-btn').classList.toggle('hidden', currentStep !== 4);
+
+            if (currentStep === 4) {
+                const qtyInput = document.getElementById('goal-val');
+                const qty = qtyInput ? parseInt(qtyInput.value) || 10 : 10;
+                const payLink = document.getElementById('paystack-link');
+                const tierLabel = document.getElementById('tier-label');
+                
+                if (qty >= 100) {
+                    if (payLink) payLink.href = "https://paystack.shop/pay/pidiauthoritypro";
+                    if (tierLabel) tierLabel.innerText = "Authority Pro Tier";
+                } else if (qty >= 30) {
+                    if (payLink) payLink.href = "https://paystack.shop/pay/pidigrowth";
+                    if (tierLabel) tierLabel.innerText = "Growth Tier";
+                } else {
+                    if (payLink) payLink.href = "https://paystack.shop/pay/pidistarter";
+                    if (tierLabel) tierLabel.innerText = "Starter Tier";
+                }
+            }
         }
 
         async function finishCreation() {
