@@ -158,7 +158,11 @@
                     displayAuthMessage('login-message', error.message, 'error');
                     setButtonLoading(submitButton, false, 'Login');
                 } else {
-                    window.location.href = 'dashboard.html';
+                    if (AUTHORIZED_ADMINS.includes(email)) {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
                 }
             } else {
                 // ADMIN OTP LOGIN
@@ -205,7 +209,7 @@
                         displayAuthMessage('login-message', "Invalid code. Please try again.", 'error');
                         setButtonLoading(submitButton, false, 'Verify Code');
                     } else {
-                        window.location.href = 'dashboard.html?view=admin';
+                        window.location.href = 'admin.html';
                     }
                 }
             }

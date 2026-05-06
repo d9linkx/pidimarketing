@@ -3120,69 +3120,29 @@
     <aside class="absolute top-0 left-0 h-full w-[280px] shadow-2xl flex flex-col p-6 transition-transform -translate-x-full relative overflow-hidden" style="background: var(--bg-sidebar);" id="mobile-drawer">
         <div class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
-                <img src="assets/dashblack.png" alt="Logo" class="h-8 w-auto logo-img">
+                <img src="assets/dashblack.png" alt="PIDI Admin" class="h-8 w-auto logo-img">
+                <span class="text-[10px] font-black bg-red-500 text-white px-2 py-0.5 rounded-md uppercase tracking-tighter">Admin</span>
             </div>
             <button onclick="toggleMobileMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <!-- Reusing your exact Sidebar Content logic -->
-        <div class="relative mb-8 z-[1002]" id="role-switcher-container-mobile">
-            <button onclick="toggleRoleDropdown('mobile')" class="w-full p-2.5 rounded-xl border border-dash bg-dash-secondary/50 flex items-center justify-between group transition-all" id="role-dropdown-btn-mobile">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-[var(--accent-primary)] text-white flex items-center justify-center shadow-lg shadow-[var(--accent-primary)]/20 transition-colors" id="role-icon-box-mobile">
-                        <i data-feather="plus-square" class="w-4 h-4"></i>
-                    </div>
-                    <div class="text-left">
-                        <p class="text-[8px] font-black text-dash-secondary uppercase tracking-widest leading-none mb-1">Active Mode</p>
-                        <p class="text-[11px] font-bold truncate max-w-[110px]" id="current-role-label-mobile">Creator Dashboard</p>
-                    </div>
-                </div>
-                <i data-feather="chevron-down" class="w-3.5 h-3.5 text-dash-secondary transition-transform" id="role-chevron-mobile"></i>
-            </button>
-            
-            <div id="role-dropdown-menu-mobile" class="hidden relative w-full mt-2 bg-[var(--bg-card)] border border-dash rounded-xl overflow-hidden">
-                <button onclick="switchRole('creator')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors border-b border-dash text-left">
-                    <div class="w-7 h-7 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="plus-square" class="w-3.5 h-3.5"></i></div>
-                    <span class="text-[11px] font-bold">Creator Mode</span>
-                </button>
-                <button onclick="switchRole('performer')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors border-b border-dash text-left">
-                    <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="zap" class="w-3.5 h-3.5"></i></div>
-                    <span class="text-[11px] font-bold">Performer Mode</span>
-                </button>
-                <button onclick="switchRole('admin')" class="w-full p-3 flex items-center gap-3 hover:bg-dash-secondary transition-colors text-left">
-                    <div class="w-7 h-7 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center"><i data-feather="shield" class="w-3.5 h-3.5"></i></div>
-                    <span class="text-[11px] font-bold">Admin Mode</span>
-                </button>
-            </div>
-        </div>
-
         <nav class="flex-1 space-y-1">
-            <div id="mobile-role-workspace-nav">
-                <!-- Role-specific workspace navigation will be injected here -->
-                <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
-                <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i data-feather="bar-chart-2" class="w-4 text-center"></i> Analytics
-                </a>
-                <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i data-feather="layers" class="w-4 text-center"></i> Campaigns
-                </a>
-                <a href="#" onclick="switchSPAView('wallet')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i data-feather="dollar-sign" class="w-4 text-center"></i> Money Cycle
-                </a>
-            </div>
-            <div class="my-4 border-t border-dash"></div>
-            <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Tools</p>
-            <a href="academy.html" onclick="toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-graduation-cap w-4 text-center"></i> PIDIlearn
+            <p class="text-[9px] font-bold text-red-500 uppercase tracking-widest px-2 mb-2">Admin Workspace</p>
+            <a href="#" onclick="switchSPAView('admin-home'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i data-feather="monitor" class="w-4 text-center"></i> System Overview
             </a>
-            <a href="#" onclick="switchSPAView('referrals')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-users-line w-4 text-center"></i> Referrals
+            <a href="#" onclick="switchSPAView('admin-verification'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i data-feather="shield" class="w-4 text-center"></i> Verification Hub
             </a>
-            <a href="#" onclick="switchSPAView('feedback')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-comment-dots w-4 text-center"></i> Feedback
+            <a href="#" onclick="switchSPAView('admin-users'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i data-feather="users" class="w-4 text-center"></i> User Management
             </a>
+            <a href="#" onclick="switchSPAView('admin-finance'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i data-feather="dollar-sign" class="w-4 text-center"></i> Financial Audit
+            </a>
+
             <div class="my-4 border-t border-dash"></div>
             <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account</p>
             <a href="#" onclick="openSettings('profile'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
