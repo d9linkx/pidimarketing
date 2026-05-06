@@ -1042,11 +1042,20 @@
             <!-- SPA CONTAINER: Campaigns View -->
             <div id="campaigns-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                    <div>
-                        <h2 class="text-3xl font-bold tracking-tight">Campaigns</h2>
-                        <p class="text-dash-secondary text-sm">Real-time status of your marketing deployments</p>
+                    <div class="bento-card border-none bg-transparent p-0 shadow-none hover:shadow-none group relative before:hidden md:ml-4">
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-3xl font-bold tracking-tight">Campaigns</h2>
+                            <button onclick="toggleCardInfo(event)" class="text-dash-secondary hover:text-[var(--accent-primary)] transition-colors">
+                                <i data-feather="info" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="card-explanation">
+                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
+                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">Campaign Archive</h4>
+                            <p class="text-[11px] text-dash-secondary leading-relaxed">Track and manage every engagement mission you've launched. This view allows you to filter active deployments, review verifying receipts, and access detailed performance reports for completed tasks.</p>
+                        </div>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <div class="flex flex-wrap md:flex-nowrap items-center gap-3 w-full md:w-auto">
                         <div class="relative flex-1 md:flex-initial">
                             <input type="text" id="campaign-search" placeholder="Search URL..." 
                                 class="w-full md:w-64 bg-dash-secondary border border-dash rounded-xl p-2.5 pl-10 text-xs focus:outline-none focus:border-[var(--accent-primary)] transition-all">
@@ -1063,6 +1072,7 @@
                         </button>
                     </div>
                 </div>
+                
 
                 <!-- Archive Quick Stats -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -3261,8 +3271,13 @@
             const rect = btn.getBoundingClientRect();
             const popoverWidth = 280;
             
-            // Position calculation (relative to icon)
+            // Smarter position calculation (relative to icon)
             let left = rect.left - popoverWidth + 24;
+            
+            // Boundary check: On desktop, prevent popover from sliding under the fixed sidebar (260px)
+            const sidebarBoundary = window.innerWidth >= 850 ? 280 : 20;
+            if (left < sidebarBoundary) left = rect.left; 
+
             let top = rect.bottom + window.scrollY + 12;
 
             if (left < 20) left = 20;
