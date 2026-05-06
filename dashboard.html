@@ -430,8 +430,7 @@
         <aside class="sidebar hidden lg:flex">
             <div class="mb-8">
                 <a href="dashboard.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <img src="assets/pidiblack.png" alt="PIDI Logo" class="h-8 w-auto logo-img">
-                    <span class="text-lg font-normal">PIDItasks</span>
+                    <img src="assets/dashblack.png" alt="PIDItasks Logo" class="h-8 w-auto logo-img">
                 </a>
             </div>
 
@@ -2400,7 +2399,7 @@
 
     window.updateLogo = function(isDark) {
         document.querySelectorAll('.logo-img').forEach(img => {
-            img.src = isDark ? 'assets/pidi.png' : 'assets/pidiblack.png';
+            img.src = isDark ? 'assets/dashwhite.png' : 'assets/dashblack.png';
         });
     };
 
@@ -3472,7 +3471,7 @@
     <aside class="absolute top-0 left-0 h-full w-[280px] shadow-2xl flex flex-col p-6 transition-transform -translate-x-full relative overflow-hidden" style="background: var(--bg-sidebar);" id="mobile-drawer">
         <div class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
-                <img src="assets/pidiblack.png" alt="Logo" class="h-8 w-auto logo-img">
+                <img src="assets/dashblack.png" alt="Logo" class="h-8 w-auto logo-img">
                 <span class="text-lg font-normal">PIDItasks</span>
             </div>
             <button onclick="toggleMobileMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100">
