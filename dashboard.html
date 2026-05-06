@@ -1287,7 +1287,7 @@
                     <!-- Main Settings Content Area -->
                     <div class="flex-1 p-6 md:p-10 relative bg-[var(--bg-card)]">
                         <button onclick="switchSPAView('dashboard-home')" class="absolute top-8 right-10 text-dash-secondary hover:text-[var(--text-primary)] hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors group">
-                            <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> <span>Back to Dashboard</span>
+                            <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> <span>Dashboard</span>
                         </button>
                         <div id="settings-content-area"></div>
                     </div>
@@ -1299,7 +1299,7 @@
     <div class="flex items-center justify-between mb-10">
         <button onclick="closeCampaignWizard()" class="text-dash-secondary hover:text-[var(--text-primary)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors group">
             <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> 
-            <span>Back to Dashboard</span>
+            <span>Dashboard</span>
         </button>
 
         <div class="flex gap-1.5">
@@ -1332,15 +1332,22 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Select Platform</label>
-                                <div class="grid grid-cols-3 gap-3">
-                                    <button onclick="selectPlatform('instagram')" class="platform-btn p-4 rounded-2xl border border-[var(--accent-primary)] bg-[var(--accent-primary)]/5 transition text-center active" id="plt-instagram"><i class="fa-brands fa-instagram text-xl mb-2"></i><p class="text-[9px] font-bold">Instagram</p></button>
+                                <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                                    <button onclick="selectPlatform('instagram')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-instagram"><i class="fa-brands fa-instagram text-xl mb-2"></i><p class="text-[9px] font-bold">Instagram</p></button>
                                     <button onclick="selectPlatform('google')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-google"><i class="fa-brands fa-google text-xl mb-2"></i><p class="text-[9px] font-bold">Google</p></button>
                                     <button onclick="selectPlatform('tiktok')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-tiktok"><i class="fa-brands fa-tiktok text-xl mb-2"></i><p class="text-[9px] font-bold">TikTok</p></button>
+                                    <button onclick="selectPlatform('facebook')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-facebook"><i class="fa-brands fa-facebook text-xl mb-2"></i><p class="text-[9px] font-bold">Facebook</p></button>
+                                    <button onclick="selectPlatform('twitter')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-twitter"><i class="fa-brands fa-x-twitter text-xl mb-2"></i><p class="text-[9px] font-bold">X</p></button>
+                                    <button onclick="selectPlatform('linkedin')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-linkedin"><i class="fa-brands fa-linkedin text-xl mb-2"></i><p class="text-[9px] font-bold">LinkedIn</p></button>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Target URL</label>
                                 <input type="url" id="target-url" placeholder="https://..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                <p class="text-[10px] text-dash-secondary mt-2 flex items-start gap-2 italic">
+                                    <i data-feather="info" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0"></i>
+                                    <span>Note: This URL is for internal review only. Our performers use organic methods (search/explore) to find your post, ensuring authentic engagement patterns.</span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -2610,18 +2617,20 @@
 
         window.openCampaignWizard = function() {
             try {
-                // Reset wizard UI to step 1 and defaults so the flow is ready
-                resetWizard();
-                selectedPlatform = 'instagram';
                 // clear inputs
                 const tgt = document.getElementById('target-url'); if (tgt) tgt.value = '';
                 const instr = document.getElementById('task-instructions'); if (instr) instr.value = '';
                 const proofInput = document.getElementById('payment-proof-file'); if (proofInput) proofInput.value = '';
+                
+                // show the campaign creation view first
+                switchSPAView('campaign-creation');
+
+                // THEN reset the wizard UI on the newly visible elements
+                resetWizard(); 
+                selectedPlatform = null;
                 const proofLabel = document.getElementById('proof-file-label'); if (proofLabel) proofLabel.innerText = 'Upload Receipt (IMG/PDF)';
                 // ensure calculation reflects defaults
                 updateCalculation();
-                // show the campaign creation view
-                switchSPAView('campaign-creation');
                 // focus first input for convenience
                 setTimeout(() => { const urlInput = document.getElementById('target-url'); if (urlInput) urlInput.focus(); }, 120);
             } catch (e) {
@@ -2703,6 +2712,18 @@
         }
 
         function nextStep() {
+            if (currentStep === 1) {
+                const urlInput = document.getElementById('target-url');
+                if (!selectedPlatform) {
+                    alert("Please select a platform to proceed.");
+                    return;
+                }
+                if (!urlInput || !urlInput.value.trim()) {
+                    alert("Please provide a Target URL for internal review.");
+                    urlInput.focus();
+                    return;
+                }
+            }
             if (currentStep < 4) {
                 document.getElementById(`step-${currentStep}`).classList.add('hidden');
                 document.getElementById(`node-${currentStep}`).classList.add('completed');
@@ -2818,6 +2839,11 @@
             try {
                 const steps = document.querySelectorAll('.wizard-step');
                 if (steps && steps.length) steps.forEach(s => s.classList.add('hidden'));
+                // Clear platform active states
+                document.querySelectorAll('.platform-btn').forEach(b => {
+                    b.classList.remove('active', 'border-[#6a26da]', 'bg-[#6a26da]/5');
+                    b.classList.add('border-dash');
+                });
                 const s1 = document.getElementById('step-1'); if (s1) s1.classList.remove('hidden');
                 currentStep = 1;
                 updateWizardUI();
