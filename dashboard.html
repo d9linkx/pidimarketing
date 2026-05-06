@@ -1356,13 +1356,16 @@
                     <div id="step-2" class="wizard-step hidden space-y-6">
                         <div class="p-6 bg-dash-secondary rounded-2xl border border-dash">
                             <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-4">Quantity of Engagements</label>
-                            <input type="range" id="goal-range" min="10" max="1000" step="10" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[var(--accent-primary)]" oninput="updateCalculation()">
-                            <div class="flex justify-between mt-4">
-                                <span class="text-3xl font-bold" id="goal-val">10</span>
-                                <span class="text-3xl font-bold text-[var(--accent-primary)]" id="cost-val">₦1,000</span>
+                            <input type="range" id="goal-range" min="10" max="1000" step="1" value="10" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[var(--accent-primary)]" oninput="syncInputs('range')">
+                            <div class="flex justify-between items-center mt-6">
+                                <div class="flex items-center gap-2">
+                                    <input type="number" id="goal-val" min="10" max="1000" value="10" class="w-24 bg-transparent border-b-2 border-dash focus:border-[var(--accent-primary)] outline-none text-3xl font-bold p-1 transition-colors" oninput="syncInputs('number')">
+                                    <span class="text-sm font-bold text-dash-secondary uppercase">Units</span>
+                                </div>
+                                <span class="text-3xl font-bold text-[var(--accent-primary)]" id="cost-val">₦3,500</span>
                             </div>
                         </div>
-                        <p class="text-xs text-dash-secondary italic">* Price calculated at ₦100 per high-quality human interaction.</p>
+                        <p class="text-xs text-dash-secondary italic">* 10-29 engagements: ₦350/ea | 30-99: ₦300/ea | 100+: ₦270/ea</p>
                     </div>
 
                     <!-- Step 3: Instructions -->
@@ -2697,12 +2700,32 @@
             updateCalculation(); // Update the summary text immediately
         }
 
-        function updateCalculation() {
+        window.syncInputs = function(source) {
             const rangeEl = document.getElementById('goal-range');
-            if (!rangeEl) return;
-            const qty = parseInt(rangeEl.value || '0', 10) || 0;
-            const cost = qty * 100; // ₦100 per high-quality human engagement
-            const goalVal = document.getElementById('goal-val'); if (goalVal) goalVal.innerText = qty;
+            const numEl = document.getElementById('goal-val');
+            if (!rangeEl || !numEl) return;
+
+            if (source === 'range') {
+                numEl.value = rangeEl.value;
+            } else {
+                rangeEl.value = numEl.value;
+            }
+            updateCalculation();
+        };
+
+        function calculateTotalCost(qty) {
+            const finalQty = Math.max(10, qty);
+            let rate = 350;
+            if (finalQty >= 100) rate = 270;
+            else if (finalQty >= 30) rate = 300;
+            return finalQty * rate;
+        }
+
+        function updateCalculation() {
+            const numEl = document.getElementById('goal-val');
+            if (!numEl) return;
+            const qty = parseInt(numEl.value || '10', 10) || 10;
+            const cost = calculateTotalCost(qty);
             const costVal = document.getElementById('cost-val'); if (costVal) costVal.innerText = `₦${cost.toLocaleString()}`;
             const finalCost = document.getElementById('final-cost'); if (finalCost) finalCost.innerText = `₦${cost.toLocaleString()}`;
             const summary = document.getElementById('summary-text'); if (summary) {
@@ -2762,11 +2785,11 @@
             finishBtn.disabled = true;
 
             // Aggregate Wizard State
-            const qty = document.getElementById('goal-range').value;
+            const qty = document.getElementById('goal-val').value;
             const url = document.getElementById('target-url').value;
             const instructions = document.getElementById('task-instructions').value;
             const fileInput = document.getElementById('payment-proof-file');
-            const totalCost = qty * 100;
+            const totalCost = calculateTotalCost(parseInt(qty));
 
             if (!url) {
                 alert("Please provide a target URL.");
@@ -3285,7 +3308,7 @@
             const names = [
                 'toggleMobileMenu','switchRole','toggleTheme','openSettings','closeSettings',
                 'confirmSignout','closeSignoutModal','processLogout','openCampaignWizard','closeCampaignWizard',
-                'selectPlatform','updateCalculation','nextStep','prevStep','finishCreation',
+                'selectPlatform','updateCalculation','syncInputs','nextStep','prevStep','finishCreation',
                 'openDepositModal','closeDepositModal','processDeposit','switchSettingsView','saveProfileSettings',
                 'updatePassword','togglePref','startTaskFlow','nextTaskStep','updateTaskProofLabel','submitTaskProof'
             ];
