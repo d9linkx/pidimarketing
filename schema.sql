@@ -62,6 +62,8 @@ CREATE TABLE IF NOT EXISTS public.engagements (
   campaign_id uuid NOT NULL,
   performer_id uuid NOT NULL,
   platform text,
+  performer_handle text,
+  status text DEFAULT 'pending',
   quality_score integer DEFAULT 0,
   proof_url text,
   metadata jsonb DEFAULT '{}'::jsonb,
@@ -104,6 +106,11 @@ CREATE TABLE IF NOT EXISTS public.proofs (
 CREATE INDEX IF NOT EXISTS idx_campaigns_creator ON public.campaigns (creator_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_user ON public.transactions (user_id);
 CREATE INDEX IF NOT EXISTS idx_engagements_campaign ON public.engagements (campaign_id);
+
+-- 10.1) Auto-payout rule note:
+-- To implement the 2-day auto-payout, an Edge Function or Postgres Cron should run:
+-- UPDATE public.engagements SET status = 'approved' 
+-- WHERE status = 'pending' AND created_at < now() - interval '2 days';
 
 -- 11) Trigger function: increment campaign.current_count on new engagement
 CREATE OR REPLACE FUNCTION public.increment_campaign_count() RETURNS trigger LANGUAGE plpgsql AS $$

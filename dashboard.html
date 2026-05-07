@@ -133,7 +133,7 @@
         /* Sidebar Layout for Desktop */
         @media (min-width: 850px) {
             .dashboard-layout { display: flex; }
-            aside.sidebar { width: 260px; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; border-right: 1px solid var(--border-dash); background: var(--bg-sidebar); padding: 1.5rem; z-index: 1001; overflow: hidden; }
+            aside.sidebar { width: 260px; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; border-right: 1px solid rgba(255,255,255,0.1); background: linear-gradient(180deg, #052c1e 0%, #02140f 100%) !important; padding: 1.5rem; z-index: 1001; overflow: hidden; }
             main.content-area { flex: 1; padding: 0rem; margin-left: 260px; }
             /* Keep header aligned with content area on desktop by offsetting it by sidebar width */
             #dashboard-header { left: 260px; width: calc(100% - 260px); }
@@ -373,6 +373,45 @@
             background-color: #dbdbdb !important;
             color: #696969 !important;
             border: 1px solid #8e8e8e !important;
+        }
+
+        /* --- CONSTANT DARK GREEN SIDEBAR OVERRIDES --- */
+        aside.sidebar, #mobile-drawer {
+            background: linear-gradient(180deg, #052c1e 0%, #02140f 100%) !important;
+            color: white !important;
+        }
+        
+        aside.sidebar .logo-img, #mobile-drawer .logo-img { 
+            filter: brightness(0) invert(1); 
+        }
+        
+        aside.sidebar .text-dash-secondary, #mobile-drawer .text-dash-secondary,
+        aside.sidebar p.text-[9px], #mobile-drawer p.text-[9px] {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+        
+        aside.sidebar a, #mobile-drawer a,
+        aside.sidebar button#role-dropdown-btn, #mobile-drawer button#role-dropdown-btn-mobile {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        aside.sidebar a:hover, #mobile-drawer a:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        aside.sidebar .bg-dash-secondary\/50, #mobile-drawer .bg-dash-secondary\/50 {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        aside.sidebar .border-dash, #mobile-drawer .border-dash,
+        aside.sidebar .border-t, #mobile-drawer .border-t {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        aside.sidebar #role-dropdown-menu, #mobile-drawer #role-dropdown-menu-mobile {
+            background-color: #02140f !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
         }
 
         /* Text Gradient for Main Heading */
@@ -763,12 +802,30 @@
                         </div>
                     </div>
 
-                    <div class="bento-card col-span-2 relative group">
-                        <h2 class="text-2xl font-normal leading-tight mb-4">Available Gigs</h2>
-                        <div id="performer-available-tasks" class="space-y-3">
-                            <p class="text-xs text-dash-secondary text-center py-10">Searching for high-value missions...</p>
+                    <div class="bento-card col-span-full relative group">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                            <div>
+                                <h2 class="text-2xl font-normal leading-tight">Available Gigs</h2>
+                                <p class="text-[10px] text-dash-secondary font-bold uppercase mt-1">Real-time mission board</p>
+                            </div>
+                            <div class="flex p-1 bg-dash-secondary rounded-xl border border-dash overflow-x-auto no-scrollbar w-full md:w-auto" id="performer-filters">
+                                <button onclick="filterPerformerGigs('all')" class="px-4 py-2 rounded-lg text-xs font-bold transition active-btn whitespace-nowrap" id="p-filter-all">All</button>
+                                <button onclick="filterPerformerGigs('instagram')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary whitespace-nowrap" id="p-filter-instagram">Instagram</button>
+                                <button onclick="filterPerformerGigs('tiktok')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary whitespace-nowrap" id="p-filter-tiktok">TikTok</button>
+                                <button onclick="filterPerformerGigs('twitter')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary whitespace-nowrap" id="p-filter-twitter">X</button>
+                                <button onclick="filterPerformerGigs('google')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary whitespace-nowrap" id="p-filter-google">Google</button>
+                            </div>
+                        </div>
+                        <div id="performer-available-tasks" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <p class="text-xs text-dash-secondary text-center py-10 col-span-full">Searching for high-value missions...</p>
                         </div>
                     </div>
+
+                    <div id="performer-pending-section" class="bento-card col-span-full hidden order-last">
+                        <h2 class="text-xl font-bold mb-4">Your Pending Submissions</h2>
+                        <div id="performer-pending-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+                </div> <!-- End performer-dashboard-content -->
 
 
                 <!-- Admin Dashboard Layout -->
@@ -938,6 +995,10 @@
                         </div>
 
                         <div class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Social Media Username</label>
+                                <input type="text" id="task-proof-username" placeholder="@yourhandle" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                            </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Comment Text (Min 10 Words)</label>
                                 <textarea id="task-proof-text" rows="3" placeholder="Paste the exact comment you posted..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></textarea>
@@ -1627,6 +1688,7 @@
         let selectedBank = null;
         let archivePage = 0;
         let archiveFilter = 'active';
+        let performerPlatformFilter = 'all';
         let roles = {
             creator: {
                 label: "Campaigns",
@@ -1822,38 +1884,110 @@
             } catch (err) { console.error("Admin Sync Error:", err); }
         }
 
+        window.filterPerformerGigs = function(plt) {
+            performerPlatformFilter = plt;
+            document.querySelectorAll('#performer-filters button').forEach(btn => {
+                btn.classList.remove('active-btn');
+                btn.classList.add('text-dash-secondary');
+            });
+            document.getElementById(`p-filter-${plt}`).classList.add('active-btn');
+            document.getElementById(`p-filter-${plt}`).classList.remove('text-dash-secondary');
+            fetchPerformerDashboardData();
+        };
+
         window.fetchPerformerDashboardData = async function() {
             try {
-                const tasksRes = await supabase.from('campaigns').select('*').eq('status', 'active').limit(5);
+                const { data: engaged } = await supabase.from('engagements').select('campaign_id').eq('performer_id', currentUser.id);
+                const engagedIds = (engaged || []).map(e => e.campaign_id);
+
+                let query = supabase.from('campaigns')
+                    .select('*')
+                    .eq('status', 'active')
+                    .neq('creator_id', currentUser.id);
+                
+                if (engagedIds.length > 0) {
+                    query = query.not('id', 'in', `(${engagedIds.join(',')})`);
+                }
+                
+                if (performerPlatformFilter !== 'all') {
+                    query = query.eq('platform', performerPlatformFilter);
+                }
+
+                const tasksRes = await query.order('created_at', { ascending: false });
                 const profileRes = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
 
                 if (tasksRes.error) { console.warn('Error fetching tasks:', tasksRes.error); showSupabaseError(tasksRes.error); }
-                if (profileRes.error) { console.warn('Error fetching profile for performer:', profileRes.error); showSupabaseError(profileRes.error); }
 
                 const tasks = tasksRes.data || [];
                 const profile = profileRes.data || null;
 
                 if (profile) {
-                    document.getElementById('performer-stat-earnings').innerText = `₦${((profile.balance || 0)).toLocaleString()}`;
-                    document.getElementById('performer-stat-pending').innerText = profile.pending_balance || 0;
+                    document.getElementById('performer-stat-earnings').innerText = `₦${(profile.balance || 0).toLocaleString()}`;
+                    document.getElementById('performer-stat-pending').innerText = profile.pending_balance || 0; 
                     document.getElementById('performer-stat-approved').innerText = profile.completed_tasks || 0;
                 }
 
                 const taskList = document.getElementById('performer-available-tasks');
                 if (tasks && tasks.length) {
-                    taskList.innerHTML = tasks.map(t => `
-                        <div class="p-4 bg-dash-secondary/30 border border-dash rounded-2xl flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${t.platform}"></i></div>
-                                <div><p class="font-bold text-xs truncate max-w-[120px]">${t.target_url}</p><p class="text-[9px] font-black text-green-500 uppercase">₦70 Reward</p></div>
+                    taskList.innerHTML = tasks.map(t => {
+                        const progress = Math.round((t.current_count / t.goal_count) * 100) || 0;
+                        return `
+                            <div class="bento-card p-4 flex flex-col gap-4 group hover:border-[var(--accent-primary)] transition-all">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-dash-secondary flex items-center justify-center text-lg">
+                                            <i class="fa-brands fa-${t.platform}"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="font-bold text-xs truncate max-w-[140px]">${t.target_url.split('/')[2] || 'Mission'}</p>
+                                            <p class="text-[9px] text-dash-secondary uppercase font-bold">${t.platform}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-lg font-black text-green-500">₦70</p>
+                                        <p class="text-[8px] font-bold text-dash-secondary uppercase">reward</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between text-[9px] font-bold uppercase">
+                                        <span class="text-dash-secondary">Spots Left</span>
+                                        <span class="text-[var(--accent-primary)]">${t.goal_count - t.current_count} / ${t.goal_count}</span>
+                                    </div>
+                                    <div class="w-full bg-dash-secondary h-1.5 rounded-full overflow-hidden">
+                                        <div class="bg-[var(--accent-primary)] h-full transition-all" style="width: ${progress}%"></div>
+                                    </div>
+                                </div>
+
+                                <button onclick="startTaskFlow('${t.id}')" class="w-full bg-[var(--accent-primary)] text-white text-[10px] font-black py-3 rounded-xl uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all">
+                                    Do This Task
+                                </button>
                             </div>
-                            <button onclick="startTaskFlow('${t.id}')" class="bg-[var(--accent-primary)] text-white text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest">Claim</button>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 } else {
                     taskList.innerHTML = '<p class="text-xs text-dash-secondary text-center py-10">Searching for high-value missions...</p>';
                 }
+                fetchPerformerPendingTasks();
             } catch (err) { console.error("Performer Sync Error:", err); }
+        };
+
+        async function fetchPerformerPendingTasks() {
+            const section = document.getElementById('performer-pending-section');
+            const list = document.getElementById('performer-pending-list');
+            const { data } = await supabase.from('engagements').select('*, campaigns(target_url, platform)').eq('performer_id', currentUser.id).eq('status', 'pending');
+            
+            if (!data || data.length === 0) { section?.classList.add('hidden'); return; }
+            section?.classList.remove('hidden');
+            list.innerHTML = data.map(e => `
+                <div class="p-4 bg-dash-secondary/20 border border-dash rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-xs"><i class="fa-brands fa-${e.campaigns.platform}"></i></div>
+                        <div class="min-w-0"><p class="font-bold text-[10px] truncate max-w-[120px]">${e.campaigns.target_url}</p><p class="text-[8px] text-dash-secondary uppercase font-bold">Verifying...</p></div>
+                    </div>
+                    <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 px-2 py-1 rounded-lg">Pending</span>
+                </div>
+            `).join('');
         }
 
         // Update Identity & Global Listeners
@@ -2907,6 +3041,13 @@
                 if (error) throw error;
                 activeTask = task;
 
+                // LOCK: Record that the user is working on this task to reserve their spot
+                await supabase.from('tasks').insert([{
+                    campaign_id: taskId,
+                    performer_id: currentUser.id,
+                    status: 'in_progress'
+                }]);
+
                 // Populate UI
                 document.getElementById('task-detail-url').innerText = task.target_url;
                 document.getElementById('task-detail-instructions').innerText = task.instructions || "Perform high-quality engagement. At least 10 words if commenting.";
@@ -2964,12 +3105,14 @@
         }
 
         window.submitTaskProof = async function() {
+            const handle = document.getElementById('task-proof-username').value.trim();
             const text = document.getElementById('task-proof-text').value.trim();
             const fileInput = document.getElementById('task-proof-file');
             const submitBtn = document.getElementById('task-submit-btn');
 
+            if (!handle) { alert("Please provide your social media handle."); return; }
             if (text.split(/\s+/).length < 10) {
-                alert("Please provide at least 10 words describing your engagement or pasting your comment.");
+                alert("Quality Check: Please provide at least 10 words.");
                 return;
             }
 
@@ -2981,11 +3124,51 @@
             submitBtn.disabled = true;
             submitBtn.querySelector('span').innerText = "Uploading Proof...";
 
-            setTimeout(() => {
+            try {
+                let proofUrl = null;
+                if (fileInput.files && fileInput.files[0]) {
+                    const file = fileInput.files[0];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${currentUser.id}_task_${Date.now()}.${fileExt}`;
+                    const filePath = `performer_proofs/${fileName}`;
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('proofs')
+                        .upload(filePath, file);
+
+                    if (uploadError) throw uploadError;
+                    const { data: { publicUrl } } = supabase.storage.from('proofs').getPublicUrl(filePath);
+                    proofUrl = publicUrl;
+                }
+
+                // Save Engagement as Pending
+                const { error: dbError } = await supabase.from('engagements').insert([{
+                    campaign_id: activeTask.id,
+                    performer_id: currentUser.id,
+                    platform: activeTask.platform,
+                    performer_handle: handle,
+                    proof_url: proofUrl,
+                    status: 'pending',
+                    metadata: { comment_text: text }
+                }]);
+
+                if (dbError) throw dbError;
+
+                // Update lock status
+                await supabase.from('tasks').update({ status: 'completed' })
+                    .eq('campaign_id', activeTask.id)
+                    .eq('performer_id', currentUser.id)
+                    .eq('status', 'in_progress');
+
                 window.triggerConfetti();
                 alert("Proof submitted! Our team will verify it within 24 hours. Reward: ₦70 (Pending)");
+                fetchPerformerDashboardData();
                 switchSPAView('dashboard-home');
-            }, 1000);
+            } catch (err) {
+                alert("Submission failed: " + err.message);
+                submitBtn.disabled = false;
+                submitBtn.querySelector('span').innerText = "Submit for Verification";
+            }
         }
 
         // --- WALLET FLOWS ---
@@ -3468,7 +3651,7 @@
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
     
     <!-- Menu Content -->
-    <aside class="absolute top-0 left-0 h-full w-[280px] shadow-2xl flex flex-col p-6 transition-transform -translate-x-full relative overflow-hidden" style="background: var(--bg-sidebar);" id="mobile-drawer">
+    <aside class="absolute top-0 left-0 h-full w-[280px] shadow-2xl flex flex-col p-6 transition-transform -translate-x-full relative overflow-hidden" style="background: linear-gradient(180deg, #052c1e 0%, #02140f 100%) !important;" id="mobile-drawer">
         <div class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
                 <img src="assets/dashblack.png" alt="Logo" class="h-8 w-auto logo-img">
