@@ -1897,77 +1897,88 @@
 
         window.fetchPerformerDashboardData = async function() {
             try {
+                // Get campaigns already engaged by this performer
                 const { data: engaged } = await supabase.from('engagements').select('campaign_id').eq('performer_id', currentUser.id);
                 const engagedIds = (engaged || []).map(e => e.campaign_id);
 
-                let query = supabase.from('campaigns')
-                    .select('*')
-                    .eq('status', 'active')
-                    .neq('creator_id', currentUser.id);
-                
-                if (engagedIds.length > 0) {
-                    query = query.not('id', 'in', `(${engagedIds.join(',')})`);
+                // Get public creators (profiles that are not admin and not the current user)
+                const { data: creators } = await supabase.from('profiles').select('id, full_name, avatar').neq('user_role', 'admin');
+                const creatorIds = (creators || []).map(c => c.id).filter(id => id !== currentUser.id);
+
+                // If no creators, clear list
+                const taskList = document.getElementById('performer-available-tasks');
+                if (!taskList) return;
+                if (!creatorIds || creatorIds.length === 0) {
+                    taskList.innerHTML = '<p class="text-xs text-dash-secondary text-center py-10">No available missions right now.</p>';
+                    fetchPerformerPendingTasks();
+                    return;
                 }
-                
-                if (performerPlatformFilter !== 'all') {
-                    query = query.eq('platform', performerPlatformFilter);
-                }
+
+                // Build campaigns query: active campaigns by creators (excluding engaged ones)
+                let query = supabase.from('campaigns').select('*').in('creator_id', creatorIds).eq('status', 'active');
+                if (engagedIds.length > 0) query = query.not('id', 'in', `(${engagedIds.join(',')})`);
+                if (performerPlatformFilter !== 'all') query = query.eq('platform', performerPlatformFilter);
 
                 const tasksRes = await query.order('created_at', { ascending: false });
-                const profileRes = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-
                 if (tasksRes.error) { console.warn('Error fetching tasks:', tasksRes.error); showSupabaseError(tasksRes.error); }
-
                 const tasks = tasksRes.data || [];
-                const profile = profileRes.data || null;
 
+                // Fetch current performer's profile for stats
+                const profileRes = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                const profile = profileRes.data || null;
                 if (profile) {
                     document.getElementById('performer-stat-earnings').innerText = `₦${(profile.balance || 0).toLocaleString()}`;
                     document.getElementById('performer-stat-pending').innerText = profile.pending_balance || 0; 
                     document.getElementById('performer-stat-approved').innerText = profile.completed_tasks || 0;
                 }
 
-                const taskList = document.getElementById('performer-available-tasks');
-                if (tasks && tasks.length) {
-                    taskList.innerHTML = tasks.map(t => {
-                        const progress = Math.round((t.current_count / t.goal_count) * 100) || 0;
-                        return `
-                            <div class="bento-card p-4 flex flex-col gap-4 group hover:border-[var(--accent-primary)] transition-all">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-dash-secondary flex items-center justify-center text-lg">
-                                            <i class="fa-brands fa-${t.platform}"></i>
-                                        </div>
-                                        <div class="min-w-0">
-                                            <p class="font-bold text-xs truncate max-w-[140px]">${t.target_url.split('/')[2] || 'Mission'}</p>
-                                            <p class="text-[9px] text-dash-secondary uppercase font-bold">${t.platform}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-lg font-black text-green-500">₦70</p>
-                                        <p class="text-[8px] font-bold text-dash-secondary uppercase">reward</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="space-y-1.5">
-                                    <div class="flex justify-between text-[9px] font-bold uppercase">
-                                        <span class="text-dash-secondary">Spots Left</span>
-                                        <span class="text-[var(--accent-primary)]">${t.goal_count - t.current_count} / ${t.goal_count}</span>
-                                    </div>
-                                    <div class="w-full bg-dash-secondary h-1.5 rounded-full overflow-hidden">
-                                        <div class="bg-[var(--accent-primary)] h-full transition-all" style="width: ${progress}%"></div>
-                                    </div>
-                                </div>
-
-                                <button onclick="startTaskFlow('${t.id}')" class="w-full bg-[var(--accent-primary)] text-white text-[10px] font-black py-3 rounded-xl uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all">
-                                    Do This Task
-                                </button>
-                            </div>
-                        `;
-                    }).join('');
-                } else {
-                    taskList.innerHTML = '<p class="text-xs text-dash-secondary text-center py-10">Searching for high-value missions...</p>';
+                if (!tasks || tasks.length === 0) {
+                    taskList.innerHTML = '<p class="text-xs text-dash-secondary text-center py-10">No available missions right now.</p>';
+                    fetchPerformerPendingTasks();
+                    return;
                 }
+
+                // Render task cards with creator info
+                taskList.innerHTML = tasks.map(t => {
+                    const progress = Math.round((t.current_count / t.goal_count) * 100) || 0;
+                    const spotsLeft = Math.max(0, (t.goal_count || 0) - (t.current_count || 0));
+                    const reward = t.total_cost || t.reward || t.price || 0;
+                    const creator = (creators || []).find(c => c.id === t.creator_id) || { full_name: 'Creator', avatar: '' };
+
+                    return `
+                        <div class="bento-card p-4 flex flex-col gap-4 group hover:border-[var(--accent-primary)] transition-all">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center gap-3">
+                                    <img src="${creator.avatar || 'assets/headshot-placeholder.svg'}" alt="${creator.full_name}" class="w-10 h-10 rounded-full object-cover border border-dash" />
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-xs truncate max-w-[160px]">${t.target_url.split('/')[2] || 'Mission'}</p>
+                                        <p class="text-[9px] text-dash-secondary uppercase font-bold">${t.platform}</p>
+                                        <p class="text-[10px] text-dash-secondary mt-1">Posted by <span class="font-semibold">${creator.full_name.split(' ')[0]}</span></p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-black text-green-500">₦${reward}</p>
+                                    <p class="text-[8px] font-bold text-dash-secondary uppercase">reward</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[9px] font-bold uppercase">
+                                    <span class="text-dash-secondary">Spots Left</span>
+                                    <span class="text-[var(--accent-primary)]">${spotsLeft} / ${t.goal_count}</span>
+                                </div>
+                                <div class="w-full bg-dash-secondary h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-[var(--accent-primary)] h-full transition-all" style="width: ${progress}%"></div>
+                                </div>
+                            </div>
+
+                            <button onclick="claimTask('${t.id}')" class="w-full bg-[var(--accent-primary)] text-white text-[10px] font-black py-3 rounded-xl uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all">
+                                Claim (15m)
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
                 fetchPerformerPendingTasks();
             } catch (err) { console.error("Performer Sync Error:", err); }
         };
@@ -2572,6 +2583,9 @@
         let taskTimerInterval = null;
         let taskCountdownSeconds = 0;
 
+    // Map of active claim timers: campaignId -> { expiresAt, intervalId }
+    const activeClaimTimers = {};
+
         window.switchSPAView = function(viewId) {
             try {
                 // New strategy: render the requested view into the single dashboard viewport
@@ -2702,36 +2716,85 @@
         async function fetchAdminPendingMissions() {
             let pending = [];
             try {
-                const { data } = await supabase
-                    .from('campaigns')
-                    .select('*, profiles(full_name)')
-                    .eq('status', 'pending_verification')
+                // Fetch engagements that are pending verification (performer submissions)
+                const { data: engagements } = await supabase
+                    .from('engagements')
+                    .select('*, campaigns(*), profiles:profiles!performer_id(full_name, balance, completed_tasks)')
+                    .eq('status', 'pending')
                     .order('created_at', { ascending: true });
-                pending = data || [];
+                pending = engagements || [];
             } catch (err) { console.warn("Admin fetch error:", err); }
             
             const container = document.getElementById('admin-pending-list');
             if (!pending || pending.length === 0) {
-                container.innerHTML = `<div class="bento-card text-center py-20 text-dash-secondary"><p>All payments verified.</p></div>`;
+                container.innerHTML = `<div class="bento-card text-center py-20 text-dash-secondary"><p>No pending submissions.</p></div>`;
                 return;
             }
 
-            container.innerHTML = pending.map(c => `
+            container.innerHTML = pending.map(e => `
                 <div class="bento-card flex flex-col md:flex-row gap-6 items-center">
                     <div class="w-full md:w-32 h-32 bg-dash-secondary rounded-2xl overflow-hidden border border-dash">
-                        ${c.payment_proof_url ? `<img src="${c.payment_proof_url}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${c.payment_proof_url}')">` : `<div class="flex items-center justify-center h-full text-xs">No Proof</div>`}
+                        ${e.proof_url ? `<img src="${e.proof_url}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${e.proof_url}')">` : `<div class="flex items-center justify-center h-full text-xs">No Proof</div>`}
                     </div>
                     <div class="flex-1 space-y-1 text-center md:text-left">
-                        <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest">Creator: ${c.profiles?.full_name || 'Unknown'}</p>
-                        <h4 class="text-xl font-bold">₦${c.total_cost.toLocaleString()} for ${c.goal_count} ${c.platform}</h4>
-                        <p class="text-xs text-dash-secondary truncate max-w-md">${c.target_url}</p>
+                        <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest">Performer: ${e.profiles?.full_name || 'Unknown'}</p>
+                        <h4 class="text-xl font-bold">Submission for ${e.campaigns?.platform || ''} mission</h4>
+                        <p class="text-xs text-dash-secondary truncate max-w-md">${e.campaigns?.target_url || ''}</p>
+                        <p class="text-[10px] text-dash-secondary">Submitted: ${new Date(e.created_at).toLocaleString()}</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="adminAction('${c.id}', 'active')" class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-green-600 transition">Approve</button>
-                        <button onclick="adminAction('${c.id}', 'rejected')" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-red-600 transition">Reject</button>
+                        <button onclick="adminApproveEngagement('${e.id}')" class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-green-600 transition">Approve</button>
+                        <button onclick="adminRejectEngagement('${e.id}')" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-red-600 transition">Reject</button>
                     </div>
                 </div>
             `).join('');
+        }
+
+        async function adminApproveEngagement(engagementId) {
+            try {
+                // Fetch engagement and campaign
+                const { data: engagement } = await supabase.from('engagements').select('*').eq('id', engagementId).single();
+                if (!engagement) throw new Error('Engagement not found');
+
+                // Update engagement status to approved
+                await supabase.from('engagements').update({ status: 'approved', reviewed_at: new Date().toISOString() }).eq('id', engagementId);
+
+                // Increment campaign current_count
+                await supabase.from('campaigns').update({ current_count: supabase.raw('current_count + 1') }).eq('id', engagement.campaign_id);
+
+                // Reward performer: update profiles balance and completed_tasks
+                const rewardAmount = engagement.reward || 70; // fallback reward
+                await supabase.from('profiles').update({ balance: supabase.raw('balance + ' + rewardAmount), completed_tasks: supabase.raw('completed_tasks + 1') }).eq('id', engagement.performer_id);
+
+                // Record transaction
+                await supabase.from('transactions').insert([{
+                    user_id: engagement.performer_id,
+                    campaign_id: engagement.campaign_id,
+                    amount: rewardAmount,
+                    type: 'payout',
+                    status: 'completed',
+                    description: 'Payout for approved engagement'
+                }]);
+
+                alert('Engagement approved and performer rewarded.');
+                fetchAdminPendingMissions();
+                fetchPerformerDashboardData();
+                fetchAdminDashboardData();
+            } catch (err) {
+                console.error('Approve error:', err);
+                alert('Failed to approve engagement: ' + (err.message || err));
+            }
+        }
+
+        async function adminRejectEngagement(engagementId) {
+            try {
+                await supabase.from('engagements').update({ status: 'rejected', reviewed_at: new Date().toISOString() }).eq('id', engagementId);
+                alert('Engagement rejected.');
+                fetchAdminPendingMissions();
+            } catch (err) {
+                console.error('Reject error:', err);
+                alert('Failed to reject engagement: ' + (err.message || err));
+            }
         }
 
         async function adminAction(campaignId, newStatus) {
@@ -3056,12 +3119,19 @@
                 if (error) throw error;
                 activeTask = task;
 
-                // LOCK: Record that the user is working on this task to reserve their spot
-                await supabase.from('tasks').insert([{
+                // LOCK: create or upsert an engagement to reserve the spot with a 15-minute expiry
+                const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+                const { data: engagement, error: engageErr } = await supabase.from('engagements').upsert({
                     campaign_id: taskId,
                     performer_id: currentUser.id,
-                    status: 'in_progress'
-                }]);
+                    status: 'in_progress',
+                    expires_at: expiresAt
+                }, { onConflict: ['campaign_id', 'performer_id'], ignoreDuplicates: false }).select().limit(1).single();
+
+                if (engageErr) console.warn('Engagement upsert warning:', engageErr);
+
+                // Start a client-side countdown timer for the claim
+                startClaimTimer(taskId, 15 * 60);
 
                 // Populate UI
                 document.getElementById('task-detail-url').innerText = task.target_url;
@@ -3075,6 +3145,65 @@
                 switchSPAView('task-flow');
             } catch (err) {
                 console.error("Task Flow Error:", err);
+            }
+        }
+
+        // Claim a task directly from the Available Gigs board
+        window.claimTask = async function(campaignId) {
+            try {
+                // Upsert engagement with in_progress and expires_at = now + 15min
+                const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+                const { data, error } = await supabase.from('engagements').upsert({
+                    campaign_id: campaignId,
+                    performer_id: currentUser.id,
+                    status: 'in_progress',
+                    expires_at: expiresAt
+                }, { onConflict: ['campaign_id', 'performer_id'] }).select().limit(1).single();
+
+                if (error) throw error;
+
+                // start timer and open task flow
+                startClaimTimer(campaignId, 15 * 60);
+                // load campaign and set activeTask then open the flow
+                await startTaskFlow(campaignId);
+            } catch (err) {
+                console.error('Claim failed:', err);
+                alert('Failed to claim task: ' + (err.message || err));
+            }
+        }
+
+        function startClaimTimer(campaignId, seconds) {
+            // Clear existing timer for this campaign if present
+            if (activeClaimTimers[campaignId] && activeClaimTimers[campaignId].intervalId) {
+                clearInterval(activeClaimTimers[campaignId].intervalId);
+            }
+            const expiresAt = Date.now() + seconds * 1000;
+            const intervalId = setInterval(() => {
+                const remaining = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
+                const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+                const secs = String(remaining % 60).padStart(2, '0');
+                // Update any visible claim buttons text if they exist
+                document.querySelectorAll(`[onclick*="claimTask('${campaignId}')"]`).forEach(btn => {
+                    btn.innerText = remaining > 0 ? `Claimed — ${mins}:${secs}` : 'Claim Expired';
+                });
+
+                if (remaining <= 0) {
+                    clearInterval(intervalId);
+                    delete activeClaimTimers[campaignId];
+                    // mark engagement as expired on server
+                    supabase.from('engagements').update({ status: 'expired' }).eq('campaign_id', campaignId).eq('performer_id', currentUser.id).then(() => {
+                        fetchPerformerDashboardData();
+                    }).catch(e => console.warn('Failed to mark engagement expired', e));
+                }
+            }, 1000);
+
+            activeClaimTimers[campaignId] = { expiresAt, intervalId };
+        }
+
+        function clearClaimTimer(campaignId) {
+            if (activeClaimTimers[campaignId]) {
+                clearInterval(activeClaimTimers[campaignId].intervalId);
+                delete activeClaimTimers[campaignId];
             }
         }
 
@@ -3156,27 +3285,25 @@
                     proofUrl = publicUrl;
                 }
 
-                // Save Engagement as Pending
-                const { error: dbError } = await supabase.from('engagements').insert([{
-                    campaign_id: activeTask.id,
-                    performer_id: currentUser.id,
-                    platform: activeTask.platform,
-                    performer_handle: handle,
-                    proof_url: proofUrl,
-                    status: 'pending',
-                    metadata: { comment_text: text }
-                }]);
+                // Update existing engagement as pending (attach proof)
+                const { data: engagement, error: upErr } = await supabase.from('engagements')
+                    .upsert({
+                        campaign_id: activeTask.id,
+                        performer_id: currentUser.id,
+                        platform: activeTask.platform,
+                        performer_handle: handle,
+                        proof_url: proofUrl,
+                        status: 'pending',
+                        metadata: { comment_text: text }
+                    }, { onConflict: ['campaign_id', 'performer_id'] }).select().limit(1).single();
 
-                if (dbError) throw dbError;
+                if (upErr) throw upErr;
 
-                // Update lock status
-                await supabase.from('tasks').update({ status: 'completed' })
-                    .eq('campaign_id', activeTask.id)
-                    .eq('performer_id', currentUser.id)
-                    .eq('status', 'in_progress');
+                // Clear any local claim timer
+                try { clearClaimTimer(activeTask.id); } catch (e) { /* ignore */ }
 
                 window.triggerConfetti();
-                alert("Proof submitted! Our team will verify it within 24 hours. Reward: ₦70 (Pending)");
+                alert("Proof submitted! Our team will verify it within 24 hours. Reward pending approval.");
                 fetchPerformerDashboardData();
                 switchSPAView('dashboard-home');
             } catch (err) {
