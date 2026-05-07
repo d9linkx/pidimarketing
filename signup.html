@@ -50,7 +50,7 @@
     <header class="flex justify-between items-center mb-8 gap-4">
             <div class="mb-8">
                 <a href="dashboard.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <img src="assets/dashblack.png" alt="PIDItasks Logo" class="h-8 w-auto logo-img">
+                    <img id="logo-img" src="assets/dashblack.png" alt="PIDItasks Logo" class="h-8 w-auto logo-img">
                 </a>
             </div>
         <div class="flex items-center gap-2 md:gap-4">
@@ -71,12 +71,14 @@
             <form onsubmit="handleSignup(event)" class="space-y-5">
                 <div>
                     <label for="signup-fullname" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Full Name</label>
-                    <input type="text" id="signup-fullname" placeholder="Prince Dike" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da] transition">
+                    <!-- name="full_name" matches the DB column `full_name` -->
+                    <input name="full_name" type="text" id="signup-fullname" placeholder="Prince Dike" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da] transition">
                 </div>
                 
                 <div>
                     <label for="signup-email" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Email Address</label>
-                    <input type="email" id="signup-email" placeholder="name@company.com" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da] transition">
+                    <!-- name="email" matches the DB column `email` -->
+                    <input name="email" type="email" id="signup-email" placeholder="name@company.com" required class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[#6a26da] transition">
                 </div>
 
                 <div>
@@ -85,7 +87,8 @@
                         <button type="button" onclick="selectRole('creator')" id="role-creator" class="p-3 rounded-xl border border-dash text-sm font-bold transition hover:border-[#6a26da] active-role">Creator</button>
                         <button type="button" onclick="selectRole('performer')" id="role-performer" class="p-3 rounded-xl border border-dash text-sm font-bold transition hover:border-[#6a26da] text-dash-secondary">Performer</button>
                     </div>
-                    <input type="hidden" id="selected-role" value="creator">
+                    <!-- name="user_role" matches the DB column `user_role` -->
+                    <input name="user_role" type="hidden" id="selected-role" value="creator">
                 </div>
 
                 <div>
@@ -116,166 +119,118 @@
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
-        // Helper function for displaying messages
+        // Helper functions
         const displayAuthMessage = (elementId, message, type = 'info') => {
             const msgDiv = document.getElementById(elementId);
             if (!msgDiv) return;
-
-            msgDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-blue-100', 'text-blue-800');
-            msgDiv.classList.add('p-3', 'rounded-xl', 'text-sm', 'mb-4', 'text-center'); // Ensure base styling
-
-            if (type === 'success') {
-                msgDiv.classList.add('bg-green-100', 'text-green-800');
-            } else if (type === 'error') {
-                msgDiv.classList.add('bg-red-100', 'text-red-800');
-            } else { // info/loading
-                msgDiv.classList.add('bg-blue-100', 'text-blue-800');
-            }
+            msgDiv.className = `p-3 rounded-xl text-sm mb-4 text-center ${type === 'success' ? 'bg-green-100 text-green-800' : type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
             msgDiv.innerHTML = message;
             msgDiv.classList.remove('hidden');
         };
 
-        const clearAuthMessage = (elementId) => {
-            const msgDiv = document.getElementById(elementId);
-            if (msgDiv) {
-                msgDiv.classList.add('hidden');
-                msgDiv.innerHTML = '';
-            }
-        };
-
-        const setButtonLoading = (button, isLoading, originalText) => {
-            if (isLoading) {
-                button.disabled = true;
-                button.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> ${originalText}`;
-                button.dataset.originalText = originalText; // Store original text
-            } else {
-                button.disabled = false;
-                button.innerHTML = button.dataset.originalText || originalText; // Restore original text
-            }
+        const setButtonLoading = (button, isLoading, text) => {
+            button.disabled = isLoading;
+            button.innerHTML = isLoading ? `<i class="fa-solid fa-spinner fa-spin mr-2"></i> ${text}` : text;
         };
 
         const selectRole = (role) => {
-            document.getElementById('role-creator').classList.toggle('active-role', role === 'creator');
-            document.getElementById('role-creator').classList.toggle('text-dash-secondary', role !== 'creator');
-            
-            document.getElementById('role-performer').classList.toggle('active-role', role === 'performer');
-            document.getElementById('role-performer').classList.toggle('text-dash-secondary', role !== 'performer');
-            
-            document.getElementById('selected-role').value = role; // Hidden input to store selected role
-        }
-
-        async function handleSignup(e) {
-            e.preventDefault();
-            clearAuthMessage('signup-message'); // Clear previous messages
-            const fullName = document.getElementById('signup-fullname').value.trim();
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            const role = document.getElementById('selected-role').value || 'performer';
-            const submitButton = e.target.querySelector('button[type="submit"]');
-
-            setButtonLoading(submitButton, true, 'Create Account');
-            displayAuthMessage('signup-message', 'Creating account...', 'info');
-
-            const { data, error } = await supabase.auth.signUp({
-                email: email.trim(),
-                password: password,
-                options: {
-                    data: {
-                        full_name: fullName,
-                        user_role: role // Store the selected role in user metadata
-                    }
-                }
-            });
-
-            setButtonLoading(submitButton, false, 'Create Account'); 
-
-            if (error) {
-                // If you see "Database error saving new user", check your Supabase triggers
-                displayAuthMessage('signup-message', `Registration failed: ${error.message}`, 'error');
-            } else {
-                // Optional: Manual profile creation if no trigger exists
-                if (data.user) {
-                    // Note: The profile is created automatically by the DB trigger in schema.sql
-                    // upon successful insertion into auth.users.
-                    
-                    try {
-                        const pending = {
-                            id: data.user?.id,
-                            full_name: fullName,
-                            email: email.trim(),
-                            user_role: role,
-                            balance: 0,
-                            pending_balance: 0,
-                            completed_tasks: 0
-                        };
-                        localStorage.setItem('pendingProfile', JSON.stringify(pending));
-                    } catch (e) { /* ignore localStorage errors */ }
-
-                    // If a session is immediately available (email confirmation off), redirect directly.
-                    // Otherwise, prompt for email confirmation.
-                    if (data.session) {
-                        displayAuthMessage('signup-message', 'Account created and signed in — redirecting...', 'success');
-                        setTimeout(() => window.location.href = `dashboard.html?view=${role}`, 800);
-                    } else {
-                        displayAuthMessage('signup-message', 'Account created! Please check your email to confirm your address before logging in. After confirmation you will be able to continue to your dashboard.', 'success');
-                    }
-                } else {
-                    // This case should ideally not be reached if data.user is expected after signup.
-                    // It might indicate an issue with the Supabase response.
-                    displayAuthMessage('signup-message', 'Account created, but user data not immediately available. Please check your email to confirm.', 'info');
-                }
-            }
-        }
-
-        // Theme toggle and logo update functions (kept for consistency with dashboard/login)
-        const toggleTheme = () => {
-            document.body.classList.toggle('light-mode');
-            const isLight = document.body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            updateThemeIcon();
-            updateLogo();
-            
-            // Refresh active role state to respect light-mode styles (if theme changes after selection)
-            const currentRole = document.getElementById('selected-role').value;
-            selectRole(currentRole);
-        }
-        
-        const updateLogo = () => {
-            const logo = document.getElementById('logo-img');
-            if (!logo) return;
-            logo.src = document.body.classList.contains('light-mode') ? 'assets/pidi.png' : 'assets/pidiblack.png';
-        }
-        
-        const updateThemeIcon = () => {
-            const icon = document.querySelector('#theme-icon');
-            icon.classList.toggle('fa-moon', !document.body.classList.contains('light-mode'));
-            icon.classList.toggle('fa-sun', document.body.classList.contains('light-mode'));
+            document.getElementById('role-creator').className = `p-3 rounded-xl border border-dash text-sm font-bold transition hover:border-[#6a26da] ${role === 'creator' ? 'active-role' : 'text-dash-secondary'}`;
+            document.getElementById('role-performer').className = `p-3 rounded-xl border border-dash text-sm font-bold transition hover:border-[#6a26da] ${role === 'performer' ? 'active-role' : 'text-dash-secondary'}`;
+            document.getElementById('selected-role').value = role;
         }
 
         const togglePassword = (id) => {
             const input = document.getElementById(id);
             const icon = document.getElementById('toggle-icon-' + id);
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.replace('fa-eye-slash', 'fa-eye');
-            }
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            icon.className = isPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
         };
 
-        if (localStorage.getItem('theme') === 'light') {
-            document.body.classList.add('light-mode');
-            updateThemeIcon();
-            updateLogo();
+        const toggleTheme = () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+
+            // Safety check for the icon
+            const themeIcon = document.querySelector('#theme-icon');
+            if (themeIcon) {
+                themeIcon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            }
+
+            // Safety check for the logo
+            const logoImg = document.getElementById('logo-img');
+            if (logoImg) {
+                logoImg.src = isLight ? 'assets/pidi.png' : 'assets/pidiblack.png';
+            }
         }
 
-        // Initialize role selection and expose functions to global scope
-        selectRole('creator');
+        const updateLogo = () => {
+            const logo = document.getElementById('logo-img');
+            if (!logo) return;
+            logo.src = document.body.classList.contains('light-mode') ? 'assets/pidi.png' : 'assets/pidiblack.png';
+        }
+
+        const updateThemeIcon = () => {
+            const icon = document.querySelector('#theme-icon');
+            if (!icon) return;
+            icon.classList.toggle('fa-moon', !document.body.classList.contains('light-mode'));
+            icon.classList.toggle('fa-sun', document.body.classList.contains('light-mode'));
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('signup-fullname').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const role = document.getElementById('selected-role').value;
+            const submitButton = e.target.querySelector('button[type="submit"]');
+
+            setButtonLoading(submitButton, true, 'Creating account...');
+            displayAuthMessage('signup-message', 'Processing...', 'info');
+
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        user_role: role
+                    }
+                }
+            });
+
+            setButtonLoading(submitButton, false, 'Create Account');
+
+            if (error) {
+                displayAuthMessage('signup-message', `Error: ${error.message}`, 'error');
+                return;
+            }
+
+            // If signUp created an active session (no email-confirm flow), redirect.
+            // Otherwise inform the user to check email for confirmation. A DB trigger
+            // (server-side) will create the profile row when the auth.user is created.
+            if (data?.session) {
+                displayAuthMessage('signup-message', 'Success! Redirecting...', 'success');
+                setTimeout(() => window.location.href = `dashboard.html?view=${role}`, 1000);
+            } else {
+                displayAuthMessage('signup-message', 'Account created! Please check your email to confirm.', 'success');
+            }
+        }
+
+
+        // Global exposing for HTML onclicks
         window.selectRole = selectRole;
         window.handleSignup = handleSignup;
         window.toggleTheme = toggleTheme;
         window.togglePassword = togglePassword;
+
+    // Init theme
+    if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light-mode');
+        updateThemeIcon();
+        updateLogo();
+    }
     </script>
 </body>
 </html>
