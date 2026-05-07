@@ -1,4 +1,6 @@
+-- 1. Remove the restrictive constraint
 -- 1) Extensions
+-- Ensure the pgcrypto extension is enabled for UUID generation
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- 2) Profiles
@@ -8,12 +10,25 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   email text,
   avatar_url text,
   balance numeric DEFAULT 0,
+  allocated_funds numeric DEFAULT 0,
   pending_balance numeric DEFAULT 0,
   completed_tasks integer DEFAULT 0,
   user_role text DEFAULT 'performer',
   metadata jsonb DEFAULT '{}'::jsonb,
   created_at timestamptz DEFAULT now()
-);
+); -- End of CREATE TABLE public.profiles
+
+-- Add a foreign key constraint to link profiles.id to auth.users.id
+-- This is crucial and was likely the direct cause of your error.
+ALTER TABLE public.profiles
+ADD CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE;
+
+-- Ensure the user_role constraint is correct and includes 'admin'
+ALTER TABLE public.profiles 
+DROP CONSTRAINT IF EXISTS profiles_user_role_check;
+ALTER TABLE public.profiles 
+ADD CONSTRAINT profiles_user_role_check 
+CHECK (user_role IN ('creator', 'performer', 'admin'));
 
 -- 3) Admin whitelist
 CREATE TABLE IF NOT EXISTS public.admin_whitelist (
@@ -66,6 +81,8 @@ CREATE TABLE IF NOT EXISTS public.engagements (
   status text DEFAULT 'pending',
   quality_score integer DEFAULT 0,
   proof_url text,
+  expires_at timestamptz,
+  reviewed_at timestamptz,
   metadata jsonb DEFAULT '{}'::jsonb,
   created_at timestamptz DEFAULT now(),
   FOREIGN KEY (campaign_id) REFERENCES public.campaigns(id) ON DELETE CASCADE,
@@ -197,36 +214,20 @@ CREATE POLICY select_engagements_for_creator_or_admin ON public.engagements FOR 
   public.is_admin() 
   OR auth.uid() = performer_id 
   OR EXISTS(SELECT 1 FROM public.campaigns c WHERE c.id = campaign_id AND c.creator_id = auth.uid())
-);
+); -- End of POLICY select_engagements_for_creator_or_admin
 
 DROP POLICY IF EXISTS insert_engagements_by_performer ON public.engagements;
 CREATE POLICY insert_engagements_by_performer ON public.engagements FOR INSERT WITH CHECK (auth.uid() = performer_id);
 
--- 14) Optional seeding (admin account + small demo)
--- Replace the admin UUID and email with your real admin if you prefer.
--- YOU PROVIDED earlier: 93ca13ef-3aff-4679-8f00-f43db5f987f8
+-- 14) Initial Admin Whitelist
+-- Add your specific emails here. The user_id will be populated by the trigger after signup.
 INSERT INTO public.admin_whitelist (email, user_id, reason)
-VALUES ('admin-93ca13ef-3aff-4679-8f00-f43db5f987f8@example.com', '93ca13ef-3aff-4679-8f00-f43db5f987f8', 'bootstrap admin');
+VALUES
+  ('officialprincedike@gmail.com', NULL, 'bootstrap admin'),
+  ('officialpidimarketing@gmail.com', NULL, 'bootstrap admin')
+ON CONFLICT (email) DO UPDATE SET reason = EXCLUDED.reason; -- Update reason if email exists
 
-INSERT INTO public.profiles (id, full_name, email, user_role, balance)
-VALUES ('93ca13ef-3aff-4679-8f00-f43db5f987f8', 'Admin Tester', 'admin-93ca13ef-3aff-4679-8f00-f43db5f987f8@example.com', 'admin', 1000)
-ON CONFLICT (id) DO UPDATE SET full_name = EXCLUDED.full_name, email = EXCLUDED.email, user_role = EXCLUDED.user_role;
-
--- Demo creator + campaign + transaction
-INSERT INTO public.profiles (id, full_name, user_role)
-VALUES ('11111111-1111-1111-1111-111111111111', 'Creator One', 'creator')
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO public.campaigns (id, creator_id, platform, target_url, goal_count, total_cost, status)
-VALUES ('22222222-2222-2222-2222-222222222222', '11111111-1111-1111-1111-111111111111', 'instagram', 'https://example.com/post', 20, 2000, 'pending_verification')
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO public.transactions (id, user_id, campaign_id, amount, type, status, description)
-VALUES ('33333333-3333-3333-3333-333333333333', '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', 2000, 'escrow_lock', 'pending', 'Seed funding for demo campaign')
-ON CONFLICT (id) DO NOTHING;
-
--- 15) Quick verification queries
-SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;
+-- 16) Quick verification queries
 SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' ORDER BY ordinal_position;
 SELECT * FROM public.admin_whitelist LIMIT 10;
 SELECT id, creator_id, status FROM public.campaigns LIMIT 10;
@@ -235,25 +236,47 @@ SELECT id, user_id, amount, status FROM public.transactions LIMIT 10;
 -- 16) Trigger to create a public.profile entry on new auth.users signup
 -- This ensures that a profile is created for every new user,
 -- regardless of whether email confirmation is required or not.
+-- The SECURITY DEFINER clause is crucial for the trigger to bypass RLS and insert into public.profiles.
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name, email, user_role, balance, pending_balance, completed_tasks)
+  INSERT INTO public.profiles (id, full_name, email, user_role, balance, allocated_funds, pending_balance, completed_tasks)
   VALUES (
     NEW.id,
-    NEW.raw_user_meta_data->>'full_name',
+    COALESCE(NEW.raw_user_meta_data->>'full_name', ''), -- Use COALESCE for safety
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'user_role', 'performer'),
-    0, 0, 0
+    -- Determine user_role: 'admin' if email is whitelisted, else from metadata or 'performer'
+    CASE
+      WHEN EXISTS (SELECT 1 FROM public.admin_whitelist WHERE email = NEW.email) THEN 'admin'
+      ELSE COALESCE(NEW.raw_user_meta_data->>'user_role', 'performer')
+    END,
+    0, 0, 0, 0
   )
   ON CONFLICT (id) DO NOTHING;
+
+  -- If the user is an admin, update their user_id in the admin_whitelist
+  IF EXISTS (SELECT 1 FROM public.admin_whitelist WHERE email = NEW.email) THEN
+    UPDATE public.admin_whitelist
+    SET user_id = NEW.id
+    WHERE email = NEW.email AND user_id IS NULL;
+  END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
--- Drop existing trigger if it exists to prevent errors on re-run
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 
 CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
 FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 17) Backfill existing users (Runs once to sync any missing profiles)
+INSERT INTO public.profiles (id, full_name, email, user_role, balance, allocated_funds, pending_balance, completed_tasks)
+SELECT 
+  id, 
+  COALESCE(raw_user_meta_data->>'full_name', ''), 
+  email, 
+  COALESCE(raw_user_meta_data->>'user_role', 'performer'),
+  0, 0, 0, 0
+FROM auth.users
+ON CONFLICT (id) DO NOTHING;
