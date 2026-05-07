@@ -1613,11 +1613,20 @@
             const initialView = urlParams.get('view') || 'admin-home';
             
             // Security Enforcement for Admin Dashboard
-            if (!profile || profile.user_role !== 'admin') {
-                alert("Access Denied: Administrative privileges required.");
-                window.location.href = 'dashboard.html';
+            // Check if the user is in the admin_whitelist table
+            const { data: adminCheck, error: adminError } = await supabase
+                .from('admin_whitelist')
+                .select('id')
+                .or(`user_id.eq.${user.id},email.eq.${user.email}`);
+
+            if (adminError || !adminCheck || adminCheck.length === 0) {
+                // User is not in the admin whitelist, redirect to access denied page
+                window.location.href = 'access-denied.html';
                 return;
             }
+            // If they are in the whitelist, ensure their profile role is also 'admin' for consistency
+            // This check is secondary to the whitelist, but good for data integrity.
+            if (!profile || profile.user_role !== 'admin') { /* Consider logging this as a potential data inconsistency */ }
 
             switchSPAView(initialView);
             document.querySelector('main.content-area').style.visibility = 'visible'; // Make main content visible

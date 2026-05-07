@@ -2113,6 +2113,21 @@
         window.switchRole = async function(role) {
             currentRole = role;
 
+            // If trying to switch to admin role, perform whitelist check
+            if (role === 'admin') {
+                const { data: adminCheck, error: adminError } = await supabase
+                    .from('admin_whitelist')
+                    .select('id')
+                    .or(`user_id.eq.${currentUser.id},email.eq.${currentUser.email}`);
+
+                if (adminError || !adminCheck || adminCheck.length === 0) {
+                    alert("Access Denied: You do not have administrator privileges.");
+                    // Redirect to a non-admin view, e.g., creator dashboard
+                    switchRole('creator'); // Recursively call to switch to creator
+                    return;
+                }
+            }
+
             // Switch to the main dashboard SPA view
             switchSPAView('dashboard-home');
 
