@@ -231,3 +231,29 @@ SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE
 SELECT * FROM public.admin_whitelist LIMIT 10;
 SELECT id, creator_id, status FROM public.campaigns LIMIT 10;
 SELECT id, user_id, amount, status FROM public.transactions LIMIT 10;
+
+-- 16) Trigger to create a public.profile entry on new auth.users signup
+-- This ensures that a profile is created for every new user,
+-- regardless of whether email confirmation is required or not.
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, full_name, email, user_role, balance, pending_balance, completed_tasks)
+  VALUES (
+    NEW.id,
+    NEW.raw_user_meta_data->>'full_name',
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'user_role', 'performer'),
+    0, 0, 0
+  )
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Drop existing trigger if it exists to prevent errors on re-run
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

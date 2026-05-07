@@ -167,10 +167,10 @@
         async function handleSignup(e) {
             e.preventDefault();
             clearAuthMessage('signup-message'); // Clear previous messages
-            const fullName = document.getElementById('signup-fullname').value;
+            const fullName = document.getElementById('signup-fullname').value.trim();
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
-            const role = document.getElementById('selected-role').value;
+            const role = document.getElementById('selected-role').value || 'performer';
             const submitButton = e.target.querySelector('button[type="submit"]');
 
             setButtonLoading(submitButton, true, 'Create Account');
@@ -195,33 +195,12 @@
             } else {
                 // Optional: Manual profile creation if no trigger exists
                 if (data.user) {
-                    // If Supabase returns a session (no confirmation required), create the profile now.
-                    if (data.session) {
-                        await supabase
-                            .from('profiles')
-                            .upsert({
-                                id: data.user.id,
-                                full_name: fullName,
-                                email: email.trim(),
-                                user_role: role,
-                                balance: 0,
-                                pending_balance: 0,
-                                completed_tasks: 0
-                            });
-
-                        displayAuthMessage('signup-message', 'Account created and signed in — redirecting...', 'success');
-                        // Redirect to dashboard for their role
-                        setTimeout(() => window.location.href = `dashboard.html?view=${role}`, 800);
-                        return;
-                    }
-                }
-
-                // Otherwise, email confirmation is required (common). Persist the profile locally
-                // so we can create the profile automatically after the user confirms and logs in.
-                try {
-                    if (data.user) {
+                    // Note: The profile is created automatically by the DB trigger in schema.sql
+                    // upon successful insertion into auth.users.
+                    
+                    try {
                         const pending = {
-                            id: data.user.id,
+                            id: data.user?.id,
                             full_name: fullName,
                             email: email.trim(),
                             user_role: role,
@@ -230,12 +209,21 @@
                             completed_tasks: 0
                         };
                         localStorage.setItem('pendingProfile', JSON.stringify(pending));
-                    }
-                } catch (e) { /* ignore localStorage errors */ }
+                    } catch (e) { /* ignore localStorage errors */ }
 
-                displayAuthMessage('signup-message', 'Account created! Please check your email to confirm your address before logging in. After confirmation you will be able to continue to your dashboard.', 'success');
-                // For immediate redirection (e.g., if email confirmation is off), use:
-                // window.location.href = `dashboard.html?view=${role}`;
+                    // If a session is immediately available (email confirmation off), redirect directly.
+                    // Otherwise, prompt for email confirmation.
+                    if (data.session) {
+                        displayAuthMessage('signup-message', 'Account created and signed in — redirecting...', 'success');
+                        setTimeout(() => window.location.href = `dashboard.html?view=${role}`, 800);
+                    } else {
+                        displayAuthMessage('signup-message', 'Account created! Please check your email to confirm your address before logging in. After confirmation you will be able to continue to your dashboard.', 'success');
+                    }
+                } else {
+                    // This case should ideally not be reached if data.user is expected after signup.
+                    // It might indicate an issue with the Supabase response.
+                    displayAuthMessage('signup-message', 'Account created, but user data not immediately available. Please check your email to confirm.', 'info');
+                }
             }
         }
 
