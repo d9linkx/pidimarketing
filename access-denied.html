@@ -3,65 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Access Denied</title>
+    <title>Access Denied Card</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f8fafc;
-            color: #1a1d23;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            text-align: center;
+            margin: 0;
         }
-        .container {
-            max-width: 500px;
-            padding: 2rem;
-            border-radius: 1rem;
+
+        /* The Card Container */
+        .card {
+            position: relative;
+            max-width: 450px;
+            width: 90%;
+            padding: 2.5rem 2rem;
+            border-radius: 1.25rem;
             background-color: #ffffff;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            text-align: center;
+            border: 1px solid #e2e8f0;
         }
+
+        /* Close Button Styling */
+        .close-btn {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #ef4444;
+        }
+
         .icon {
             color: #ef4444;
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            font-size: 3.5rem;
+            margin-bottom: 1.25rem;
         }
+
         h1 {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
         }
+
         p {
-            color: #6b7280;
-            margin-bottom: 1.5rem;
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
         }
+
         .btn {
             display: inline-block;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 0.75rem;
             background-color: #45b96e;
             color: #ffffff;
             font-weight: 600;
             text-decoration: none;
-            transition: background-color 0.3s ease;
+            transition: transform 0.2s ease, background-color 0.2s ease;
         }
+
         .btn:hover {
             background-color: #3daf65;
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <div class="card" id="accessCard">
+        <button class="close-btn" onclick="closeCard()" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
         <div class="icon">
-            <i class="fa-solid fa-ban"></i>
+            <i class="fa-solid fa-circle-exclamation"></i>
         </div>
+
         <h1>Access Denied</h1>
-        <p>You do not have the necessary permissions to access the administrator dashboard. Please contact support if you believe this is an error.</p>
-        <a href="dashboard.html" class="btn">Go to Dashboard</a>
+        <p>
+            You don't have the right permissions to view the admin dashboard. 
+            Reach out to support if you think this is a mistake!
+        </p>
+        
+        <a href="dashboard.html" class="btn">Return to Dashboard</a>
     </div>
+
+    <script>
+        function closeCard() {
+            const card = document.getElementById('accessCard');
+            card.style.display = 'none';
+        }
+    </script>
+
 </body>
 </html>
