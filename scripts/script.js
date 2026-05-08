@@ -210,7 +210,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Update profile display
             if (userProfileNav) {
-                userProfileNav.querySelector('img').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=6a26da&color=fff`;
+                const userImg = userProfileNav.querySelector('img');
+                if (userImg) {
+                    userImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=6a26da&color=fff`;
+                }
                 // You might want to display the name somewhere in the nav too
             }
 

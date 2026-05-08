@@ -325,12 +325,13 @@ ul { list-style: none; }
 .nav-right { display: flex; align-items: center; gap: 15px; }
 .user-profile-nav { position: relative; display: flex; align-items: center; margin-left: 10px; }
 .user-avatar-btn {
-    background: none; border: 2px solid transparent; padding: 0; cursor: pointer;
-    width: 38px; height: 38px; border-radius: 12px; overflow: visible;
+    background: #000; color: #fff !important; border: none; padding: 10px 20px; cursor: pointer;
+    border-radius: 100px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase;
+    letter-spacing: 0.5px;
     transition: var(--transition);
     position: relative;
 }
-.user-avatar-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+.user-avatar-btn:hover { transform: scale(1.05); background: #333; }
 .user-avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 
 .notification-badge {
