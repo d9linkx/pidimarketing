@@ -48,7 +48,7 @@
     <header class="flex justify-between items-center mb-8 gap-4">
             <div class="mb-8">
                 <a href="dashboard.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <img src="assets/dashblack.png" alt="PIDItasks Logo" class="h-8 w-auto logo-img">
+                    <img id="logo-img" src="assets/dashblack.png" alt="PIDItasks Logo" class="h-8 w-auto logo-img">
                 </a>
             </div>
         <div class="flex items-center gap-2 md:gap-4">
@@ -242,14 +242,14 @@ const toggleTheme = () => {
     // Safety check for the logo (This fixes your error!)
     const logoImg = document.getElementById('logo-img');
     if (logoImg) {
-        logoImg.src = isLight ? 'assets/pidi.png' : 'assets/pidiblack.png';
+        logoImg.src = isLight ? 'assets/dashblack.png' : 'assets/dashwhite.png';
     }
 }
         
         const updateLogo = () => {
     const logo = document.getElementById('logo-img');
     if (!logo) return; // This line prevents the "properties of null" error
-    logo.src = document.body.classList.contains('light-mode') ? 'assets/pidi.png' : 'assets/pidiblack.png';
+    logo.src = document.body.classList.contains('light-mode') ? 'assets/dashblack.png' : 'assets/dashwhite.png';
 }
         
         const updateThemeIcon = () => {
