@@ -2049,7 +2049,8 @@
 
             // Initialize View based on query param OR user's stored role preference
             const urlParams = new URLSearchParams(window.location.search);
-            const initialRole = urlParams.get('view') || (profile ? profile.user_role : 'creator');
+            const sessionRole = profile ? profile.user_role : 'creator';
+            const initialRole = urlParams.get('view') || sessionRole;
             
             switchRole(initialRole);
             document.querySelector('main.content-area').style.visibility = 'visible'; // Make main content visible
@@ -3537,6 +3538,7 @@
 
         async function processLogout() {
             try {
+                // Delete the current session from Appwrite
                 await account.deleteSession('current');
             } catch (error) {
                 console.error("Logout Error:", error);

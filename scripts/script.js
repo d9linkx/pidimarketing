@@ -240,11 +240,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.handleLogout = async () => {
         try {
+            // Clear specific session
             await account.deleteSession('current');
         } catch (e) {
             console.error("Logout failed:", e);
+        } finally {
+            // Always clear local state and redirect
+            window.location.href = 'index.html';
         }
-        window.location.href = 'index.html';
     };
 
 });

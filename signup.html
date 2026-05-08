@@ -68,7 +68,7 @@
                 <p class="text-dash-secondary mt-2">Join the future of performance marketing.</p>
             </div>
 
-            <form onsubmit="handleSignup(event)" class="space-y-5">
+            <form onsubmit="handleSignup(event)" method="POST" class="space-y-5">
                 <div>
                     <label for="signup-fullname" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Full Name</label>
                     <!-- name="full_name" matches the DB column `full_name` -->
@@ -217,7 +217,14 @@
                 setTimeout(() => window.location.href = `dashboard.html?view=${role}`, 1000);
             } catch (error) {
                 console.error('Appwrite Signup Error:', error);
-                displayAuthMessage('signup-message', `Error: ${error.message}`, 'error');
+                let errorMessage = `Error: ${error.message}`;
+                
+                // Handle the "User already exists" error (Appwrite error code 409)
+                if (error.code === 409) {
+                    errorMessage = "An account with this email already exists. Please <a href='login.html' class='font-bold underline'>log in here</a>.";
+                }
+                
+                displayAuthMessage('signup-message', errorMessage, 'error');
             } finally {
                 setButtonLoading(submitButton, false, 'Create Account');
             }

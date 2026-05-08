@@ -156,6 +156,14 @@
                 setButtonLoading(submitButton, true, 'Login');
                 
                 try {
+                    // Proactively clear any existing session to prevent "prohibited" error
+                    try {
+                        await account.deleteSession('current');
+                    } catch (e) {
+                        // Silently ignore if no session exists
+                    }
+
+                    // Create new session
                     await account.createEmailPasswordSession(email, password);
                     const user = await account.get();
 
@@ -167,7 +175,12 @@
                     }
                 } catch (error) {
                     console.error('Appwrite Login Error:', error);
-                    displayAuthMessage('login-message', error.message, 'error');
+                    let msg = error.message;
+                    if (error.code === 401) msg = "Invalid email or password. Please try again.";
+                    if (error.type === 'user_session_already_exists') {
+                        msg = "A session is already active. Please refresh the page.";
+                    }
+                    displayAuthMessage('login-message', msg, 'error');
                     setButtonLoading(submitButton, false, 'Login');
                 }
             } else {
