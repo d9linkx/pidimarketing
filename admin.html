@@ -9,15 +9,7 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-        <!-- Load local supabase config if present (not committed to git) -->
         <script>
-            try {
-                var script = document.createElement('script');
-                script.src = '/supabase/supabase.config.js';
-                script.async = false; // load synchronously so window.SUPABASE_CONFIG is available
-                script.onerror = function() { /* silently ignore if not present */ };
-                document.head.appendChild(script);
-            } catch (e) { console.warn('No local supabase config loaded:', e); }
             // Runtime Error Overlay: surfaces JS errors to avoid silent white-screen failures
             window.__showRuntimeError = function(message) {
                 try {
@@ -1158,7 +1150,7 @@
     </div>
 
     <script type="module">
-        import { supabase } from './supabaseClient.js';
+        import { account, databases, Query, ID, APPWRITE_CONFIG } from './appwriteClient.js';
 
         // Ensure there's a dedicated viewport for SPA views to prevent stacking
     document.addEventListener('DOMContentLoaded', () => {
@@ -1407,14 +1399,14 @@
         window.fetchAdminDashboardData = async function() {
             try {
                 const [campsRes, usersRes, txRes] = await Promise.all([
-                    supabase.from('campaigns').select('*, profiles(full_name)'),
-                    supabase.from('profiles').select('*'),
-                    supabase.from('transactions').select('*, profiles(full_name)')
+                    databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS),
+                    databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES),
+                    databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS)
                 ]);
 
-                const allCamps = campsRes.data || [];
-                const allUsers = usersRes.data || [];
-                const allTx = txRes.data || [];
+                const allCamps = campsRes.documents || [];
+                const allUsers = usersRes.documents || [];
+                const allTx = txRes.documents || [];
 
                 // 1. Update Aggregate Stats
                 const tvl = allTx.filter(t => t.status === 'pending').reduce((acc, t) => acc + (t.amount || 0), 0);
@@ -1430,7 +1422,7 @@
                     return `
                         <tr class="hover:bg-dash-secondary/20 transition-colors border-b border-dash">
                             <td class="py-3 font-bold truncate max-w-[150px]">${c.target_url}</td>
-                            <td class="py-3 text-dash-secondary font-semibold">${c.profiles?.full_name || 'System'}</td>
+                            <td class="py-3 text-dash-secondary font-semibold">${c.full_name || 'System'}</td>
                             <td class="py-3 uppercase font-bold text-[9px] text-dash-secondary">${c.platform}</td>
                             <td class="py-3 font-bold">₦${(c.total_cost || 0).toLocaleString()}</td>
                             <td class="py-3"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${c.status}</span></td>
@@ -1458,8 +1450,8 @@
                 const txTable = document.getElementById('admin-ledger-list');
                 if (txTable) txTable.innerHTML = allTx.slice(0, 20).map(t => `
                     <tr class="hover:bg-dash-secondary/20 transition-colors">
-                        <td class="p-4 font-mono opacity-50">#${t.id.slice(0, 8)}</td>
-                        <td class="p-4 font-semibold">${t.profiles?.full_name || 'System'}</td>
+                        <td class="p-4 font-mono opacity-50">#${t.$id.slice(0, 8)}</td>
+                        <td class="p-4 font-semibold">${t.full_name || 'System'}</td>
                         <td class="p-4 uppercase font-bold text-[9px] text-dash-secondary">${t.type.replace('_',' ')}</td>
                         <td class="p-4 font-black">₦${(t.amount || 0).toLocaleString()}</td>
                         <td class="p-4 text-right"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${t.status}</span></td>
@@ -1471,14 +1463,10 @@
 
         window.fetchPerformerDashboardData = async function() {
             try {
-                const tasksRes = await supabase.from('campaigns').select('*').eq('status', 'active').limit(5);
-                const profileRes = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+                const tasksRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, [Query.equal('status', 'active'), Query.limit(5)]);
+                const profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id);
 
-                if (tasksRes.error) { console.warn('Error fetching tasks:', tasksRes.error); showSupabaseError(tasksRes.error); }
-                if (profileRes.error) { console.warn('Error fetching profile for performer:', profileRes.error); showSupabaseError(profileRes.error); }
-
-                const tasks = tasksRes.data || [];
-                const profile = profileRes.data || null;
+                const tasks = tasksRes.documents || [];
 
                 if (profile) {
                     document.getElementById('performer-stat-earnings').innerText = `₦${((profile.balance || 0)).toLocaleString()}`;
@@ -1492,9 +1480,9 @@
                         <div class="p-4 bg-dash-secondary/30 border border-dash rounded-2xl flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${t.platform}"></i></div>
-                                <div><p class="font-bold text-xs truncate max-w-[120px]">${t.target_url}</p><p class="text-[9px] font-black text-green-500 uppercase">₦70 Reward</p></div>
+                                <div><p class="font-bold text-xs truncate max-w-[120px]">${t.target_url || 'Mission'}</p><p class="text-[9px] font-black text-green-500 uppercase">₦70 Reward</p></div>
                             </div>
-                            <button onclick="startTaskFlow('${t.id}')" class="bg-[var(--accent-primary)] text-white text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest">Claim</button>
+                            <button onclick="startTaskFlow('${t.$id}')" class="bg-[var(--accent-primary)] text-white text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest">Claim</button>
                         </div>
                     `).join('');
                 } else {
@@ -1512,67 +1500,28 @@
         });
 
         async function initializeUser() {
-            // Guarded call to avoid runtime exceptions if supabase returns unexpected shape
-            const authRes = await supabase.auth.getUser();
-            const user = authRes?.data?.user || null;
-            const authError = authRes?.error || null;
-
-            if (authError || !user) {
-                // If user isn't authenticated, redirect to login
+            let user;
+            try {
+                user = await account.get();
+            } catch (err) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Map real Supabase data to our local state
-            currentUser.id = user.id;
-            currentUser.fullName = user.user_metadata.full_name || 'User';
+            currentUser.id = user.$id;
+            currentUser.fullName = user.name || 'User';
             currentUser.email = user.email;
             currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.fullName)}&background=6a26da&color=fff`;
 
-            // Update Identity in DOM
             document.querySelectorAll('.user-name-display').forEach(el => el.innerText = currentUser.fullName.split(' ')[0]);
             document.querySelectorAll('.user-avatar-display').forEach(img => img.src = currentUser.avatar);
-
-            // Search listener for campaigns view
-            document.getElementById('campaign-search')?.addEventListener('input', () => {
-                archivePage = 0;
-                renderArchiveTable();
-            });
 
             // Fetch real user data from profiles table
             let profile = null;
             try {
-                const profileRes = await supabase.from('profiles').select('*').eq('id', user.id).single();
-                profile = profileRes?.data || null;
+                profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, user.$id);
             } catch (err) {
                 console.warn('Profile fetch error (might be missing):', err);
-                profile = null;
-            }
-
-            // If profile is missing, check localStorage for pending profile (created at signup)
-            if (!profile) {
-                try {
-                    const pendingRaw = localStorage.getItem('pendingProfile');
-                    if (pendingRaw) {
-                        const pending = JSON.parse(pendingRaw);
-                        if (pending && pending.id === user.id) {
-                            await supabase.from('profiles').upsert({
-                                id: pending.id,
-                                full_name: pending.full_name,
-                                email: pending.email,
-                                user_role: pending.user_role,
-                                balance: pending.balance || 0,
-                                pending_balance: pending.pending_balance || 0,
-                                completed_tasks: pending.completed_tasks || 0
-                            });
-                            // Remove pending after upsert
-                            localStorage.removeItem('pendingProfile');
-                            // Refetch profile
-                            const pr = await supabase.from('profiles').select('*').eq('id', user.id).single();
-                            profile = pr?.data || null;
-                        }
-                    }
-                } catch (e) { console.warn('Failed to upsert pending profile:', e); }
             }
 
             if (profile) {
@@ -1580,53 +1529,25 @@
                 roles.creator.allocatedFunds = profile.allocated_funds || 0;
             }
 
-            // Real-time Engine: Campaigns, Wallet, and Global Activity
-            supabase.channel('dashboard-sync')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'campaigns' }, payload => {
-                    fetchRoleData(currentRole);
-                })
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'campaigns' }, payload => {
-                    // Instant Update: Transition from PENDING_VERIFICATION to ACTIVE
-                    if (payload.old.status === 'pending_verification' && payload.new.status === 'active') {
-                        window.triggerConfetti();
-                    }
-                    fetchRoleData(currentRole);
-                })
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_activity' }, payload => {
-                    // Live Updates Feed: Nigerian performers completing tasks
-                    addToLiveFeed(payload.new);
-                })
-                .on('postgres_changes', { 
-                    event: 'UPDATE', 
-                    schema: 'public', 
-                    table: 'profiles', 
-                    filter: `id=eq.${user.id}` 
-                }, payload => {
-                    roles.creator.availableBalance = payload.new.balance;
-                    roles.creator.allocatedFunds = payload.new.allocated_funds;
-                    updateWalletDisplay();
-                })
-                .subscribe();
-
-            // Initialize View based on query param OR user's stored role preference
             const urlParams = new URLSearchParams(window.location.search);
             const initialView = urlParams.get('view') || 'admin-home';
             
-            // Security Enforcement for Admin Dashboard
-            // Check if the user is in the admin_whitelist table
-            const { data: adminCheck, error: adminError } = await supabase
-                .from('admin_whitelist')
-                .select('id')
-                .or(`user_id.eq.${user.id},email.eq.${user.email}`);
+            try {
+                const adminCheck = await databases.listDocuments(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.COLLECTIONS.ADMIN_WHITELIST,
+                    [Query.equal('email', currentUser.email)]
+                );
 
-            if (adminError || !adminCheck || adminCheck.length === 0) {
-                // User is not in the admin whitelist, redirect to access denied page
+                if (adminCheck.total === 0) {
+                    window.location.href = 'access-denied.html';
+                    return;
+                }
+            } catch (err) {
+                console.error("Admin check error:", err);
                 window.location.href = 'access-denied.html';
                 return;
             }
-            // If they are in the whitelist, ensure their profile role is also 'admin' for consistency
-            // This check is secondary to the whitelist, but good for data integrity.
-            if (!profile || profile.user_role !== 'admin') { /* Consider logging this as a potential data inconsistency */ }
 
             switchSPAView(initialView);
             document.querySelector('main.content-area').style.visibility = 'visible'; // Make main content visible
@@ -1814,11 +1735,11 @@
                 };
                 
                 return `
-                    <tr class="hover:bg-dash-secondary/40 transition-colors cursor-pointer group border-b border-dash" onclick="viewCampaignDetails('${c.id}')">
+                    <tr class="hover:bg-dash-secondary/40 transition-colors cursor-pointer group border-b border-dash" onclick="viewCampaignDetails('${c.$id}')">
                         <td class="p-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${c.platform} text-xs"></i></div>
-                                <div class="max-w-[180px] truncate"><p class="font-bold truncate group-hover:text-[var(--accent-primary)] transition-colors">${c.target_url}</p><p class="text-[10px] text-dash-secondary">${new Date(c.created_at).toLocaleDateString()}</p></div>
+                                <div class="max-w-[180px] truncate"><p class="font-bold truncate group-hover:text-[var(--accent-primary)] transition-colors">${c.target_url || 'Mission'}</p><p class="text-[10px] text-dash-secondary">${new Date(c.created_at).toLocaleDateString()}</p></div>
                             </div>
                         </td>
                         <td class="p-4 uppercase font-bold text-[9px] text-dash-secondary tracking-widest hidden md:table-cell">${c.platform}</td>
@@ -1837,7 +1758,7 @@
         }
 
         window.viewCampaignDetails = async function(campaignId) {
-            const campaign = roles.creator.items.find(c => c.id === campaignId);
+            const campaign = roles.creator.items.find(c => c.$id === campaignId);
             if (!campaign) return;
 
             // Populate Detail View
@@ -1884,18 +1805,16 @@
             
             try {
                 // 1. Fetch all Campaigns for this creator (guard errors)
-                const campaignsRes = await supabase
-                    .from('campaigns')
-                    .select('*')
-                    .eq('creator_id', currentUser.id)
-                    .order('created_at', { ascending: false });
+                const campaignsRes = await databases.listDocuments(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS,
+                    [Query.equal('creator_id', currentUser.id), Query.orderDesc('created_at')]
+                );
 
-                if (campaignsRes.error) {
-                    console.warn('fetchRoleData: campaigns fetch error', campaignsRes.error);
-                    showSupabaseError(campaignsRes.error);
+                if (!campaignsRes) {
                     roles.creator.items = [];
                 } else {
-                    roles.creator.items = campaignsRes.data || [];
+                    roles.creator.items = campaignsRes.documents || [];
                 }
 
                 // 2. Update Dashboard Home View Components
@@ -1909,8 +1828,8 @@
                 const managementList = document.getElementById('creator-campaign-list');
                 if (managementList) {
                     managementList.innerHTML = roles.creator.items.slice(0, 5).map(c => `
-                        <tr class="border-b border-dash hover:bg-dash-secondary/20 transition-colors cursor-pointer" onclick="viewCampaignDetails('${c.id}')">
-                            <td class="py-3 font-bold text-[11px] truncate max-w-[150px]">${c.target_url}</td>
+                        <tr class="border-b border-dash hover:bg-dash-secondary/20 transition-colors cursor-pointer" onclick="viewCampaignDetails('${c.$id}')">
+                            <td class="py-3 font-bold text-[11px] truncate max-w-[150px]">${c.target_url || 'Mission'}</td>
                             <td class="py-3"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${c.status}</span></td>
                             <td class="py-3 font-mono text-[10px]">${c.current_count}/${c.goal_count}</td>
                             <td class="py-3 text-right"><i data-feather="chevron-right" class="w-3 h-3 inline"></i></td>
@@ -1941,7 +1860,7 @@
             list.innerHTML = latestThreeCampaigns.map(c => {
                 const progress = Math.round((c.current_count / c.goal_count) * 100) || 0;
                 return `
-                    <tr class="group/row hover:bg-[var(--nav-bg)] transition-colors cursor-pointer" onclick="viewCampaignDetails('${c.id}')">
+                    <tr class="group/row hover:bg-[var(--nav-bg)] transition-colors cursor-pointer" onclick="viewCampaignDetails('${c.$id}')">
                         <td class="p-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)] flex items-center justify-center">
@@ -1991,7 +1910,7 @@
                 <tr class="border-b border-dash task-item">
                     <td class="py-4 font-bold">
                         ${item.isTask ?
-                            `<button onclick="startTaskFlow('${item.id}')" class="text-[#6a26da] hover:underline">${item.name}</button>` :
+                            `<button onclick="startTaskFlow('${item.$id}')" class="text-[#6a26da] hover:underline">${item.name}</button>` :
                             item.name
                         }
                     </td>
@@ -2162,14 +2081,15 @@
         // --- WALLET DATA LOGIC ---
         async function fetchWalletData() {
             try {
-                const { data: campaigns } = await supabase.from('campaigns').select('*').eq('creator_id', currentUser.id);
+                const campaignsRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, [Query.equal('creator_id', currentUser.id)]);
+                const campaigns = campaignsRes.documents || [];
+
                 let transactions = null;
                 try {
-                    const res = await supabase.from('transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-                    transactions = res.data || null;
+                    const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', currentUser.id), Query.orderDesc('created_at')]);
+                    transactions = res.documents || null;
                 } catch (err) {
                     console.warn('Transactions fetch failed:', err);
-                    transactions = null;
                 }
 
                 if (campaigns) {
@@ -2182,8 +2102,7 @@
                     document.getElementById('wallet-spent-funds').innerText = `₦${spent.toLocaleString()}`;
                 }
                 } catch (err) {
-                    console.warn("Wallet campaigns/transactions fetch error (Table might be missing):", err);
-                    showSupabaseError(err);
+                    console.warn("Wallet fetch error:", err);
                 }
 
             // Attempt to update ledger even if transactions fetch errored (handled by checking data presence)
@@ -2191,7 +2110,7 @@
             if (typeof transactions !== 'undefined' && transactions && transactions.length > 0) {
                 ledger.innerHTML = transactions.map(t => `
                     <tr class="border-b border-dash hover:bg-dash-secondary/30 transition-colors">
-                        <td class="py-4 font-mono text-[10px]">${t.id.slice(0, 8)}...</td>
+                        <td class="py-4 font-mono text-[10px]">${t.$id.slice(0, 8)}...</td>
                         <td class="py-4">
                             <p class="font-bold">${t.type === 'escrow_lock' ? 'Campaign Funding' : 'Manual Deposit'}</p>
                             <p class="text-[9px] text-dash-secondary">${new Date(t.created_at).toLocaleDateString()}</p>
@@ -2211,12 +2130,12 @@
         async function fetchAdminPendingMissions() {
             let pending = [];
             try {
-                const { data } = await supabase
-                    .from('campaigns')
-                    .select('*, profiles(full_name)')
-                    .eq('status', 'pending_verification')
-                    .order('created_at', { ascending: true });
-                pending = data || [];
+                const res = await databases.listDocuments(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS,
+                    [Query.equal('status', 'pending_verification'), Query.orderAsc('created_at')]
+                );
+                pending = res.documents || [];
             } catch (err) { console.warn("Admin fetch error:", err); }
             
             const container = document.getElementById('admin-pending-list');
@@ -2231,13 +2150,13 @@
                         ${c.payment_proof_url ? `<img src="${c.payment_proof_url}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${c.payment_proof_url}')">` : `<div class="flex items-center justify-center h-full text-xs">No Proof</div>`}
                     </div>
                     <div class="flex-1 space-y-1 text-center md:text-left">
-                        <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest">Creator: ${c.profiles?.full_name || 'Unknown'}</p>
-                        <h4 class="text-xl font-bold">₦${c.total_cost.toLocaleString()} for ${c.goal_count} ${c.platform}</h4>
-                        <p class="text-xs text-dash-secondary truncate max-w-md">${c.target_url}</p>
+                        <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest">Creator: ${c.full_name || 'Unknown'}</p>
+                        <h4 class="text-xl font-bold">₦${(c.total_cost || 0).toLocaleString()} for ${c.goal_count} ${c.platform}</h4>
+                        <p class="text-xs text-dash-secondary truncate max-w-md">${c.target_url || ''}</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="adminAction('${c.id}', 'active')" class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-green-600 transition">Approve</button>
-                        <button onclick="adminAction('${c.id}', 'rejected')" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-red-600 transition">Reject</button>
+                        <button onclick="adminAction('${c.$id}', 'active')" class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-green-600 transition">Approve</button>
+                        <button onclick="adminAction('${c.$id}', 'rejected')" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-red-600 transition">Reject</button>
                     </div>
                 </div>
             `).join('');
@@ -2246,31 +2165,17 @@
         async function adminAction(campaignId, newStatus) {
             try {
                 // 1. Update Campaign Status
-                const { error: campError } = await supabase
-                    .from('campaigns')
-                    .update({ status: newStatus })
-                    .eq('id', campaignId);
-                
-                if (campError) throw campError;
+                await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, campaignId, { status: newStatus });
 
                 // 2. Update linked Transaction Status
-                const { error: transError } = await supabase
-                    .from('transactions')
-                    .update({ status: newStatus === 'active' ? 'completed' : 'failed' })
-                    .eq('campaign_id', campaignId);
-                
-                if (transError) throw transError;
-
-                // 3. Add to Global Activity if approved
-                if (newStatus === 'active') {
-                    await supabase.from('global_activity').insert([{
-                        message: `launched a new ${newStatus} mission`,
-                        user_handle: 'PIDI Admin'
-                    }]);
+                const transRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('campaign_id', campaignId)]);
+                if (transRes.total > 0) {
+                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, transRes.documents[0].$id, { status: newStatus === 'active' ? 'completed' : 'failed' });
                 }
 
                 alert(`Campaign ${newStatus} successfully.`);
                 fetchAdminPendingMissions();
+                fetchAdminDashboardData();
             } catch (err) {
                 console.error("Admin Error:", err);
                 alert("Failed to process action.");
@@ -2483,21 +2388,17 @@
                     const file = fileInput.files[0];
                     const fileExt = file.name.split('.').pop();
                     const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`;
-                    const filePath = `receipts/${fileName}`;
 
-                    const { error: uploadError } = await supabase.storage
-                        .from('proofs')
-                        .upload(filePath, file);
-
-                    if (uploadError) throw uploadError;
-                    const { data: { publicUrl } } = supabase.storage.from('proofs').getPublicUrl(filePath);
-                    proofUrl = publicUrl;
+                    const uploadRes = await storage.createFile(APPWRITE_CONFIG.BUCKETS.PROOFS, ID.unique(), file);
+                    proofUrl = storage.getFileView(APPWRITE_CONFIG.BUCKETS.PROOFS, uploadRes.$id);
                 }
 
                 // 2. Save Campaign details and capture returned ID for ledger
-                const { data: campaignData, error: dbError } = await supabase
-                    .from('campaigns')
-                    .insert([{
+                const campaignData = await databases.createDocument(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS,
+                    ID.unique(),
+                    {
                         creator_id: currentUser.id,
                         platform: selectedPlatform,
                         target_url: url,
@@ -2505,22 +2406,21 @@
                         instructions: instructions,
                         payment_proof_url: proofUrl,
                         total_cost: totalCost,
-                        status: 'pending_verification'
-                    }]).select();
-
-                if (dbError) throw dbError;
+                        status: 'pending_verification',
+                        created_at: new Date().toISOString()
+                    }
+                );
 
                 // 3. Create relational link in transactions ledger for balance reconciliation
-                if (campaignData && campaignData[0]) {
-                    await supabase.from('transactions').insert([{
-                        user_id: currentUser.id,
-                        campaign_id: campaignData[0].id,
-                        amount: totalCost,
-                        type: 'escrow_lock',
-                        status: 'pending',
-                        description: `Funding for ${qty} ${selectedPlatform} engagements`
-                    }]);
-                }
+                await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
+                    user_id: currentUser.id,
+                    campaign_id: campaignData.$id,
+                    amount: totalCost,
+                    type: 'escrow_lock',
+                    status: 'pending',
+                    description: `Funding for ${qty} ${selectedPlatform} engagements`,
+                    created_at: new Date().toISOString()
+                });
 
                 alert("Campaign deployed! Status: Pending Verification.");
                 closeCampaignWizard();
@@ -2556,13 +2456,8 @@
 
         window.startTaskFlow = async function(taskId) {
             try {
-                const { data: task, error } = await supabase
-                    .from('campaigns')
-                    .select('*')
-                    .eq('id', taskId)
-                    .single();
+                const task = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, taskId);
 
-                if (error) throw error;
                 activeTask = task;
 
                 // Populate UI
@@ -2958,8 +2853,11 @@
         }
 
         async function processLogout() {
-            // Logic Ledger: Perform actual sign out via Supabase
-            await supabase.auth.signOut();
+            try {
+                await account.deleteSession('current');
+            } catch (err) {
+                console.error("Logout error:", err);
+            }
 
             // Create Toast Container
             let toast = document.createElement('div');
@@ -3109,16 +3007,6 @@
                 document.getElementById('runtime-error-overlay').style.display = 'block';
             } catch (e) { console.error('Error overlay failed:', e); }
         });
-        
-        // Helper to show Supabase errors in the overlay for easier debugging
-        function showSupabaseError(err) {
-            try {
-                const card = document.getElementById('runtime-error-card');
-                const body = typeof err === 'string' ? err : JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
-                card.innerHTML = `<strong>Supabase Error:</strong><pre style="white-space:pre-wrap">${body}</pre>`;
-                document.getElementById('runtime-error-overlay').style.display = 'block';
-            } catch (e) { console.error('Error overlay failed:', e); }
-        }
     </script>
     <!-- Mobile Sidebar Overlay -->
 <div id="mobile-menu" class="fixed inset-0 z-[200] hidden">
