@@ -6,6 +6,7 @@
     <title>Create Account | PIDI Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
         :root {
@@ -117,7 +118,7 @@
     </main>
 
     <script type="module">
-        import { supabase } from './supabaseClient.js';
+        import { account, databases, ID, APPWRITE_CONFIG } from './appwriteClient.js';
 
         // Helper functions
         const displayAuthMessage = (elementId, message, type = 'info') => {
@@ -189,32 +190,36 @@
             setButtonLoading(submitButton, true, 'Creating account...');
             displayAuthMessage('signup-message', 'Processing...', 'info');
 
-            const { data, error } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    data: {
+            try {
+                // 1. Create Auth Account
+                const user = await account.create(ID.unique(), email, password, fullName);
+                
+                // 2. Create Session
+                await account.createEmailPasswordSession(email, password);
+
+                // 3. Create Profile Document (Replaces SQL Trigger)
+                await databases.createDocument(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.COLLECTIONS.PROFILES,
+                    user.$id, // Use user ID as Document ID
+                    {
                         full_name: fullName,
-                        user_role: role
+                        email: email,
+                        user_role: role,
+                        balance: 0,
+                        allocated_funds: 0,
+                        pending_balance: 0,
+                        completed_tasks: 0,
+                        created_at: new Date().toISOString()
                     }
-                }
-            });
+                );
 
-            setButtonLoading(submitButton, false, 'Create Account');
-
-            if (error) {
-                displayAuthMessage('signup-message', `Error: ${error.message}`, 'error');
-                return;
-            }
-
-            // If signUp created an active session (no email-confirm flow), redirect.
-            // Otherwise inform the user to check email for confirmation. A DB trigger
-            // (server-side) will create the profile row when the auth.user is created.
-            if (data?.session) {
                 displayAuthMessage('signup-message', 'Success! Redirecting...', 'success');
                 setTimeout(() => window.location.href = `dashboard.html?view=${role}`, 1000);
-            } else {
-                displayAuthMessage('signup-message', 'Account created! Please check your email to confirm.', 'success');
+            } catch (error) {
+                displayAuthMessage('signup-message', `Error: ${error.message}`, 'error');
+            } finally {
+                setButtonLoading(submitButton, false, 'Create Account');
             }
         }
 

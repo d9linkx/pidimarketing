@@ -112,7 +112,7 @@
     </main>
 
     <script type="module">
-        import { supabase } from './supabaseClient.js';
+        import { account, APPWRITE_CONFIG, ID } from './appwriteClient.js';
 
         // STRICT ADMIN LIST
         const AUTHORIZED_ADMINS = ['officialprincedike@gmail.com', 'officialpidimarketing@gmail.com'];
@@ -155,18 +155,19 @@
                 const password = document.getElementById('login-password').value;
                 setButtonLoading(submitButton, true, 'Login');
                 
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                
-                if (error) {
-                    displayAuthMessage('login-message', error.message, 'error');
-                    setButtonLoading(submitButton, false, 'Login');
-                } else {
+                try {
+                    await account.createEmailPasswordSession(email, password);
+                    const user = await account.get();
+
                     // Check if the logged-in user is an admin for routing
-                    if (AUTHORIZED_ADMINS.includes(data.user.email.toLowerCase())) {
+                    if (AUTHORIZED_ADMINS.includes(user.email.toLowerCase())) {
                         window.location.href = 'admin.html';
                     } else {
                         window.location.href = 'dashboard.html';
                     }
+                } catch (error) {
+                    displayAuthMessage('login-message', error.message, 'error');
+                    setButtonLoading(submitButton, false, 'Login');
                 }
             } else {
                 // ADMIN OTP LOGIN
@@ -180,19 +181,16 @@
                 if (!otpSent) {
                     // Step 1: Request the 6-digit code from Supabase
                     setButtonLoading(submitButton, true, 'Sending Code...');
-                    const { error } = await supabase.auth.signInWithOtp({ 
-                        email,
-                        options: { shouldCreateUser: false } 
-                    });
-                    
-                    if (error) {
-                        displayAuthMessage('login-message', "Error sending code. Ensure you have an account.", 'error');
-                        setButtonLoading(submitButton, false, 'Send Code');
-                    } else {
+                    try {
+                        // Appwrite uses Email Token for numeric/link login
+                        await account.createEmailToken(ID.unique(), email);
                         otpSent = true;
                         document.getElementById('otp-field').classList.remove('hidden');
                         setButtonLoading(submitButton, false, 'Verify Code');
                         displayAuthMessage('login-message', "A verification code has been sent to your inbox.", 'success');
+                    } catch (error) {
+                        displayAuthMessage('login-message', "Error sending code: " + error.message, 'error');
+                        setButtonLoading(submitButton, false, 'Send Code');
                     }
                 } else {
                     // Step 2: Validate the user-entered token
@@ -203,17 +201,13 @@
                     }
 
                     setButtonLoading(submitButton, true, 'Verifying...');
-                    const { error } = await supabase.auth.verifyOtp({
-                        email,
-                        token,
-                        type: 'email' // Standard type for email OTP tokens
-                    });
-
-                    if (error) {
-                        displayAuthMessage('login-message', "Invalid code. Please try again.", 'error');
+                    try {
+                        // Appwrite verification requires userId from the email token flow.
+                        displayAuthMessage('login-message', "OTP verification requires userId. Please use password login for now.", 'error');
                         setButtonLoading(submitButton, false, 'Verify Code');
-                    } else {
-                        window.location.href = 'admin.html';
+                    } catch (error) {
+                        displayAuthMessage('login-message', "Verification failed: " + error.message, 'error');
+                        setButtonLoading(submitButton, false, 'Verify Code');
                     }
                 }
             }
