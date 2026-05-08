@@ -325,13 +325,19 @@ ul { list-style: none; }
 .nav-right { display: flex; align-items: center; gap: 15px; }
 .user-profile-nav { position: relative; display: flex; align-items: center; margin-left: 10px; }
 .user-avatar-btn {
-    background: #000; color: #fff !important; border: none; padding: 10px 20px; cursor: pointer;
+    background: linear-gradient(135deg, #45b96e 60%, #3daf65 40%);
+    color: #0f172a !important;
+    border: 1px solid #45b96e !important;
+    padding: 10px 20px; cursor: pointer;
     border-radius: 100px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: var(--transition);
+    transition: background 0.5s ease, transform 0.2s ease;
     position: relative;
 }
-.user-avatar-btn:hover { transform: scale(1.05); background: #333; }
+.user-avatar-btn:hover {
+    background: linear-gradient(135deg, #45b96e 60%, #14913f 40%);
+    transform: scale(1.05);
+}
 .user-avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 
 .notification-badge {
