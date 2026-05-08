@@ -17,8 +17,17 @@
             --nav-bg: #ffffff;
             --btn-secondary: #f1f5f9;
         }
+        body.dark-mode {
+            --bg-body: #09090b;
+            --bg-card: #18181b;
+            --border-dash: #27272a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --nav-bg: #18181b;
+            --btn-secondary: #27272a;
+        }
         body.light-mode {
-            --bg-body: #f4f7f6;
+            --bg-body: #f8fafc;
             --bg-card: #ffffff;
             --border-dash: #e2e8f0;
             --text-primary: #1a202c;
@@ -52,7 +61,7 @@
                 </a>
             </div>
         <div class="flex items-center gap-2 md:gap-4">
-            <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition" id="theme-toggle">
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[#6a26da] transition" id="theme-toggle" title="Switch Theme (System / Light / Dark)">
                 <i class="fa-solid fa-moon" id="theme-icon"></i>
             </button>
         </div>
@@ -228,36 +237,45 @@
             }
         }
 
-const toggleTheme = () => {
-    document.body.classList.toggle('light-mode');
-    const isLight = document.body.classList.contains('light-mode');
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        window.applyTheme = function() {
+            const theme = localStorage.getItem('theme') || 'system';
+            const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = theme === 'dark' || (theme === 'system' && isSystemDark);
+            
+            document.body.classList.toggle('dark-mode', isDark);
+            document.body.classList.toggle('light-mode', !isDark);
+            
+            updateThemeIcon(theme);
+            updateLogo(isDark);
+        };
 
-    // Safety check for the icon
-    const themeIcon = document.querySelector('#theme-icon');
-    if (themeIcon) {
-        themeIcon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-    }
+        window.toggleTheme = function() {
+            const themes = ['system', 'light', 'dark'];
+            const current = localStorage.getItem('theme') || 'system';
+            const next = themes[(themes.indexOf(current) + 1) % themes.length];
+            
+            localStorage.setItem('theme', next);
+            window.applyTheme();
+        };
 
-    // Safety check for the logo (This fixes your error!)
-    const logoImg = document.getElementById('logo-img');
-    if (logoImg) {
-        logoImg.src = isLight ? 'assets/dashblack.png' : 'assets/dashwhite.png';
-    }
-}
-        
-        const updateLogo = () => {
-    const logo = document.getElementById('logo-img');
-    if (!logo) return; // This line prevents the "properties of null" error
-    logo.src = document.body.classList.contains('light-mode') ? 'assets/dashblack.png' : 'assets/dashwhite.png';
-}
-        
-        const updateThemeIcon = () => {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if ((localStorage.getItem('theme') || 'system') === 'system') {
+                window.applyTheme();
+            }
+        });
+
+        window.updateThemeIcon = function(theme) {
             const icon = document.querySelector('#theme-icon');
             if (!icon) return;
-            icon.classList.toggle('fa-moon', !document.body.classList.contains('light-mode'));
-            icon.classList.toggle('fa-sun', document.body.classList.contains('light-mode'));
-        }
+            let iconClass = theme === 'light' ? 'fa-sun' : (theme === 'dark' ? 'fa-moon' : 'fa-desktop');
+            icon.className = `fa-solid ${iconClass}`;
+        };
+
+        window.updateLogo = function(isDark) {
+            const logo = document.getElementById('logo-img');
+            if (!logo) return;
+            logo.src = isDark ? 'assets/dashwhite.png' : 'assets/dashblack.png';
+        };
 
         const togglePassword = (id) => {
             const input = document.getElementById(id);
@@ -271,11 +289,8 @@ const toggleTheme = () => {
             }
         };
 
-        if (localStorage.getItem('theme') === 'light') {
-            document.body.classList.add('light-mode');
-            updateThemeIcon();
-            updateLogo();
-        }
+        // Initialize theme
+        window.applyTheme();
         
         window.handleAuthAction = handleAuthAction;
         window.toggleTheme = toggleTheme;
