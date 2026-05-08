@@ -2018,7 +2018,7 @@
                 return;
             }
 
-            // Map real Supabase data to our local state
+            // Map Appwrite data to our local state
             currentUser.id = user.$id;
             currentUser.fullName = user.name || 'User';
             currentUser.email = user.email;
@@ -2049,15 +2049,8 @@
 
             // Initialize View based on query param OR user's stored role preference
             const urlParams = new URLSearchParams(window.location.search);
-            const initialRole = urlParams.get('view') || user.user_metadata.user_role || 'creator';
+            const initialRole = urlParams.get('view') || (profile ? profile.user_role : 'creator');
             
-            // Security: If user tries to access admin view, verify role (guard against missing profile)
-            if (initialRole === 'admin' && (!profile || profile.user_role !== 'admin')) {
-                alert("Access Denied: You do not have administrator privileges.");
-                switchRole('creator');
-                return;
-            }
-
             switchRole(initialRole);
             document.querySelector('main.content-area').style.visibility = 'visible'; // Make main content visible
         }
@@ -2359,7 +2352,7 @@
 
                 // 3. Sync Other Views
                 renderArchiveTable(); // Campaigns View
-                fetchAnalytics();     // Stats Strip & Radar
+                if (window.fetchAnalytics) fetchAnalytics(); 
                 fetchWalletData();     // Wallet View
             } catch (err) {
                 console.error("Critical Dashboard Sync Error:", err);
@@ -2441,18 +2434,7 @@
         }
 
         async function refreshActivityFeed() {
-            const { data } = await supabase.from('activity_feed').select('*').order('created_at', { ascending: false }).limit(5);
-            const container = document.getElementById('feed-container');
-            if (!data?.length) {
-                container.innerHTML = '<p class="text-xs text-dash-secondary py-4 text-center">No recent activity found.</p>';
-                return;
-            }
-            container.innerHTML = data.map(item => `
-                <div class="border-b border-dash pb-3">
-                    <p class="text-xs text-dash-secondary">${new Date(item.created_at).toLocaleTimeString()}</p>
-                    <p class="text-sm">${item.message}</p>
-                </div>
-            `).join('');
+            // Integration point for Appwrite Realtime events
         }
 
     window.applyTheme = function() {
@@ -2955,7 +2937,7 @@
             try {
                 let proofUrl = null;
 
-                // 1. Upload Receipt to Supabase Storage in "proofs" bucket
+                // 1. Upload Receipt to Appwrite Storage in "proofs" bucket
                 if (fileInput.files && fileInput.files[0]) {
                     const file = fileInput.files[0];
                     const fileExt = file.name.split('.').pop();
@@ -3047,8 +3029,6 @@
                         created_at: new Date().toISOString()
                     });
                 }
-
-                if (engageErr) console.warn('Engagement upsert warning:', engageErr);
 
                 // Start a client-side countdown timer for the claim
                 startClaimTimer(taskId, 15 * 60);
@@ -3231,7 +3211,7 @@
                 }
 
                 // Clear any local claim timer
-                try { clearClaimTimer(activeTask.id); } catch (e) { /* ignore */ }
+                try { if (activeTask) clearClaimTimer(activeTask.$id); } catch (e) { /* ignore */ }
 
                 window.triggerConfetti();
                 alert("Proof submitted! Our team will verify it within 24 hours. Reward pending approval.");
@@ -3711,15 +3691,6 @@
             } catch (e) { console.error('Error overlay failed:', e); }
         });
         
-        // Helper to show Supabase errors in the overlay for easier debugging
-        function showSupabaseError(err) {
-            try {
-                const card = document.getElementById('runtime-error-card');
-                const body = typeof err === 'string' ? err : JSON.stringify(err, Object.getOwnPropertyNames(err), 2);
-                card.innerHTML = `<strong>Supabase Error:</strong><pre style="white-space:pre-wrap">${body}</pre>`;
-                document.getElementById('runtime-error-overlay').style.display = 'block';
-            } catch (e) { console.error('Error overlay failed:', e); }
-        }
     </script>
     <!-- Mobile Sidebar Overlay -->
 <div id="mobile-menu" class="fixed inset-0 z-[200] hidden">

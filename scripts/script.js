@@ -4,7 +4,7 @@
  * Combined: Side Drawer, Top Bar, Sticky Nav, Exit Modal, & Cookies
  */
 
-import { supabase } from '../supabaseClient.js';
+import { account } from '../appwriteClient.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Ensure page starts at the top on load
@@ -193,7 +193,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 10. AUTH & DASHBOARD REDIRECTS ---
     async function checkSession() {
-        const { data: { session } } = await supabase.auth.getSession();
+        let session = null;
+        try {
+            session = await account.getSession('current');
+        } catch (e) { /* No active session */ }
+
         const userProfileNav = document.querySelector('.user-profile-nav');
         const loginLink = document.querySelector('.user-dropdown a[href="login.html"]');
         const dashboardLink = document.querySelector('.user-dropdown a[href="dashboard.html"]');
@@ -201,9 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (session) {
             // User is logged in
-            const user = session.user;
-            const userName = user.user_metadata.full_name || user.email;
-            const userRole = user.user_metadata.user_role || 'creator'; // Default role
+            const user = await account.get();
+            const userName = user.name || user.email;
 
             // Update profile display
             if (userProfileNav) {
@@ -236,7 +239,11 @@ document.addEventListener('DOMContentLoaded', () => {
     checkSession(); // Run on page load
 
     window.handleLogout = async () => {
-        await supabase.auth.signOut();
+        try {
+            await account.deleteSession('current');
+        } catch (e) {
+            console.error("Logout failed:", e);
+        }
         window.location.href = 'index.html';
     };
 

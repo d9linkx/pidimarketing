@@ -166,6 +166,7 @@
                         window.location.href = 'dashboard.html';
                     }
                 } catch (error) {
+                    console.error('Appwrite Login Error:', error);
                     displayAuthMessage('login-message', error.message, 'error');
                     setButtonLoading(submitButton, false, 'Login');
                 }
@@ -189,8 +190,9 @@
                         setButtonLoading(submitButton, false, 'Verify Code');
                         displayAuthMessage('login-message', "A verification code has been sent to your inbox.", 'success');
                     } catch (error) {
+                        console.error('Appwrite OTP Error:', error);
                         displayAuthMessage('login-message', "Error sending code: " + error.message, 'error');
-                        setButtonLoading(submitButton, false, 'Send Code');
+                        setButtonLoading(submitButton, false, 'Login');
                     }
                 } else {
                     // Step 2: Validate the user-entered token
