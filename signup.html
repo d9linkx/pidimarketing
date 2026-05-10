@@ -214,6 +214,13 @@
             displayAuthMessage('signup-message', 'Processing...', 'info');
 
             try {
+                // Proactively clear any existing session to prevent "prohibited" errors
+                try {
+                    await account.deleteSession('current');
+                } catch (e) {
+                    // Silently ignore if no session exists
+                }
+
                 // 1. Create Auth Account
                 const user = await account.create(ID.unique(), email, password, fullName);
                 
