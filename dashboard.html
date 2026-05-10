@@ -2088,6 +2088,9 @@
             if (role === 'creator') {
                 workspaceNavHTML = `
                     <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
+                    <a href="#" onclick="switchSPAView('dashboard-home')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="grid" class="w-4 text-center"></i> Dashboard
+                    </a>
                     <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                         <i data-feather="bar-chart-2" class="w-4 text-center"></i> Analytics
                     </a>
@@ -2101,6 +2104,9 @@
             } else if (role === 'performer') {
                 workspaceNavHTML = `
                     <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">My Work</p>
+                    <a href="#" onclick="switchSPAView('dashboard-home')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                        <i data-feather="grid" class="w-4 text-center"></i> Dashboard
+                    </a>
                     <a href="#" onclick="switchSPAView('performer-gigs')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                         <i data-feather="briefcase" class="w-4 text-center"></i> My Gigs
                     </a>
@@ -2148,24 +2154,28 @@
                 mIconBox.innerHTML = `<i data-feather="${c.icon}" class="w-4 h-4"></i>`;
             }
 
-            // Update Main CTA logic
-            const ctaBtn = document.getElementById('main-cta-btn');
-            const ctaText = document.getElementById('main-cta');
-            if (ctaText) ctaText.innerText = c.cta;
-            if (ctaBtn) {
-                if (role === 'creator') ctaBtn.onclick = () => openCampaignWizard();
-                else if (role === 'performer') ctaBtn.onclick = () => switchSPAView('performer-gigs');
-                else ctaBtn.onclick = () => switchSPAView('admin');
-            }
-
             // Close dropdowns
             document.querySelectorAll('[id^="role-dropdown-menu"]').forEach(m => m.classList.add('hidden'));
             document.querySelectorAll('[id^="role-chevron"]').forEach(c => c.classList.remove('rotate-180'));
 
-            // Toggle content blocks
-            document.getElementById('creator-dashboard-content')?.classList.toggle('hidden', role !== 'creator');
-            document.getElementById('performer-dashboard-content')?.classList.toggle('hidden', role !== 'performer');
-            document.getElementById('admin-dashboard-content')?.classList.toggle('hidden', role !== 'admin');
+            // Update Viewport elements (Search within viewport to avoid template ID collisions)
+            const vp = document.getElementById('dashboard-viewport');
+            if (vp) {
+                // Update Main CTA logic
+                const ctaBtn = vp.querySelector('#main-cta-btn');
+                const ctaText = vp.querySelector('#main-cta');
+                if (ctaText) ctaText.innerText = c.cta;
+                if (ctaBtn) {
+                    if (role === 'creator') ctaBtn.onclick = () => openCampaignWizard();
+                    else if (role === 'performer') ctaBtn.onclick = () => switchSPAView('performer-gigs');
+                    else ctaBtn.onclick = () => switchSPAView('admin');
+                }
+
+                // Toggle content blocks
+                vp.querySelector('#creator-dashboard-content')?.classList.toggle('hidden', role !== 'creator');
+                vp.querySelector('#performer-dashboard-content')?.classList.toggle('hidden', role !== 'performer');
+                vp.querySelector('#admin-dashboard-content')?.classList.toggle('hidden', role !== 'admin');
+            }
             
             feather.replace();
             if (role === 'creator') fetchRoleData('creator');
@@ -2535,6 +2545,30 @@
                     clone.removeAttribute('id');
                     clone.classList.remove('hidden');
                     viewport.appendChild(clone);
+
+                    // If we are showing the home dashboard, ensure the correct role-specific content is visible
+                    if (viewId === 'dashboard-home' || viewId === 'dashboard-home-view') {
+                        const role = currentRole;
+                        const config = {
+                            creator: { cta: 'Create Campaign' },
+                            performer: { cta: 'Find New Task' },
+                            admin: { cta: 'Manage System' }
+                        };
+                        const c = config[role] || config.creator;
+                        
+                        const ctaText = viewport.querySelector('#main-cta');
+                        if (ctaText) ctaText.innerText = c.cta;
+                        const ctaBtn = viewport.querySelector('#main-cta-btn');
+                        if (ctaBtn) {
+                            if (role === 'creator') ctaBtn.onclick = () => openCampaignWizard();
+                            else if (role === 'performer') ctaBtn.onclick = () => switchSPAView('performer-gigs');
+                            else ctaBtn.onclick = () => switchSPAView('admin');
+                        }
+
+                        viewport.querySelector('#creator-dashboard-content')?.classList.toggle('hidden', role !== 'creator');
+                        viewport.querySelector('#performer-dashboard-content')?.classList.toggle('hidden', role !== 'performer');
+                        viewport.querySelector('#admin-dashboard-content')?.classList.toggle('hidden', role !== 'admin');
+                    }
                 } catch (e) {
                     console.warn('switchSPAView: failed to mount template into viewport, falling back to showing template in-place', e);
                     // fallback: attempt to show template in place
@@ -2574,6 +2608,30 @@
                         clone.removeAttribute('id');
                         clone.classList.remove('hidden');
                         vp.appendChild(clone);
+
+                        // Apply role visibility to fallback mount as well
+                        if (viewId === 'dashboard-home' || viewId === 'dashboard-home-view') {
+                            const role = currentRole;
+                            const config = {
+                                creator: { cta: 'Create Campaign' },
+                                performer: { cta: 'Find New Task' },
+                                admin: { cta: 'Manage System' }
+                            };
+                            const c = config[role] || config.creator;
+                            
+                            const ctaText = vp.querySelector('#main-cta');
+                            if (ctaText) ctaText.innerText = c.cta;
+                            const ctaBtn = vp.querySelector('#main-cta-btn');
+                            if (ctaBtn) {
+                                if (role === 'creator') ctaBtn.onclick = () => openCampaignWizard();
+                                else if (role === 'performer') ctaBtn.onclick = () => switchSPAView('performer-gigs');
+                                else ctaBtn.onclick = () => switchSPAView('admin');
+                            }
+
+                            vp.querySelector('#creator-dashboard-content')?.classList.toggle('hidden', role !== 'creator');
+                            vp.querySelector('#performer-dashboard-content')?.classList.toggle('hidden', role !== 'performer');
+                            vp.querySelector('#admin-dashboard-content')?.classList.toggle('hidden', role !== 'admin');
+                        }
                     }
                 }
                 // Refresh icons for dynamically shown/updated content
@@ -3745,6 +3803,9 @@
             <div id="mobile-role-workspace-nav">
                 <!-- Role-specific workspace navigation will be injected here -->
                 <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
+                <a href="#" onclick="switchSPAView('dashboard-home')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i data-feather="grid" class="w-4 text-center"></i> Dashboard
+                </a>
                 <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i data-feather="bar-chart-2" class="w-4 text-center"></i> Analytics
                 </a>
