@@ -1584,6 +1584,16 @@
         </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="hidden fixed inset-0 z-[500] bg-black/60 backdrop-blur-md flex flex-col items-center justify-center gap-4 text-center">
+        <div class="w-16 h-16 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(69,185,110,0.3)]"></div>
+        <p class="text-white font-black text-xs uppercase tracking-[0.2em]" id="loading-text">Deploying Mission...</p>
+        <p class="text-[var(--accent-primary)] font-mono text-lg font-bold" id="loading-percentage">0%</p>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-8 right-8 z-[1000] flex flex-col gap-3 pointer-events-none"></div>
+
     <!-- Signout Confirmation Overlay -->
     <div id="signout-overlay" class="hidden fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bento-card max-w-sm text-center p-10 relative">
@@ -1600,7 +1610,7 @@
     </div>
 
     <script type="module">
-        import { account, databases, storage, ID, Query, APPWRITE_CONFIG } from './appwriteClient.js';
+        import { client, account, databases, storage, ID, Query, APPWRITE_CONFIG } from './appwriteClient.js';
 
         // Ensure there's a dedicated viewport for SPA views to prevent stacking
     document.addEventListener('DOMContentLoaded', () => {
@@ -2068,6 +2078,8 @@
             
             switchRole(initialRole);
             document.querySelector('main.content-area').style.visibility = 'visible'; // Make main content visible
+
+            setupRealtimeSubscriptions();
         }
 
         window.switchRole = async function(role) {
@@ -2433,6 +2445,78 @@
         window.scrollToTasks = function() {
             const table = document.querySelector('.bento-grid .col-span-3');
             if (table) table.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.showToast = function(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-green-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-600');
+            const icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
+
+            toast.className = `${bgClass} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 transform translate-y-20 opacity-0 transition-all duration-500 border border-white/10 min-w-[320px] pointer-events-auto shadow-lg`;
+            toast.innerHTML = `
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <i data-feather="${icon}" class="w-5 h-5"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] font-black uppercase tracking-[0.1em] leading-none mb-1 opacity-80">${type === 'success' ? 'Update Success' : (type === 'error' ? 'Action Required' : 'Notice')}</p>
+                    <p class="text-xs font-bold">${message}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="opacity-50 hover:opacity-100 transition-opacity p-1">
+                    <i data-feather="x" class="w-4 h-4"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+            if (window.feather) feather.replace();
+
+            // Animate In
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-20', 'opacity-0');
+            });
+
+            // Auto Remove after 6 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    setTimeout(() => toast.remove(), 500);
+                }
+            }, 6000);
+        };
+
+        function setupRealtimeSubscriptions() {
+            const channel = `databases.${APPWRITE_CONFIG.DATABASE_ID}.collections.*.documents`;
+            client.subscribe(channel, response => {
+                const event = response.events[0];
+                const doc = response.payload;
+                
+                // If a Campaign doc is updated
+                if (event.includes('collections.' + APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS)) {
+                    if (doc.creator_id === currentUser.id) {
+                        fetchRoleData('creator');
+                        
+                        if (event.includes('.update')) {
+                            if (doc.status === 'active') {
+                                showToast(`Campaign Approved: Your ${doc.platform.toUpperCase()} mission is now live!`, 'success');
+                                window.triggerConfetti();
+                            } else if (doc.status === 'rejected') {
+                                showToast(`Campaign Rejected: Please review guidance for your ${doc.platform.toUpperCase()} mission.`, 'error');
+                            }
+                        }
+                    }
+                    
+                    // Refresh performer data if a task becomes active
+                    if (doc.status === 'active' && doc.creator_id !== currentUser.id) fetchPerformerDashboardData();
+                }
+
+                // If an Engagement doc is updated
+                if (event.includes('collections.' + APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS)) {
+                    if (doc.performer_id === currentUser.id) fetchPerformerDashboardData();
+                    if (doc.creator_id === currentUser.id) fetchRoleData('creator');
+                }
+            });
         }
 
         function renderTable(items, listId) {
@@ -3007,19 +3091,44 @@
                 return;
             }
 
+            // Validation: Payment Proof is Compulsory
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Action Required: Please upload your payment receipt (screenshot or PDF) before submitting.");
+                btnSpan.innerText = originalText;
+                finishBtn.disabled = false;
+                return;
+            }
+
+            // Show loading spinner
+            const loader = document.getElementById('loading-overlay');
+            const loaderText = document.getElementById('loading-text');
+            const loaderPct = document.getElementById('loading-percentage');
+            if (loader) loader.classList.remove('hidden');
+
             try {
                 let proofUrl = null;
 
                 // 1. Upload Receipt to Appwrite Storage in "proofs" bucket
                 if (fileInput.files && fileInput.files[0]) {
+                    if (loaderText) loaderText.innerText = "Uploading Receipt...";
+                    let uploadProgress = 0;
+                    const interval = setInterval(() => {
+                        if (uploadProgress < 90) {
+                            uploadProgress += Math.floor(Math.random() * 7) + 1;
+                            if (loaderPct) loaderPct.innerText = `${Math.min(uploadProgress, 90)}%`;
+                        }
+                    }, 250);
+
                     const file = fileInput.files[0];
                     const fileExt = file.name.split('.').pop();
-                    const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`;
 
                     const uploadRes = await storage.createFile(APPWRITE_CONFIG.BUCKETS.PROOFS, ID.unique(), file);
+                    clearInterval(interval);
+                    if (loaderPct) loaderPct.innerText = "95%";
                     proofUrl = storage.getFileView(APPWRITE_CONFIG.BUCKETS.PROOFS, uploadRes.$id);
                 }
 
+                if (loaderText) loaderText.innerText = "Registering Campaign...";
                 // 2. Save Campaign details and capture returned ID for ledger
                 const campaignData = await databases.createDocument(
                     APPWRITE_CONFIG.DATABASE_ID, 
@@ -3038,6 +3147,7 @@
                     }
                 );
 
+                if (loaderText) loaderText.innerText = "Finalizing Ledger...";
                 // 3. Create relational link in transactions ledger for balance reconciliation
                 await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
                     user_id: currentUser.id,
@@ -3050,6 +3160,8 @@
                 });
 
                 // Transition to success screen
+                if (loaderPct) loaderPct.innerText = "100%";
+                if (loader) loader.classList.add('hidden');
                 document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
                 const s5 = document.getElementById('step-5');
                 if (s5) s5.classList.remove('hidden');
@@ -3072,6 +3184,7 @@
 
             } catch (err) {
                 console.error("Submission Error:", err);
+                if (loader) loader.classList.add('hidden');
                 alert("Failed to deploy campaign: " + err.message);
             } finally {
                 btnSpan.innerText = originalText;
@@ -3679,7 +3792,8 @@
                 'confirmSignout','closeSignoutModal','processLogout','openCampaignWizard','closeCampaignWizard',
                 'selectPlatform','updateCalculation','syncInputs','nextStep','prevStep','finishCreation',
                 'openDepositModal','closeDepositModal','processDeposit','switchSettingsView','saveProfileSettings',
-                'updatePassword','togglePref','startTaskFlow','nextTaskStep','updateTaskProofLabel','submitTaskProof'
+                'updatePassword','togglePref','startTaskFlow','nextTaskStep','updateTaskProofLabel','submitTaskProof',
+                'showToast'
             ];
 
             names.forEach(name => {

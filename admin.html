@@ -1099,7 +1099,7 @@
                         </div>
                         <div class="space-y-2">
                             <h2 class="text-3xl font-bold">Great Success!</h2>
-                            <p class="text-dash-secondary max-w-xs mx-auto">Your campaign has been queued. We're verifying your payment right now.</p>
+                            <p class="text-dash-secondary max-w-xs mx-auto">Your campaign has been queued. We're verifying your payment in the background right now.</p>
                         </div>
                         <div class="flex flex-col gap-3 max-w-xs mx-auto pt-4">
                             <button onclick="closeCampaignWizard(); switchSPAView('campaigns')" class="w-full btn-fintech btn-primary justify-center py-4">GO TO CAMPAIGNS</button>
@@ -1147,6 +1147,13 @@
                 <button onclick="processDeposit()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Pay with Paystack</button>
             </div>
         </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="hidden fixed inset-0 z-[500] bg-black/60 backdrop-blur-md flex flex-col items-center justify-center gap-4 text-center">
+        <div class="w-16 h-16 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(69,185,110,0.3)]"></div>
+        <p class="text-white font-black text-xs uppercase tracking-[0.2em]" id="loading-text">Deploying Mission...</p>
+        <p class="text-[var(--accent-primary)] font-mono text-lg font-bold" id="loading-percentage">0%</p>
     </div>
 
     <!-- Signout Confirmation Overlay -->
@@ -1792,7 +1799,12 @@
             document.getElementById('detail-platform-icon').innerHTML = `<i class="fa-brands fa-${campaign.platform}"></i>`;
             
             // Status Badge
-            const statusColors = { active: 'bg-green-500/10 text-green-500', pending_verification: 'bg-amber-500/10 text-amber-500', completed: 'bg-blue-500/10 text-blue-500' };
+            const statusColors = { 
+                active: 'bg-green-500/10 text-green-500', 
+                pending_verification: 'bg-amber-500/10 text-amber-500', 
+                completed: 'bg-blue-500/10 text-blue-500',
+                rejected: 'bg-red-500/10 text-red-500'
+            };
             document.getElementById('detail-status-badge').innerHTML = `<span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${statusColors[campaign.status]}">${campaign.status === 'pending_verification' ? 'Verifying' : campaign.status}</span>`;
             
             // Action Link
@@ -2395,19 +2407,44 @@
                 return;
             }
 
+            // Validation: Payment Proof is Compulsory
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Action Required: Please upload your payment receipt (screenshot or PDF) before submitting.");
+                btnSpan.innerText = originalText;
+                finishBtn.disabled = false;
+                return;
+            }
+
+            // Show loading spinner
+            const loader = document.getElementById('loading-overlay');
+            const loaderText = document.getElementById('loading-text');
+            const loaderPct = document.getElementById('loading-percentage');
+            if (loader) loader.classList.remove('hidden');
+
             try {
                 let proofUrl = null;
 
-                // 1. Upload Receipt to Supabase Storage in "proofs" bucket
+                // 1. Upload Receipt to Appwrite Storage in "proofs" bucket
                 if (fileInput.files && fileInput.files[0]) {
+                    if (loaderText) loaderText.innerText = "Uploading Receipt...";
+                    let uploadProgress = 0;
+                    const interval = setInterval(() => {
+                        if (uploadProgress < 90) {
+                            uploadProgress += Math.floor(Math.random() * 7) + 1;
+                            if (loaderPct) loaderPct.innerText = `${Math.min(uploadProgress, 90)}%`;
+                        }
+                    }, 250);
+
                     const file = fileInput.files[0];
                     const fileExt = file.name.split('.').pop();
-                    const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`;
 
                     const uploadRes = await storage.createFile(APPWRITE_CONFIG.BUCKETS.PROOFS, ID.unique(), file);
+                    clearInterval(interval);
+                    if (loaderPct) loaderPct.innerText = "95%";
                     proofUrl = storage.getFileView(APPWRITE_CONFIG.BUCKETS.PROOFS, uploadRes.$id);
                 }
 
+                if (loaderText) loaderText.innerText = "Registering Campaign...";
                 // 2. Save Campaign details and capture returned ID for ledger
                 const campaignData = await databases.createDocument(
                     APPWRITE_CONFIG.DATABASE_ID,
@@ -2426,6 +2463,7 @@
                     }
                 );
 
+                if (loaderText) loaderText.innerText = "Finalizing Ledger...";
                 // 3. Create relational link in transactions ledger for balance reconciliation
                 await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
                     user_id: currentUser.id,
@@ -2438,6 +2476,8 @@
                 });
 
                 // Transition to success screen
+                if (loaderPct) loaderPct.innerText = "100%";
+                if (loader) loader.classList.add('hidden');
                 document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
                 const s5 = document.getElementById('step-5');
                 if (s5) s5.classList.remove('hidden');
@@ -2460,6 +2500,7 @@
 
             } catch (err) {
                 console.error("Submission Error:", err);
+                if (loader) loader.classList.add('hidden');
                 alert("Failed to deploy campaign: " + err.message);
             } finally {
                 btnSpan.innerText = originalText;

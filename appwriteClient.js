@@ -25,4 +25,4 @@ client.setEndpoint(APPWRITE_CONFIG.ENDPOINT).setProject(APPWRITE_CONFIG.PROJECT_
 export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
-export { ID, Query, Account, Databases, Storage, APPWRITE_CONFIG };
+export { client, ID, Query, Account, Databases, Storage, APPWRITE_CONFIG };
