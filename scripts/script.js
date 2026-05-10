@@ -224,14 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 logoutButton.style.display = 'flex';
                 logoutButton.onclick = handleLogout; // Attach logout function
             }
-
-            // Update Earn/Grow links to point to dashboard with specific views
-            document.querySelectorAll('a[href="earn.html"]').forEach(link => {
-                link.href = `dashboard.html?view=performer`;
-            });
-            document.querySelectorAll('a[href="grow.html"]').forEach(link => {
-                link.href = `dashboard.html?view=creator`;
-            });
         } else {
             // User is not logged in
             if (loginLink) loginLink.style.display = 'flex';
