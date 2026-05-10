@@ -1408,15 +1408,46 @@
                                     <button onclick="selectPlatform('facebook')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-facebook"><i class="fa-brands fa-facebook text-xl mb-2"></i><p class="text-[9px] font-bold">Facebook</p></button>
                                     <button onclick="selectPlatform('twitter')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-twitter"><i class="fa-brands fa-x-twitter text-xl mb-2"></i><p class="text-[9px] font-bold">X</p></button>
                                     <button onclick="selectPlatform('linkedin')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-linkedin"><i class="fa-brands fa-linkedin text-xl mb-2"></i><p class="text-[9px] font-bold">LinkedIn</p></button>
+                                    <button onclick="selectPlatform('youtube')" class="platform-btn p-4 rounded-2xl border border-dash hover:border-[var(--accent-primary)] transition text-center" id="plt-youtube"><i class="fa-brands fa-youtube text-xl mb-2"></i><p class="text-[9px] font-bold">YouTube</p></button>
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Target URL</label>
-                                <input type="url" id="target-url" placeholder="https://..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
-                                <p class="text-[10px] text-dash-secondary mt-2 flex items-start gap-2 italic">
-                                    <i data-feather="info" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0"></i>
-                                    <span>Note: This URL is for internal review only. Our performers use organic methods (search/explore) to find your post, ensuring authentic engagement patterns.</span>
-                                </p>
+                            
+                            <div id="discovery-fields" class="hidden space-y-4 pt-4 border-t border-dash">
+                                <!-- Social Media Discovery (IG/TikTok/FB/X) -->
+                                <div id="social-discovery-fields" class="hidden space-y-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Account @Username</label>
+                                        <input type="text" id="target-username" placeholder="@brandname" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                    </div>
+                                    <div class="relative group">
+                                        <input type="file" id="target-thumbnail" accept="image/*" class="hidden" onchange="updateThumbnailLabel(this)">
+                                        <label for="target-thumbnail" class="w-full bg-dash-secondary border-2 border-dashed border-dash hover:border-[var(--accent-primary)] transition p-6 rounded-3xl flex flex-col items-center gap-2 cursor-pointer">
+                                            <i data-feather="image" class="w-6 h-6 text-dash-secondary"></i>
+                                            <span id="thumbnail-file-label" class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Upload Content Thumbnail (Visual Guide)</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- SEO Platforms Discovery (Google/YouTube) -->
+                                <div id="seo-discovery-fields" class="hidden space-y-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Search Seed (Keywords)</label>
+                                        <input type="text" id="search-seed" placeholder="e.g. Best performance marketing 2026" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Breadcrumb (Navigation Instruction)</label>
+                                        <input type="text" id="breadcrumb" placeholder="e.g. Sort by Latest, look for black flyer" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Master URL (Hidden from Performers)</label>
+                                    <input type="url" id="target-url" placeholder="https://..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                    <p class="text-[9px] text-dash-secondary mt-2 flex items-start gap-2 italic">
+                                        <i data-feather="lock" class="w-3 h-3 mt-0.5 flex-shrink-0"></i>
+                                        <span>Encrypted Ground Truth: Used by PIDI admins to verify mission success. Performers only see discovery guides.</span>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2610,6 +2641,16 @@
         let taskTimerInterval = null;
         let taskCountdownSeconds = 0;
 
+        const PLATFORM_CONFIG = {
+            instagram: { category: 'social', timer: 15 },
+            tiktok: { category: 'social', timer: 15 },
+            facebook: { category: 'social', timer: 15 },
+            twitter: { category: 'social', timer: 15 },
+            linkedin: { category: 'social', timer: 15 },
+            google: { category: 'seo', timer: 60 },
+            youtube: { category: 'seo', timer: 60 }
+        };
+
     // Map of active claim timers: campaignId -> { expiresAt, intervalId }
     const activeClaimTimers = {};
 
@@ -2907,15 +2948,28 @@
                 resetWizard(); 
                 selectedPlatform = null;
                 const proofLabel = document.getElementById('proof-file-label'); if (proofLabel) proofLabel.innerText = 'Upload Receipt (IMG/PDF)';
+                const thumbLabel = document.getElementById('thumbnail-file-label'); if (thumbLabel) thumbLabel.innerText = 'Upload Content Thumbnail (Visual Guide)';
+                const df = document.getElementById('discovery-fields'); if (df) df.classList.add('hidden');
                 // ensure calculation reflects defaults
                 updateCalculation();
                 // focus first input for convenience
-                setTimeout(() => { const urlInput = document.getElementById('target-url'); if (urlInput) urlInput.focus(); }, 120);
+                setTimeout(() => { const urlInput = document.getElementById('target-username'); if (urlInput) urlInput.focus(); }, 120);
             } catch (e) {
                 console.error('Failed to open campaign wizard:', e);
                 switchSPAView('campaign-creation');
             }
         };
+
+        window.updateThumbnailLabel = function(input) {
+            const label = document.getElementById('thumbnail-file-label');
+            if (input.files && input.files[0]) {
+                label.innerText = `Thumb Ready: ${input.files[0].name}`;
+                label.classList.add('text-[var(--accent-primary)]');
+            } else {
+                label.innerText = "Upload Content Thumbnail (Visual Guide)";
+                label.classList.remove('text-[var(--accent-primary)]');
+            }
+        }
 
         window.closeCampaignWizard = () => { switchSPAView('dashboard-home'); resetWizard(); };
 
@@ -2972,6 +3026,15 @@
                 activeBtn.classList.add('active', 'border-[#6a26da]', 'bg-[#6a26da]/5');
                 activeBtn.classList.remove('border-dash'); // Remove conflicting !important border
             }
+
+            const config = PLATFORM_CONFIG[plt] || { category: 'social' };
+            const df = document.getElementById('discovery-fields');
+            const sf = document.getElementById('social-discovery-fields');
+            const ef = document.getElementById('seo-discovery-fields');
+            if (df) df.classList.remove('hidden');
+            if (sf) sf.classList.toggle('hidden', config.category !== 'social');
+            if (ef) ef.classList.toggle('hidden', config.category !== 'seo');
+
             updateCalculation(); // Update the summary text immediately
         }
 
@@ -3011,13 +3074,29 @@
 
         function nextStep() {
             if (currentStep === 1) {
-                const urlInput = document.getElementById('target-url');
                 if (!selectedPlatform) {
                     alert("Please select a platform to proceed.");
                     return;
                 }
+                const config = PLATFORM_CONFIG[selectedPlatform];
+                if (config.category === 'social') {
+                    const user = document.getElementById('target-username').value.trim();
+                    const thumb = document.getElementById('target-thumbnail');
+                    if (!user || !thumb.files[0]) {
+                        alert("Social missions require a @Username and a Thumbnail visual guide.");
+                        return;
+                    }
+                } else {
+                    const seed = document.getElementById('search-seed').value.trim();
+                    const bread = document.getElementById('breadcrumb').value.trim();
+                    if (!seed || !bread) {
+                        alert("SEO missions require a Search Seed and Breadcrumb instructions.");
+                        return;
+                    }
+                }
+                const urlInput = document.getElementById('target-url');
                 if (!urlInput || !urlInput.value.trim()) {
-                    alert("Please provide a Target URL for internal review.");
+                    alert("Admin Verification Required: Please provide the Master URL.");
                     urlInput.focus();
                     return;
                 }
@@ -3080,8 +3159,12 @@
             // Aggregate Wizard State
             const qty = document.getElementById('goal-val').value;
             const url = document.getElementById('target-url').value;
+            const username = document.getElementById('target-username').value;
+            const seed = document.getElementById('search-seed').value;
+            const bread = document.getElementById('breadcrumb').value;
             const instructions = document.getElementById('task-instructions').value;
             const fileInput = document.getElementById('payment-proof-file');
+            const thumbInput = document.getElementById('target-thumbnail');
             const totalCost = calculateTotalCost(parseInt(qty));
 
             if (!url) {
@@ -3107,6 +3190,7 @@
 
             try {
                 let proofUrl = null;
+                let thumbUrl = null;
 
                 // 1. Upload Receipt to Appwrite Storage in "proofs" bucket
                 if (fileInput.files && fileInput.files[0]) {
@@ -3128,6 +3212,12 @@
                     proofUrl = storage.getFileView(APPWRITE_CONFIG.BUCKETS.PROOFS, uploadRes.$id);
                 }
 
+                // Upload thumbnail if exists
+                if (thumbInput && thumbInput.files[0]) {
+                    const uploadRes = await storage.createFile(APPWRITE_CONFIG.BUCKETS.PROOFS, ID.unique(), thumbInput.files[0]);
+                    thumbUrl = storage.getFileView(APPWRITE_CONFIG.BUCKETS.PROOFS, uploadRes.$id);
+                }
+
                 if (loaderText) loaderText.innerText = "Registering Campaign...";
                 // 2. Save Campaign details and capture returned ID for ledger
                 const campaignData = await databases.createDocument(
@@ -3137,7 +3227,12 @@
                     {
                         creator_id: currentUser.id,
                         platform: selectedPlatform,
+                        platform_category: PLATFORM_CONFIG[selectedPlatform].category,
                         target_url: url,
+                        username: username,
+                        thumbnail_url: thumbUrl,
+                        search_seed: seed,
+                        breadcrumb: bread,
                         goal_count: parseInt(qty),
                         instructions: instructions,
                         payment_proof_url: proofUrl,
@@ -3333,12 +3428,42 @@
         }
 
         window.nextTaskStep = function() {
-            if (currentTaskStep < 3) {
+            if (currentTaskStep === 1) {
+                // Transition to Search Guide & Start Retention Timer
+                document.getElementById(`task-step-${currentTaskStep}`).classList.add('hidden');
+                currentTaskStep++;
+                document.getElementById(`task-step-${currentTaskStep}`).classList.remove('hidden');
+                updateTaskFlowNav();
+                
+                const config = PLATFORM_CONFIG[activeTask.platform] || { timer: 15 };
+                startRetentionTimer(config.timer);
+            } else if (currentTaskStep < 3) {
                 document.getElementById(`task-step-${currentTaskStep}`).classList.add('hidden');
                 currentTaskStep++;
                 document.getElementById(`task-step-${currentTaskStep}`).classList.remove('hidden');
                 updateTaskFlowNav();
             }
+        }
+
+        function startRetentionTimer(seconds) {
+            const timerEl = document.getElementById('retention-timer');
+            const completeBtn = document.getElementById('task-complete-btn');
+            if (!timerEl || !completeBtn) return;
+            
+            let remaining = seconds;
+            const interval = setInterval(() => {
+                const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+                const s = String(remaining % 60).padStart(2, '0');
+                timerEl.innerText = `${m}:${s}`;
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    completeBtn.disabled = false;
+                    completeBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-dash-secondary');
+                    completeBtn.classList.add('btn-primary', 'text-white');
+                    completeBtn.innerText = "Dwell-Time Met: Submit Evidence";
+                }
+                remaining--;
+            }, 1000);
         }
 
         function resetTaskFlowUI() {
