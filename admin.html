@@ -591,263 +591,75 @@
             <div id="admin-verification-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h2 class="text-3xl font-bold">Verification Hub</h2>
-                        <p class="text-dash-secondary text-sm">Approve campaign funding receipts & performer proof submissions. Use the controls to filter, search, and analyze activity.</p>
+                        <h2 class="text-3xl font-extrabold tracking-tight">Verification Hub</h2>
+                        <p class="text-dash-secondary text-sm">Manage campaign funding and performer task approvals.</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <label class="text-[10px] text-dash-secondary mr-2">View</label>
-                        <div class="bg-dash-secondary rounded-lg p-1 flex items-center text-xs">
-                            <button id="view-campaigns-btn" class="px-3 py-1 rounded-md text-dash-secondary font-bold">Campaigns</button>
-                            <button id="view-creators-btn" class="px-3 py-1 rounded-md text-dash-secondary font-bold">Creators</button>
-                            <button id="view-performers-btn" class="px-3 py-1 rounded-md text-dash-secondary font-bold">Performers</button>
-                        </div>
+                    <div class="bg-dash-secondary rounded-xl p-1 flex items-center text-[10px] font-black uppercase tracking-widest border border-dash shadow-inner">
+                        <button onclick="setHubView('campaigns')" id="hub-tab-campaigns" class="px-4 py-2 rounded-lg transition-all">Missions</button>
+                        <button onclick="setHubView('performers')" id="hub-tab-performers" class="px-4 py-2 rounded-lg transition-all">Submissions</button>
+                        <button onclick="setHubView('creators')" id="hub-tab-creators" class="px-4 py-2 rounded-lg transition-all">Directory</button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-                    <div class="lg:col-span-2 space-y-3">
-                        <div class="flex flex-col md:flex-row items-start md:items-center gap-3">
-                            <input id="admin-search" type="search" placeholder="Search by campaign name, creator email or URL..." class="flex-1 bg-dash-secondary border border-dash rounded-xl p-2.5 text-sm focus:outline-none">
-                            <select id="filter-status" class="bg-white border border-dash rounded-xl p-2 text-sm">
-                                <option value="all">All statuses</option>
+                <!-- Top Stats Strip -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bento-card p-4 flex flex-col gap-1">
+                        <p class="text-[8px] font-black text-dash-secondary uppercase tracking-widest">Total Value</p>
+                        <h4 id="hub-stat-value" class="text-xl font-bold">₦0</h4>
+                    </div>
+                    <div class="bento-card p-4 flex flex-col gap-1">
+                        <p class="text-[8px] font-black text-dash-secondary uppercase tracking-widest">Pending</p>
+                        <h4 id="hub-stat-pending" class="text-xl font-bold text-amber-500">0</h4>
+                    </div>
+                    <div class="bento-card p-4 flex flex-col gap-1">
+                        <p class="text-[8px] font-black text-dash-secondary uppercase tracking-widest">Approved</p>
+                        <h4 id="hub-stat-approved" class="text-xl font-bold text-green-500">0</h4>
+                    </div>
+                    <div class="bento-card p-4 flex flex-col gap-1">
+                        <p class="text-[8px] font-black text-dash-secondary uppercase tracking-widest">Total Entities</p>
+                        <h4 id="hub-stat-total" class="text-xl font-bold">0</h4>
+                    </div>
+                </div>
+
+                <div class="bento-card p-0 overflow-hidden shadow-2xl shadow-slate-200/50">
+                    <!-- Advanced Filter Bar -->
+                    <div class="p-4 border-b border-dash bg-white flex flex-col md:flex-row gap-4">
+                        <div class="relative flex-1">
+                            <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dash-secondary"></i>
+                            <input id="hub-search" oninput="applyHubFilters()" type="text" placeholder="Search by name, email, or URL..." class="w-full bg-dash-secondary/50 border border-dash rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-red-500 transition-all">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <select id="hub-filter-status" onchange="applyHubFilters()" class="bg-dash-secondary/50 border border-dash rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none">
+                                <option value="all">All Status</option>
                                 <option value="pending_verification">Pending</option>
-                                <option value="active">Active</option>
-                                <option value="completed">Completed</option>
+                                <option value="active">Active/Approved</option>
                                 <option value="rejected">Rejected</option>
+                                <option value="completed">Completed</option>
                             </select>
-                            <input id="filter-from" type="date" class="bg-white border border-dash rounded-xl p-2 text-sm">
-                            <input id="filter-to" type="date" class="bg-white border border-dash rounded-xl p-2 text-sm">
-                            <button id="refresh-admin-view" class="btn-fintech bg-dash-secondary text-[10px] font-black uppercase tracking-widest px-4 py-2">Refresh</button>
-                        </div>
-
-                        <div class="bento-card p-0 overflow-x-auto">
-                            <table class="w-full text-left text-xs" id="admin-verification-table">
-                                <thead class="bg-dash-secondary/30">
-                                    <tr class="text-dash-secondary border-b border-dash">
-                                        <th class="p-3 font-semibold uppercase tracking-wider">Campaign</th>
-                                        <th class="p-3 font-semibold uppercase tracking-wider">Creator</th>
-                                        <th class="p-3 font-semibold uppercase tracking-wider">Platform</th>
-                                        <th class="p-3 font-semibold uppercase tracking-wider">Location</th>
-                                        <th class="p-3 font-semibold uppercase tracking-wider">Created</th>
-                                        <th class="p-3 font-semibold uppercase tracking-wider">Start → End</th>
-                                        <th class="p-3 font-semibold uppercase tracking-wider">Goal</th>
-                                        <th class="p-3 font-semibold uppercase tracking-wider">Spend</th>
-                                        <th class="p-3 font-semibold uppercase tracking-wider">Status</th>
-                                        <th class="p-3 font-semibold uppercase tracking-wider text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-verification-body" class="divide-y divide-dash">
-                                    <tr><td colspan="10" class="py-8 text-center text-dash-secondary">Loading...</td></tr>
-                                </tbody>
-                            </table>
+                            <div class="flex items-center bg-dash-secondary/50 border border-dash rounded-xl px-3 gap-2">
+                                <i data-feather="calendar" class="w-3.5 h-3.5 text-dash-secondary"></i>
+                                <input id="hub-filter-date" onchange="applyHubFilters()" type="date" class="bg-transparent border-none py-2 text-[10px] font-bold uppercase focus:ring-0 cursor-pointer">
+                            </div>
+                            <button onclick="fetchAdminPendingMissions()" class="p-2.5 rounded-xl bg-dash-secondary hover:bg-white border border-dash transition-colors">
+                                <i data-feather="refresh-cw" class="w-4 h-4 text-dash-secondary"></i>
+                            </button>
                         </div>
                     </div>
-
-                    <div class="space-y-4">
-                        <div class="bento-card p-4">
-                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary mb-4">Analytics</h4>
-                            <canvas id="admin-analytics-chart" height="220"></canvas>
-                        </div>
-
-                        <div class="bento-card p-4">
-                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary mb-4">Summary</h4>
-                            <div id="admin-analytics-summary" class="text-sm text-dash-secondary"></div>
-                        </div>
+                    
+                    <!-- Dynamic Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-dash-secondary/30 text-dash-secondary font-bold uppercase tracking-widest border-b border-dash">
+                                <tr id="hub-table-head">
+                                    <!-- Headers injected via JS -->
+                                </tr>
+                            </thead>
+                            <tbody id="hub-table-body" class="divide-y divide-dash">
+                                <!-- Data rows injected via JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <script>
-                (function(){
-                    // Simple admin verification view module
-                    const el = id => document.getElementById(id);
-                    let campaignsCache = [];
-                    let profilesCache = [];
-
-                    async function fetchAllCampaigns(){
-                        try{
-                            if (!window.databases || !window.APPWRITE_CONFIG) throw new Error('Appwrite client not available');
-                            const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS);
-                            campaignsCache = res.documents || [];
-                            return campaignsCache;
-                        }catch(err){
-                            console.error('fetchAllCampaigns', err);
-                            campaignsCache = [];
-                            return [];
-                        }
-                    }
-
-                    async function fetchAllProfiles(){
-                        try{
-                            if (!window.databases || !window.APPWRITE_CONFIG) throw new Error('Appwrite client not available');
-                            const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES);
-                            profilesCache = res.documents || [];
-                            return profilesCache;
-                        }catch(err){
-                            console.error('fetchAllProfiles', err);
-                            profilesCache = [];
-                            return [];
-                        }
-                    }
-
-                    function formatDate(ts){
-                        if(!ts) return '-';
-                        try{ return new Date(ts).toLocaleString(); }catch(e){return ts}
-                    }
-
-                    function findProfileById(id){
-                        return profilesCache.find(p => p.$id === id) || profilesCache.find(p => p.email === id) || {name:'Unknown', email:'-'};
-                    }
-
-                    function renderCampaignsTable(list){
-                        const body = el('admin-verification-body');
-                        body.innerHTML = '';
-                        if(!list.length){
-                            body.innerHTML = '<tr><td colspan="10" class="py-8 text-center text-dash-secondary">No campaigns match the selected filters.</td></tr>';
-                            return;
-                        }
-                        for(const c of list){
-                            const creator = findProfileById(c.creator_id || c.creator);
-                            const tr = document.createElement('tr');
-                            tr.className = 'campaign-row';
-                            tr.innerHTML = `
-                                <td class="p-3 align-top font-semibold">${c.title || c.name || c.target_url || c.$id}</td>
-                                <td class="p-3 align-top">${creator.name || creator.email || '-' }<div class="text-[10px] text-dash-secondary">${creator.email || ''}</div></td>
-                                <td class="p-3 align-top">${c.platform || c.platform_name || '-'}</td>
-                                <td class="p-3 align-top">${c.location || c.country || '-'}</td>
-                                <td class="p-3 align-top">${formatDate(c.$createdAt || c.created_at || c.created)}</td>
-                                <td class="p-3 align-top">${c.start_date ? formatDate(c.start_date) : '-'} → ${c.end_date ? formatDate(c.end_date) : '-'}</td>
-                                <td class="p-3 align-top">${c.goal || c.target_count || '-'}</td>
-                                <td class="p-3 align-top">₦${c.budget || c.total_cost || 0}</td>
-                                <td class="p-3 align-top">${c.status || '-'}</td>
-                                <td class="p-3 align-top text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <button onclick="window.open('/campaign-detail.html?id=${c.$id}', '_blank')" class="text-[10px] bg-dash-secondary px-3 py-1 rounded-lg">View</button>
-                                        <button onclick="adminAction('${c.$id}','approved')" class="text-[10px] bg-green-100 text-green-700 px-3 py-1 rounded-lg">Approve</button>
-                                        <button onclick="adminAction('${c.$id}','rejected')" class="text-[10px] bg-rose-100 text-rose-700 px-3 py-1 rounded-lg">Reject</button>
-                                    </div>
-                                </td>
-                            `;
-                            body.appendChild(tr);
-                        }
-                    }
-
-                    function summarizeCampaigns(list){
-                        const total = list.length;
-                        const byStatus = list.reduce((acc, c) => { acc[c.status] = (acc[c.status]||0)+1; return acc; }, {});
-                        const totalBudget = list.reduce((s,c) => s + Number(c.budget || c.total_cost || 0), 0);
-                        return { total, byStatus, totalBudget };
-                    }
-
-                    let analyticsChart = null;
-                    function renderAnalytics(list){
-                        const summary = summarizeCampaigns(list);
-                        const summaryEl = el('admin-analytics-summary');
-                        summaryEl.innerHTML = `<div class="mb-2"><strong>Total campaigns:</strong> ${summary.total}</div><div class="mb-2"><strong>Total spend:</strong> ₦${summary.totalBudget}</div>`;
-
-                        const labels = Object.keys(summary.byStatus);
-                        const data = labels.map(k => summary.byStatus[k]);
-
-                        const ctx = document.getElementById('admin-analytics-chart').getContext('2d');
-                        if(analyticsChart){ analyticsChart.data.labels = labels; analyticsChart.data.datasets[0].data = data; analyticsChart.update(); return; }
-
-                        analyticsChart = new Chart(ctx, {
-                            type: 'doughnut',
-                            data: { labels, datasets: [{ data, backgroundColor: ['#f97316','#10b981','#ef4444','#60a5fa','#a78bfa'] }] },
-                            options: { plugins: { legend: { position:'bottom' } } }
-                        });
-                    }
-
-                    function applyFiltersAndRender(){
-                        const q = (el('admin-search').value || '').toLowerCase().trim();
-                        const status = el('filter-status').value;
-                        const from = el('filter-from').value ? new Date(el('filter-from').value) : null;
-                        const to = el('filter-to').value ? new Date(el('filter-to').value) : null;
-                        let list = campaignsCache.slice();
-                        if(status && status !== 'all') list = list.filter(c => (c.status||'').toLowerCase() === status.toLowerCase());
-                        if(q) list = list.filter(c => ((c.title||c.name||'')+ (c.target_url||'') + (c.creator_email||'') + (c.$id||'')).toLowerCase().includes(q));
-                        if(from) list = list.filter(c => { const d = new Date(c.$createdAt || c.created_at || c.created); return d >= from; });
-                        if(to) list = list.filter(c => { const d = new Date(c.$createdAt || c.created_at || c.created); return d <= to; });
-
-                        renderCampaignsTable(list);
-                        renderAnalytics(list);
-                    }
-
-                    async function initAdminVerificationView(){
-                        try{
-                            el('admin-verification-body').innerHTML = '<tr><td colspan="10" class="py-8 text-center text-dash-secondary">Loading...</td></tr>';
-                            await Promise.all([fetchAllProfiles(), fetchAllCampaigns()]);
-                            applyFiltersAndRender();
-                        }catch(e){
-                            console.error('initAdminVerificationView', e);
-                            el('admin-verification-body').innerHTML = '<tr><td colspan="10" class="py-8 text-center text-red-500">Failed to load data.</td></tr>';
-                        }
-                    }
-
-                    // Wire UI
-                    el('refresh-admin-view').addEventListener('click', async()=>{ await initAdminVerificationView(); });
-                    el('filter-status').addEventListener('change', applyFiltersAndRender);
-                    el('admin-search').addEventListener('input', () => { setTimeout(applyFiltersAndRender, 150); });
-                    el('filter-from').addEventListener('change', applyFiltersAndRender);
-                    el('filter-to').addEventListener('change', applyFiltersAndRender);
-
-                    // View toggles
-                    el('view-campaigns-btn').addEventListener('click', ()=>{ initAdminVerificationView(); });
-                    el('view-creators-btn').addEventListener('click', async ()=>{
-                        await fetchAllProfiles();
-                        // Render a simple creators list in the campaigns table area
-                        const body = el('admin-verification-body'); body.innerHTML = '';
-                        if(!profilesCache.length) body.innerHTML = '<tr><td colspan="10" class="py-8 text-center text-dash-secondary">No creators found.</td></tr>';
-                        for(const p of profilesCache){
-                            const tr = document.createElement('tr'); tr.innerHTML = `
-                                <td class="p-3 font-semibold">${p.name || p.email || p.$id}</td>
-                                <td class="p-3">${p.email || '-'}</td>
-                                <td class="p-3">${p.role || '-'}</td>
-                                <td class="p-3">₦${p.balance||0}</td>
-                                <td class="p-3">${p.joined || p.$createdAt || '-'}</td>
-                                <td class="p-3" colspan="5"></td>
-                            `; body.appendChild(tr);
-                        }
-                        renderAnalytics(campaignsCache);
-                    });
-
-                    el('view-performers-btn').addEventListener('click', async ()=>{
-                        // quick reuse: fetch engagements to display performer submissions if collection exists
-                        try{
-                            const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS);
-                            const items = res.documents || [];
-                            const body = el('admin-verification-body'); body.innerHTML = '';
-                            if(!items.length) body.innerHTML = '<tr><td colspan="10" class="py-8 text-center text-dash-secondary">No performer submissions found.</td></tr>';
-                            for(const e of items){
-                                const tr = document.createElement('tr');
-                                tr.innerHTML = `
-                                    <td class="p-3 font-semibold">${e.title || e.mission_name || e.$id}</td>
-                                    <td class="p-3">${e.performer_name || e.performer_email || e.performer_id || '-'}</td>
-                                    <td class="p-3">${e.platform || '-'}</td>
-                                    <td class="p-3">${e.location || '-'}</td>
-                                    <td class="p-3">${formatDate(e.$createdAt)}</td>
-                                    <td class="p-3">-</td>
-                                    <td class="p-3">₦${e.reward||0}</td>
-                                    <td class="p-3">-</td>
-                                    <td class="p-3">${e.status||'-'}</td>
-                                    <td class="p-3 text-right">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <button onclick="adminVerifyEngagement('${e.$id}','approved')" class="text-[10px] bg-green-100 text-green-700 px-3 py-1 rounded-lg">Approve</button>
-                                            <button onclick="adminVerifyEngagement('${e.$id}','rejected')" class="text-[10px] bg-rose-100 text-rose-700 px-3 py-1 rounded-lg">Reject</button>
-                                        </div>
-                                    </td>
-                                `;
-                                body.appendChild(tr);
-                            }
-                            renderAnalytics(campaignsCache);
-                        }catch(err){ console.error('fetch engagements', err); alert('Failed to load performer submissions: ' + (err.message||err)); }
-                    });
-
-                    // Kick off initial load
-                    setTimeout(initAdminVerificationView, 300);
-                    // expose for debugging
-                    window._adminVerification = { init: initAdminVerificationView, refresh: initAdminVerificationView };
-                })();
-                </script>
             </div>
 
             <!-- SPA CONTAINER: User Management View -->
@@ -1654,6 +1466,160 @@
             renderActiveList(filteredItems);
         }
 
+        // --- VERIFICATION HUB CORE LOGIC ---
+        window.setHubView = function(view) {
+            hubState.view = view;
+            const tabs = ['campaigns', 'performers', 'creators'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`hub-tab-${t}`);
+                if (el) {
+                    el.classList.toggle('bg-white', t === view);
+                    el.classList.toggle('shadow-sm', t === view);
+                    el.classList.toggle('text-[var(--text-primary)]', t === view);
+                    el.classList.toggle('text-dash-secondary', t !== view);
+                }
+            });
+            renderHubTable();
+        };
+
+        window.applyHubFilters = function() {
+            hubState.search = document.getElementById('hub-search').value.toLowerCase();
+            hubState.status = document.getElementById('hub-filter-status').value;
+            hubState.date = document.getElementById('hub-filter-date').value;
+            renderHubTable();
+        };
+
+        function renderHubTable() {
+            const head = document.getElementById('hub-table-head');
+            const body = document.getElementById('hub-table-body');
+            if (!head || !body) return;
+
+            body.innerHTML = '<tr><td colspan="10" class="py-12 text-center text-dash-secondary font-medium animate-pulse italic">Applying filters...</td></tr>';
+
+            let data = [];
+            if (hubState.view === 'campaigns') {
+                head.innerHTML = `
+                    <th class="p-4">Mission Details</th>
+                    <th class="p-4">Value</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4 text-right">Verification</th>`;
+                data = hubState.campaigns.filter(c => {
+                    const matchesSearch = (c.target_url || '').toLowerCase().includes(hubState.search) || (c.full_name || '').toLowerCase().includes(hubState.search);
+                    const matchesStatus = hubState.status === 'all' || c.status === hubState.status;
+                    const matchesDate = !hubState.date || c.created_at.startsWith(hubState.date);
+                    return matchesSearch && matchesStatus && matchesDate;
+                });
+                body.innerHTML = data.map(c => `
+                    <tr class="hover:bg-dash-secondary/10 transition-colors">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${c.platform} text-xs"></i></div>
+                                <div><p class="font-bold text-[11px] truncate max-w-[200px]">${c.target_url}</p><p class="text-[9px] text-dash-secondary">${c.full_name}</p></div>
+                            </div>
+                        </td>
+                        <td class="p-4 font-bold">₦${(c.total_cost || 0).toLocaleString()}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter ${c.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${c.status.replace('_', ' ')}</span></td>
+                        <td class="p-4 text-right">
+                            <div class="flex justify-end gap-1.5">
+                                ${c.payment_proof_url ? `<button onclick="window.open('${c.payment_proof_url}')" class="p-2 rounded-lg bg-dash-secondary hover:bg-white border border-dash transition-colors" title="View Receipt"><i data-feather="image" class="w-3.5 h-3.5 text-dash-secondary"></i></button>` : ''}
+                                ${c.status === 'pending_verification' ? `
+                                    <button onclick="adminAction('${c.$id}', 'active')" class="p-2 rounded-lg bg-green-500/10 hover:bg-green-500 text-green-500 hover:text-white border border-green-500/20 transition-all"><i data-feather="check" class="w-3.5 h-3.5"></i></button>
+                                    <button onclick="adminAction('${c.$id}', 'rejected')" class="p-2 rounded-lg bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all"><i data-feather="x" class="w-3.5 h-3.5"></i></button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } else if (hubState.view === 'performers') {
+                head.innerHTML = `
+                    <th class="p-4">Submission</th>
+                    <th class="p-4">Reward</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4 text-right">Review</th>`;
+                data = hubState.engagements.filter(e => {
+                    const matchesSearch = (e.performer_name || '').toLowerCase().includes(hubState.search) || (e.proof_text || '').toLowerCase().includes(hubState.search);
+                    const matchesStatus = hubState.status === 'all' || e.status === hubState.status;
+                    const matchesDate = !hubState.date || e.created_at.startsWith(hubState.date);
+                    return matchesSearch && matchesStatus && matchesDate;
+                });
+                body.innerHTML = data.map(e => `
+                    <tr class="hover:bg-dash-secondary/10 transition-colors">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <img src="${e.proof_url || 'assets/headshot-placeholder.svg'}" class="w-8 h-10 object-cover rounded-lg bg-dash-secondary border border-dash cursor-pointer" onclick="window.open('${e.proof_url}')">
+                                <div><p class="font-bold text-[11px]">${e.performer_name || 'Performer'}</p><p class="text-[9px] text-dash-secondary truncate max-w-[150px] italic">"${(e.proof_text || '').slice(0, 40)}..."</p></div>
+                            </div>
+                        </td>
+                        <td class="p-4 font-bold">₦${(e.reward || 70).toLocaleString()}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter ${e.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${e.status}</span></td>
+                        <td class="p-4 text-right">
+                            <div class="flex justify-end gap-1.5">
+                                ${e.status === 'pending_verification' ? `
+                                    <button onclick="adminVerifyEngagement('${e.$id}', 'completed')" class="p-2 rounded-lg bg-green-500 text-white shadow-lg shadow-green-500/20"><i data-feather="check" class="w-3.5 h-3.5"></i></button>
+                                    <button onclick="adminVerifyEngagement('${e.$id}', 'rejected')" class="p-2 rounded-lg bg-red-500 text-white shadow-lg shadow-red-500/20"><i data-feather="x" class="w-3.5 h-3.5"></i></button>
+                                ` : `<button class="p-2 rounded-lg bg-dash-secondary text-dash-secondary opacity-50 cursor-not-allowed"><i data-feather="lock" class="w-3.5 h-3.5"></i></button>`}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                head.innerHTML = `
+                    <th class="p-4">User</th>
+                    <th class="p-4">Role</th>
+                    <th class="p-4">Balance</th>
+                    <th class="p-4 text-right">Control</th>`;
+                data = hubState.profiles.filter(p => {
+                    const matchesSearch = (p.full_name || '').toLowerCase().includes(hubState.search) || (p.email || '').toLowerCase().includes(hubState.search);
+                    const matchesStatus = hubState.status === 'all' || p.user_role === hubState.status;
+                    return matchesSearch && matchesStatus;
+                });
+                body.innerHTML = data.map(u => `
+                    <tr class="hover:bg-dash-secondary/10 transition-colors">
+                        <td class="p-4 flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.full_name)}&background=random" class="w-8 h-8 rounded-lg">
+                            <div><p class="font-bold">${u.full_name}</p><p class="text-dash-secondary text-[10px]">${u.email}</p></div>
+                        </td>
+                        <td class="p-4 uppercase font-bold text-[9px] text-dash-secondary">${u.user_role}</td>
+                        <td class="p-4 font-bold">₦${(u.balance || 0).toLocaleString()}</td>
+                        <td class="p-4 text-right"><button class="text-[10px] font-black uppercase text-red-500 hover:underline">Ban</button></td>
+                    </tr>
+                `).join('');
+            }
+
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="10" class="py-20 text-center text-dash-secondary font-bold uppercase tracking-widest opacity-30"><i data-feather="inbox" class="w-12 h-12 mx-auto mb-4 block"></i>No matching records</td></tr>';
+            }
+
+            // Update Hub Stats
+            document.getElementById('hub-stat-total').innerText = data.length;
+            if (hubState.view === 'campaigns') {
+                const pendingCount = hubState.campaigns.filter(c => c.status === 'pending_verification').length;
+                const totalSpend = hubState.campaigns.reduce((s, c) => s + (c.total_cost || 0), 0);
+                document.getElementById('hub-stat-pending').innerText = pendingCount;
+                document.getElementById('hub-stat-approved').innerText = hubState.campaigns.filter(c => c.status === 'active').length;
+                document.getElementById('hub-stat-value').innerText = `₦${totalSpend.toLocaleString()}`;
+            } else if (hubState.view === 'performers') {
+                const pendingCount = hubState.engagements.filter(e => e.status === 'pending_verification').length;
+                const totalPayouts = hubState.engagements.filter(e => e.status === 'completed').reduce((s, e) => s + (e.reward || 70), 0);
+                document.getElementById('hub-stat-pending').innerText = pendingCount;
+                document.getElementById('hub-stat-approved').innerText = hubState.engagements.filter(e => e.status === 'completed').length;
+                document.getElementById('hub-stat-value').innerText = `₦${totalPayouts.toLocaleString()}`;
+            } else {
+                document.getElementById('hub-stat-pending').innerText = '-';
+                document.getElementById('hub-stat-approved').innerText = '-';
+                const totalBal = hubState.profiles.reduce((s, p) => s + (p.balance || 0), 0);
+                document.getElementById('hub-stat-value').innerText = `₦${totalBal.toLocaleString()}`;
+            }
+            
+            feather.replace();
+        }
+
+        // Expose to window for global access from hub tabs
+        window.setHubView = setHubView;
+        window.applyHubFilters = applyHubFilters;
+        window.renderHubTable = renderHubTable;
+
+
         // Add event listeners for search bars
         document.addEventListener('DOMContentLoaded', () => {
             const searchInputs = document.querySelectorAll('.search-bar-container input, .md\\:hidden input');
@@ -2383,6 +2349,15 @@
                 // 2. ATTEMPT DATA SYNC (Wrapped to prevent navigation breaks)
                 try {
                     if (viewId.startsWith('admin-')) fetchAdminDashboardData();
+                    if (viewId === 'admin-verification') {
+                        Promise.all([
+                            databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS),
+                            databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS),
+                            databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES)
+                        ]).then(([c, e, p]) => {
+                            hubState.campaigns = c.documents; hubState.engagements = e.documents; hubState.profiles = p.documents; renderHubTable();
+                        });
+                    }
                     if (viewId === 'admin-verification') fetchAdminPendingMissions();
                     if (viewId === 'campaigns') fetchRoleData('creator');
                 } catch (err) {
@@ -2541,12 +2516,13 @@
             try {
                 // 1. Update Campaign Status
                 await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, campaignId, { status: newStatus });
-
+                
                 // 2. Update linked Transaction Status (best-effort)
                 try {
                     const transRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('campaign_id', campaignId)]);
                     if (transRes && transRes.total > 0 && transRes.documents && transRes.documents[0]) {
                         await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, transRes.documents[0].$id, { status: newStatus === 'active' ? 'completed' : 'failed' });
+                        if (newStatus === 'active') window.triggerConfetti();
                     }
                 } catch (tErr) {
                     // Non-fatal: surface warning but continue
@@ -2554,6 +2530,11 @@
                 }
 
                 showAdminMessageModal('Action Successful', `Campaign ${newStatus === 'active' ? 'Approved' : 'Rejected'} successfully.`, 'success');
+                
+                // Optimistic state update
+                const idx = hubState.campaigns.findIndex(c => c.$id === campaignId);
+                if (idx !== -1) { hubState.campaigns[idx].status = newStatus; renderHubTable(); }
+
                 // Refresh admin lists and dashboards so creators see updated state
                 fetchAdminPendingMissions();
                 fetchAdminDashboardData();
@@ -2613,6 +2594,10 @@
                         console.warn('Failed to update performer profile:', e);
                     }
                 }
+
+                // Optimistic update
+                const idx = hubState.engagements.findIndex(e => e.$id === engagementId);
+                if (idx !== -1) { hubState.engagements[idx].status = newStatus; renderHubTable(); }
 
                 showAdminMessageModal('Submission Verified', `Submission marked as ${newStatus} successfully.`, 'success');
                 fetchAdminPendingMissions();
