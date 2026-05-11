@@ -3474,15 +3474,7 @@
         initializeUser();
         updateLogo();
 
-        // Start the Pulse
-        function schedulePulse() {
-            const delay = Math.random() * (8000 - 3000) + 3000; // 3-8 seconds
-            setTimeout(() => {
-                spawnPulseItem();
-                schedulePulse();
-            }, delay);
-        }
-        // Global Pulse is now driven by real-time database events from Nigerian taskers
+        // Live pulse removed; Global Pulse is now driven by real-time database events from Nigerian taskers
         feather.replace();
 
         // Defensive helpers: ensure SPA navigation still works if inline handlers didn't bind
