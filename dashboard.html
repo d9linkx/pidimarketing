@@ -3220,20 +3220,19 @@
 
                 if (loaderText) loaderText.innerText = "Registering Campaign...";
                 // 2. Save Campaign details and capture returned ID for ledger
+                const generatedId = ID.unique();
                 const campaignData = await databases.createDocument(
                     APPWRITE_CONFIG.DATABASE_ID, 
                     APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, 
-                    ID.unique(), 
+                    generatedId, 
                     {
+                        campaign_id: generatedId,
                         creator_id: currentUser.id,
+                        full_name: currentUser.fullName,
                         platform: selectedPlatform,
-                        platform_category: PLATFORM_CONFIG[selectedPlatform].category,
                         target_url: url,
-                        username: username,
-                        thumbnail_url: thumbUrl,
-                        search_seed: seed,
-                        breadcrumb: bread,
                         goal_count: parseInt(qty),
+                        current_count: 0,
                         instructions: instructions,
                         payment_proof_url: proofUrl,
                         total_cost: totalCost,
@@ -3254,28 +3253,14 @@
                     created_at: new Date().toISOString()
                 });
 
-                // Transition to success screen
+                // Creation successful: Refresh local state and redirect to details view
                 if (loaderPct) loaderPct.innerText = "100%";
                 if (loader) loader.classList.add('hidden');
-                document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
-                const s5 = document.getElementById('step-5');
-                if (s5) s5.classList.remove('hidden');
-                
-                // Hide footer navigation & update header title
-                const footerNav = document.querySelector('#campaign-creation-view .mt-10');
-                if (footerNav) footerNav.classList.add('hidden');
-                const stepTitle = document.getElementById('step-title');
-                if (stepTitle) stepTitle.innerText = "Deployment Initialized";
-                
-                // UI visual update for steps (mark all complete)
-                document.querySelectorAll('.step-node').forEach(n => { n.classList.add('completed'); n.classList.remove('active'); });
-                document.querySelectorAll('[id^="bar-"]').forEach(b => {
-                    b.classList.add('bg-[var(--accent-primary)]', 'shadow-[0_0_8px_rgba(69,185,110,0.3)]');
-                    b.classList.remove('bg-dash-secondary');
-                });
-                if (window.feather) feather.replace();
+
+                await window.fetchRoleData('creator');
                 window.triggerConfetti();
-                fetchRoleData('creator');
+                window.showToast("Campaign Deployed Successfully!", "success");
+                window.viewCampaignDetails(campaignData.$id);
 
             } catch (err) {
                 console.error("Submission Error:", err);
