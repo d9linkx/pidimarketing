@@ -6,6 +6,8 @@
     <title>PIDI Admin | System Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Load Plus Jakarta Sans with a full weight range so thin/bold variants are available -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -17,7 +19,7 @@
                     if (!overlay) {
                         overlay = document.createElement('div');
                         overlay.id = 'runtime-error-overlay';
-                        overlay.style = 'position:fixed;inset:10px;background:rgba(0,0,0,0.85);color:#fff;padding:16px;border-radius:8px;z-index:99999;font-family:monospace;font-size:13px;overflow:auto;max-height:calc(100vh - 20px);';
+                        overlay.style = 'position:fixed;inset:10px;background:rgba(0,0,0,0.85);color:#fff;padding:16px;border-radius:8px;z-index:99999;font-family:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size:13px;overflow:auto;max-height:calc(100vh - 20px);';
                         document.body.appendChild(overlay);
                     }
                     overlay.innerText = 'Runtime Error:\n\n' + String(message);
@@ -113,7 +115,7 @@
         body.dark-mode textarea::placeholder { color: var(--text-secondary); opacity: 0.5; }
         
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
             background: var(--bg-body);
             background-attachment: fixed;
             color: var(--text-primary); 
@@ -121,6 +123,43 @@
             max-width: 100vw;
             overflow-x: hidden;
         }
+
+        /* Ensure form controls inherit the dashboard font for visual consistency */
+        input, button, select, textarea { font-family: inherit; }
+
+        /* Explicit weight mappings to use Plus Jakarta Sans textures consistently
+           This aligns Tailwind utility-class names used throughout the markup with
+           the corresponding font-weight so headings, buttons and labels look crisp.
+        */
+        body { font-weight: 400; }
+        h1,h2,h3,h4,h5, .text-3xl, .text-2xl { font-weight: 500; }
+        /* Utility weight overrides (Tailwind names) */
+        .font-thin { font-weight: 100 !important; }
+        .font-extralight, .font-light { font-weight: 300 !important; }
+        .font-normal { font-weight: 300 !important; }
+        .font-medium { font-weight: 400 !important; }
+        .font-semibold { font-weight: 500 !important; }
+        .font-bold { font-weight: 600 !important; }
+        .font-extrabold { font-weight: 700 !important; }
+        .font-black { font-weight: 800 !important; }
+
+    /* Make small caps/tight labels slightly bolder for readability */
+    .text-xs, .text-sm { font-weight: 400; }
+
+        /* Default UI text: slightly tighter tracking and thin weight for a modern look */
+        body, p, label, span, a, li, input, select, textarea, button, .bento-card, .nav-container, .sidebar { 
+            font-weight: 300; /* thin */
+            letter-spacing: -0.03em; /* slightly tighter */
+        }
+
+        /* Keep headings and significant text at stronger weights and normal tracking */
+        h1, h2, h3, h4, h5, .text-3xl, .text-2xl, .font-bold, .font-extrabold, .font-black, .icon-box { 
+            font-weight: 400 !important;
+            letter-spacing: 0 !important;
+        }
+
+        /* Buttons and CTAs should be readable: medium weight and neutral tracking */
+        .btn-fintech, .btn-primary, .btn-secondary, .accent-gradient { font-weight: 600 !important; letter-spacing: 0 !important; }
 
         /* Sidebar Layout for Desktop */
         @media (min-width: 850px) {
@@ -535,7 +574,7 @@
 
                     <div class="bento-card p-4 card-emerald flex items-center gap-4">
                         <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="activity" class="w-5"></i></div>
-                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Global Missions</p><h4 id="admin-stat-active" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Currently Running</p></div>
+                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Global Campaigns</p><h4 id="admin-stat-active" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Currently Running</p></div>
                     </div>
 
                     <div class="bento-card p-4 card-indigo flex items-center gap-4">
@@ -548,42 +587,7 @@
                          <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Pending Approval</p><h4 id="admin-stat-queue" class="text-lg font-bold text-red-500">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Awaiting Audit</p></div>
                     </div>
 
-                    <!-- Row 2: Live Updates Pulse -->
-                    <div class="bento-card col-span-full card-slate flex flex-col p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                                <h2 class="text-2xl font-normal leading-tight">Live Network Pulse</h2>
-                            </div>
-                            <span class="text-[8px] font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 uppercase">Realtime</span>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="live-activity-feed"></div>
-                    </div>
-
-                    <!-- Row 3: Global Campaigns Monitor -->
-                    <div class="bento-card col-span-full relative group">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-2xl font-normal leading-tight">Global Campaign Monitor</h2>
-                            <button onclick="switchSPAView('admin-verification')" class="btn-fintech bg-dash-secondary text-[10px] font-black uppercase tracking-widest px-4 py-2 hover:opacity-80 transition">Audit Queue</button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="text-dash-secondary border-b border-dash">
-                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Campaign</th>
-                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Creator</th>
-                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Platform</th>
-                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Value</th>
-                                        <th class="pb-3 font-semibold uppercase tracking-wider text-[10px]">Status</th>
-                                        <th class="pb-3 font-semibold text-right uppercase tracking-wider text-[10px]">Progress</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-global-campaigns" class="divide-y divide-dash">
-                                    <!-- Admin view injected here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <!-- Global Campaign Monitor and Live Pulse removed -->
                 </div>
             </div> <!-- End admin-home-view -->
 
@@ -595,8 +599,8 @@
                         <p class="text-dash-secondary text-sm">Manage campaign funding and performer task approvals.</p>
                     </div>
                     <div class="bg-dash-secondary rounded-xl p-1 flex items-center text-[10px] font-black uppercase tracking-widest border border-dash shadow-inner">
-                        <button onclick="setHubView('campaigns')" id="hub-tab-campaigns" class="px-4 py-2 rounded-lg transition-all">Missions</button>
-                        <button onclick="setHubView('performers')" id="hub-tab-performers" class="px-4 py-2 rounded-lg transition-all">Submissions</button>
+                        <button onclick="setHubView('campaigns')" id="hub-tab-campaigns" class="px-4 py-2 rounded-lg transition-all">Campaigns</button>
+                        <button onclick="setHubView('performers')" id="hub-tab-performers" class="px-4 py-2 rounded-lg transition-all">Submitted Tasks</button>
                         <button onclick="setHubView('creators')" id="hub-tab-creators" class="px-4 py-2 rounded-lg transition-all">Directory</button>
                     </div>
                 </div>
@@ -1391,6 +1395,18 @@
             }
         };
 
+        // HUB STATE: central store for the admin verification hub
+        // Holds loaded campaigns, engagements, profiles and current view/filter state
+        const hubState = {
+            view: 'campaigns', // campaigns | performers | creators
+            search: '',
+            status: 'all',
+            date: '',
+            campaigns: [],
+            engagements: [],
+            profiles: []
+        };
+
         const ROLE_CONFIG = {
             creator: {
                 label: "Active Campaigns",
@@ -1467,7 +1483,7 @@
         }
 
         // --- VERIFICATION HUB CORE LOGIC ---
-        window.setHubView = function(view) {
+        function setHubView(view) {
             hubState.view = view;
             const tabs = ['campaigns', 'performers', 'creators'];
             tabs.forEach(t => {
@@ -1480,14 +1496,14 @@
                 }
             });
             renderHubTable();
-        };
+        }
 
-        window.applyHubFilters = function() {
-            hubState.search = document.getElementById('hub-search').value.toLowerCase();
-            hubState.status = document.getElementById('hub-filter-status').value;
-            hubState.date = document.getElementById('hub-filter-date').value;
+        function applyHubFilters() {
+            hubState.search = (document.getElementById('hub-search')?.value || '').toLowerCase();
+            hubState.status = (document.getElementById('hub-filter-status')?.value) || 'all';
+            hubState.date = (document.getElementById('hub-filter-date')?.value) || '';
             renderHubTable();
-        };
+        }
 
         function renderHubTable() {
             const head = document.getElementById('hub-table-head');
@@ -2358,7 +2374,15 @@
                             hubState.campaigns = c.documents; hubState.engagements = e.documents; hubState.profiles = p.documents; renderHubTable();
                         });
                     }
-                    if (viewId === 'admin-verification') fetchAdminPendingMissions();
+                    if (viewId === 'admin-verification') {
+                        // Ensure filter UI reflects hubState defaults
+                        const statusEl = document.getElementById('hub-filter-status'); if (statusEl) statusEl.value = hubState.status || 'all';
+                        const searchEl = document.getElementById('hub-search'); if (searchEl) searchEl.value = hubState.search || '';
+                        const dateEl = document.getElementById('hub-filter-date'); if (dateEl) dateEl.value = hubState.date || '';
+                        // Ensure default tab
+                        setHubView(hubState.view || 'campaigns');
+                        fetchAdminPendingMissions();
+                    }
                     if (viewId === 'campaigns') fetchRoleData('creator');
                 } catch (err) {
                     console.error("Non-critical sync error during view switch:", err);
@@ -2501,6 +2525,28 @@
             `).join('');
 
             container.innerHTML = campsHtml + engsHtml;
+            // Also refresh the hubState datasets so filters operate on full data
+            try {
+                await fetchHubData();
+            } catch (e) { console.warn('fetchHubData (post-pending) failed:', e); }
+        }
+
+        // Load full datasets for the admin hub so filters/search work across all statuses
+        async function fetchHubData() {
+            try {
+                const [cRes, eRes, pRes] = await Promise.all([
+                    databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, [Query.orderDesc('created_at')]),
+                    databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.orderDesc('created_at')]),
+                    databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, [Query.orderDesc('created_at')])
+                ]);
+                hubState.campaigns = cRes.documents || [];
+                hubState.engagements = eRes.documents || [];
+                hubState.profiles = pRes.documents || [];
+                // Re-render current table view with fresh data
+                renderHubTable();
+            } catch (err) {
+                console.warn('fetchHubData error:', err);
+            }
         }
 
         async function adminAction(campaignId, newStatus) {
@@ -3311,86 +3357,6 @@
                 gravity: 1.2,
                 ticks: 200
             });
-        }
-
-        // --- LIVE PULSE SIMULATION ---
-        const livePulseActions = [
-            { msg: "just submitted a TikTok task", icon: "video" },
-            { msg: "claimed a Google Search mission", icon: "search" },
-            { msg: "reached 50% campaign completion", icon: "trending-up" },
-            { msg: "verified 10 human interactions", icon: "shield" },
-            { msg: "earned ₦70 for engagement", icon: "dollar-sign" },
-            { msg: "launched a new Authority campaign", icon: "plus-circle" },
-            { msg: "completed an Instagram comment task", icon: "instagram" },
-            { msg: "just reached Level 2 Elite status", icon: "star" },
-            { msg: "withdrew ₦5,000 to their bank", icon: "arrow-down-left" },
-            { msg: "updated their business profile", icon: "user-gear" },
-            { msg: "started a viral engine mission", icon: "activity" },
-            { msg: "linked a new verified bank account", icon: "building-columns" }
-        ];
-
-        const pulseUsers = [
-            "Kwame", "Fummi", "Adama", "Chidi", "Zanele", "Fatima", "Oluchi", "Kofi", "Tendai", "Jumoke",
-            "Wei", "Yuki", "Arjun", "Priya", "Siti", "Minh", "Zhang", "Kim", "Mohammed", "Aisha",
-            "Lucas", "Sofia", "Hans", "Elena", "Giovanni", "Marta", "Pierre", "Olga",
-            "Diego", "Camila", "Mateo", "Camila", "Jackson", "Harper", "Rodrigo", "Valentina",
-            "Omar", "Leila", "Hassan", "Amira", "Youssef", "Nour", "Aisulu", "Satoshi",
-            "Ivan", "Tatiana", "Bjorn", "Freja", "Soren", "Ingrid", "Olu", "Nneka", 
-            "Moussa", "Mariam", "Jabari", "Keisha", "Zuberi", "Amara", "Yara", "Xavier",
-            "Bodhi", "Ananya", "Sven", "Astrid", "Malik", "Zahra", "Kenji", "Hina"
-        ];
-
-        // Track last few items to prevent immediate repetition of the same action type
-        let recentActions = [];
-
-        function spawnPulseItem() {
-            // Try to find the feed in whichever dashboard is currently active
-            const feed = document.getElementById('live-activity-feed');
-            if (!feed) return;
-
-            // Create a unique user handle by mixing a name with a random number
-            const baseName = pulseUsers[Math.floor(Math.random() * pulseUsers.length)];
-            const uniqueId = Math.floor(Math.random() * 999);
-            const userHandle = `${baseName}_${uniqueId}`;
-
-            // Pick an action that hasn't been shown in the last 3 items
-            let actionIndex;
-            do {
-                actionIndex = Math.floor(Math.random() * livePulseActions.length);
-            } while (recentActions.includes(actionIndex));
-            
-            recentActions.push(actionIndex);
-            if (recentActions.length > 3) recentActions.shift();
-
-            const action = livePulseActions[actionIndex];
-            const avatar = `https://ui-avatars.com/api/?name=${baseName}&background=random&color=fff&size=32`;
-
-            const item = document.createElement('div');
-            item.className = 'flex gap-3 items-start opacity-0 translate-y-4 transition-all duration-500 py-1';
-            item.innerHTML = `
-                <div class="relative">
-                    <img src="${avatar}" class="w-7 h-7 rounded-lg border border-dash flex-shrink-0">
-                    <div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-[var(--bg-card)] border border-dash flex items-center justify-center">
-                        <i data-feather="${action.icon}" class="w-2 h-2 text-[var(--accent-primary)]"></i>
-                    </div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-[11px] leading-tight text-[var(--text-primary)]"><span class="font-bold">${userHandle}</span> ${action.msg}</p>
-                    <p class="text-[9px] text-dash-secondary mt-1">Just now</p>
-                </div>
-            `;
-
-            feed.prepend(item);
-            feather.replace(); // Refresh icons for the new item
-            
-            // Trigger animation
-            setTimeout(() => {
-                item.classList.remove('opacity-0', 'translate-y-4');
-            }, 50);
-
-            if (feed.children.length > 15) {
-                feed.lastElementChild.remove();
-            }
         }
 
         window.toggleCardInfo = function(event) {
