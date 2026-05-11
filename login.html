@@ -146,6 +146,7 @@
 
         let isOTPMode = false;
         let otpSent = false;
+        let pendingUserId = null; // To store userId from createEmailToken response
 
         window.toggleAuthMode = () => {
             isOTPMode = !isOTPMode;
@@ -211,11 +212,12 @@
                     setButtonLoading(submitButton, true, 'Sending Code...');
                     try {
                         // Appwrite uses Email Token for numeric/link login
-                        await account.createEmailToken(ID.unique(), email);
+                        const tokenResponse = await account.createEmailToken(ID.unique(), email);
+                        pendingUserId = tokenResponse.userId; // Store the userId
                         otpSent = true;
                         document.getElementById('otp-field').classList.remove('hidden');
                         setButtonLoading(submitButton, false, 'Verify Code');
-                        displayAuthMessage('login-message', "A verification code has been sent to your inbox.", 'success');
+                        displayAuthMessage('login-message', "A magic link has been sent to your inbox. Please extract the 'secret' parameter (the code) from the URL in the email and enter it below.", 'success');
                     } catch (error) {
                         console.error('Appwrite OTP Error:', error);
                         displayAuthMessage('login-message', "Error sending code: " + error.message, 'error');
@@ -231,8 +233,22 @@
 
                     setButtonLoading(submitButton, true, 'Verifying...');
                     try {
-                        // Appwrite verification requires userId from the email token flow.
-                        displayAuthMessage('login-message', "OTP verification requires userId. Please use password login for now.", 'error');
+                        if (!pendingUserId) {
+                            displayAuthMessage('login-message', "User ID not found. Please resend the code.", 'error');
+                            setButtonLoading(submitButton, false, 'Verify Code');
+                            return;
+                        }
+                        
+                        // Complete the magic URL session using the stored userId and the entered secret (token)
+                        await account.updateMagicURLSession(pendingUserId, token);
+                        
+                        const user = await account.get();
+                        if (AUTHORIZED_ADMINS.includes(user.email.toLowerCase())) {
+                            window.location.href = 'admin.html';
+                        } else {
+                            // This case should ideally not happen if AUTHORIZED_ADMINS check is done upfront
+                            window.location.href = 'dashboard.html';
+                        }
                         setButtonLoading(submitButton, false, 'Verify Code');
                     } catch (error) {
                         displayAuthMessage('login-message', "Verification failed: " + error.message, 'error');

@@ -1188,7 +1188,12 @@
                         <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> 
                         <span>Back to Campaigns</span>
                     </button>
-                    <div id="detail-status-badge"></div>
+                    <div class="flex items-center gap-3">
+                        <button id="edit-campaign-btn" class="hidden btn-fintech bg-white border border-dash text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">
+                            <i data-feather="edit-2" class="mr-2 w-3.5 h-3.5"></i> Edit Mission
+                        </button>
+                        <div id="detail-status-badge"></div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -1611,6 +1616,49 @@
                     <input type="number" id="deposit-amount" placeholder="e.g. 50000" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-lg font-bold focus:outline-none focus:border-[var(--accent-primary)]">
                 </div>
                 <button onclick="processDeposit()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Pay with Paystack</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Campaign Overlay -->
+    <div id="edit-campaign-overlay" class="hidden fixed inset-0 z-[250] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeEditModal()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
+                <i data-feather="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-2">Edit Mission Details</h3>
+            <p class="text-dash-secondary text-xs mb-8 uppercase font-bold tracking-widest">Pricing and quantity are locked</p>
+            
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Platform</label>
+                        <select id="edit-platform" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                            <option value="instagram">Instagram</option>
+                            <option value="tiktok">TikTok</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="twitter">X (Twitter)</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="google">Google</option>
+                            <option value="youtube">YouTube</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Account @Username</label>
+                        <input type="text" id="edit-username" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Target/Post URL</label>
+                    <input type="url" id="edit-url" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Mission Instructions</label>
+                    <textarea id="edit-instructions" rows="4" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></textarea>
+                </div>
+                <button id="save-edit-btn" class="w-full btn-fintech btn-primary justify-center py-4 font-black uppercase tracking-widest shadow-lg">
+                    Update Campaign <i data-feather="check" class="ml-2 w-4 h-4"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -2362,6 +2410,24 @@
             
             // Action Link
             document.getElementById('detail-open-link').onclick = () => window.open(campaign.target_url, '_blank');
+
+            // Check Edit Eligibility
+            const editBtn = document.getElementById('edit-campaign-btn');
+            if (editBtn) {
+                try {
+                    // Only allow edit if no performer has started (in_progress) or submitted (pending/approved/rejected)
+                    const blockRes = await databases.listDocuments(
+                        APPWRITE_CONFIG.DATABASE_ID,
+                        APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS,
+                        [
+                            Query.equal('campaign_id', campaignId),
+                            Query.equal('status', ['in_progress', 'pending', 'approved', 'rejected'])
+                        ]
+                    );
+                    editBtn.classList.toggle('hidden', blockRes.total > 0);
+                    editBtn.onclick = () => openEditCampaignModal(campaignId);
+                } catch (e) { console.warn("Edit check failed:", e); editBtn.classList.add('hidden'); }
+            }
 
             // Proof Image
             const proofCard = document.getElementById('detail-proof-card');
@@ -3300,6 +3366,47 @@
                 currentStep = 1;
                 updateWizardUI();
             } catch (e) { console.error('resetWizard failed:', e); }
+        }
+
+        // --- EDIT CAMPAIGN LOGIC ---
+        window.openEditCampaignModal = function(campaignId) {
+            const campaign = roles.creator.items.find(c => c.$id === campaignId);
+            if (!campaign) return;
+
+            document.getElementById('edit-platform').value = campaign.platform;
+            document.getElementById('edit-username').value = campaign.username || '';
+            document.getElementById('edit-url').value = campaign.target_url;
+            document.getElementById('edit-instructions').value = campaign.instructions;
+            
+            document.getElementById('save-edit-btn').onclick = () => saveCampaignEdits(campaignId);
+            document.getElementById('edit-campaign-overlay').classList.remove('hidden');
+            feather.replace();
+        };
+
+        window.closeEditModal = () => document.getElementById('edit-campaign-overlay').classList.add('hidden');
+
+        async function saveCampaignEdits(campaignId) {
+            const btn = document.getElementById('save-edit-btn');
+            btn.disabled = true;
+            btn.innerText = "Updating...";
+
+            try {
+                await databases.updateDocument(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS,
+                    campaignId,
+                    {
+                        platform: document.getElementById('edit-platform').value,
+                        username: document.getElementById('edit-username').value,
+                        target_url: document.getElementById('edit-url').value,
+                        instructions: document.getElementById('edit-instructions').value
+                    }
+                );
+                window.showToast("Campaign Details Updated", "success");
+                closeEditModal();
+                await fetchRoleData('creator');
+                viewCampaignDetails(campaignId);
+            } catch (err) { alert("Update failed: " + err.message); } finally { btn.disabled = false; btn.innerText = "Update Campaign"; feather.replace(); }
         }
 
         // --- TASK FLOW LOGIC (Performer) ---
