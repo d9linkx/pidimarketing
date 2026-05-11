@@ -565,29 +565,49 @@
                     </div>
                 </div>
 
-                <div class="bento-grid p-6 mt-[-1rem]">
-                    <!-- Row 1: Global High-Level Stats -->
+                <div class="bento-grid p-6 mt-[-1rem] grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Row 1: Global High-Level Stats (6 cards) -->
                     <div class="bento-card p-4 card-azure flex items-center gap-4">
                         <div class="icon-box bg-blue-500/10 text-blue-500 mb-0 w-10 h-10"><i data-feather="database" class="w-5"></i></div>
-                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Locked Escrow</p><h4 id="admin-stat-tvl" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">System-wide Funds</p></div>
+                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Locked Escrow</p><h4 id="admin-stat-tvl" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">System-wide Funds</p></div>
                     </div>
 
                     <div class="bento-card p-4 card-emerald flex items-center gap-4">
-                        <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="activity" class="w-5"></i></div>
-                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Global Campaigns</p><h4 id="admin-stat-active" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Currently Running</p></div>
+                        <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="trending-up" class="w-5"></i></div>
+                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Revenue</p><h4 id="admin-stat-revenue" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">All-time gross</p></div>
                     </div>
 
                     <div class="bento-card p-4 card-indigo flex items-center gap-4">
-                        <div class="icon-box bg-indigo-500/10 text-indigo-500 mb-0 w-10 h-10"><i data-feather="users" class="w-5"></i></div>
-                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Users</p><h4 id="admin-stat-users" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Creators & Performers</p></div>
+                        <div class="icon-box bg-indigo-500/10 text-indigo-500 mb-0 w-10 h-10"><i data-feather="layers" class="w-5"></i></div>
+                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Campaigns</p><h4 id="admin-stat-campaigns" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">All time</p></div>
                     </div>
 
                     <div class="bento-card p-4 card-amber flex items-center gap-4">
-                        <div class="icon-box bg-red-100 text-red-600 mb-0 w-10 h-10"><i data-feather="alert-circle" class="w-5"></i></div>
-                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Pending Approval</p><h4 id="admin-stat-queue" class="text-lg font-bold text-red-500">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Awaiting Audit</p></div>
+                        <div class="icon-box bg-amber-100 text-amber-600 mb-0 w-10 h-10"><i data-feather="award" class="w-5"></i></div>
+                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Leading Industries</p><h4 id="admin-stat-industries" class="text-lg font-bold">—</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Top sectors</p></div>
                     </div>
 
-                    <!-- Global Campaign Monitor and Live Pulse removed -->
+                    <div class="bento-card p-4 card-emerald flex items-center gap-4">
+                        <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="dollar-sign" class="w-5"></i></div>
+                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Paid Out</p><h4 id="admin-stat-paidout" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Rewards & payouts</p></div>
+                    </div>
+
+                    <div class="bento-card p-4 card-rose flex items-center gap-4">
+                        <div class="icon-box bg-rose-pale text-rose-vibrant mb-0 w-10 h-10"><i data-feather="percent" class="w-5"></i></div>
+                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Profit</p><h4 id="admin-stat-profit" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Revenue minus payouts</p></div>
+                    </div>
+                </div>
+
+                <!-- Analytics Row: Revenue trend and Industries distribution -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+                    <div class="bento-card p-4">
+                        <h4 class="text-sm font-bold text-dash-secondary uppercase tracking-widest mb-3">Revenue Trend (Last 12 months)</h4>
+                        <canvas id="admin-chart-revenue" height="120"></canvas>
+                    </div>
+                    <div class="bento-card p-4">
+                        <h4 class="text-sm font-bold text-dash-secondary uppercase tracking-widest mb-3">Top Industries</h4>
+                        <canvas id="admin-chart-industries" height="120"></canvas>
+                    </div>
                 </div>
             </div> <!-- End admin-home-view -->
 
@@ -1706,9 +1726,32 @@
                 // 1. Update Aggregate Stats
                 const tvl = allTx.filter(t => t.status === 'pending').reduce((acc, t) => acc + (t.amount || 0), 0);
                 document.getElementById('admin-stat-tvl').innerText = `₦${tvl.toLocaleString()}`;
-                document.getElementById('admin-stat-active').innerText = allCamps.filter(c => c.status === 'active').length;
-                document.getElementById('admin-stat-users').innerText = allUsers.length;
-                document.getElementById('admin-stat-queue').innerText = allCamps.filter(c => c.status === 'pending_verification').length;
+
+                // New metrics: revenue, campaigns, industries, paid out, profit
+                // Assume transactions with type 'charge' or 'sale' are revenue; 'payout' are outflows.
+                const revenueTx = allTx.filter(t => ['charge', 'sale', 'payment_received', 'credit'].includes((t.type || '').toLowerCase()) && t.status === 'completed');
+                const payoutTx = allTx.filter(t => (t.type || '').toLowerCase().includes('payout') && t.status === 'completed');
+
+                const totalRevenue = revenueTx.reduce((acc, t) => acc + (t.amount || 0), 0);
+                const totalPaidOut = payoutTx.reduce((acc, t) => acc + (t.amount || 0), 0);
+                const totalProfit = totalRevenue - totalPaidOut;
+
+                const totalCampaigns = allCamps.length;
+
+                // Determine top industries from campaigns. Use campaign.industry || campaign.category || 'Uncategorized'
+                const industryCounts = {};
+                allCamps.forEach(c => {
+                    const key = (c.industry || c.category || 'Uncategorized').toString();
+                    industryCounts[key] = (industryCounts[key] || 0) + 1;
+                });
+                const industryEntries = Object.entries(industryCounts).sort((a,b) => b[1]-a[1]);
+                const topIndustriesText = industryEntries.slice(0,3).map(i=>`${i[0]} (${i[1]})`).join(', ') || '—';
+
+                document.getElementById('admin-stat-revenue').innerText = `₦${totalRevenue.toLocaleString()}`;
+                document.getElementById('admin-stat-campaigns').innerText = totalCampaigns;
+                document.getElementById('admin-stat-industries').innerText = topIndustriesText;
+                document.getElementById('admin-stat-paidout').innerText = `₦${totalPaidOut.toLocaleString()}`;
+                document.getElementById('admin-stat-profit').innerText = `₦${totalProfit.toLocaleString()}`;
 
                 // 2. Render Monitor Table
                 const tbody = document.getElementById('admin-global-campaigns');
@@ -1752,6 +1795,70 @@
                         <td class="p-4 text-right"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${t.status}</span></td>
                     </tr>
                 `).join('');
+
+                // 5. Prepare time-series for Revenue Trend (monthly buckets, last 12 months)
+                const now = new Date();
+                const months = [];
+                for (let i = 11; i >= 0; i--) {
+                    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    months.push({ key: `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}`, label: d.toLocaleString(undefined, { month: 'short', year: 'numeric' }) });
+                }
+
+                const revenueByMonth = months.map(m => 0);
+                revenueTx.forEach(t => {
+                    const d = new Date(t.createdAt || t.$createdAt || t.created_at || t.$created);
+                    if (isNaN(d)) return;
+                    const key = `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}`;
+                    const idx = months.findIndex(m => m.key === key);
+                    if (idx >= 0) revenueByMonth[idx] += (t.amount || 0);
+                });
+
+                // 6. Prepare industry pie data
+                const industryLabels = industryEntries.map(e => e[0]);
+                const industryValues = industryEntries.map(e => e[1]);
+
+                // 7. Render or update Chart.js charts
+                // Keep instances on window to avoid duplicates
+                const revenueCtx = document.getElementById('admin-chart-revenue');
+                const industriesCtx = document.getElementById('admin-chart-industries');
+
+                // Destroy old charts if present
+                if (window._adminRevenueChart) { try { window._adminRevenueChart.destroy(); } catch(e){} window._adminRevenueChart = null; }
+                if (window._adminIndustriesChart) { try { window._adminIndustriesChart.destroy(); } catch(e){} window._adminIndustriesChart = null; }
+
+                if (revenueCtx) {
+                    window._adminRevenueChart = new Chart(revenueCtx, {
+                        type: 'line',
+                        data: {
+                            labels: months.map(m => m.label),
+                            datasets: [{
+                                label: 'Revenue',
+                                data: revenueByMonth,
+                                borderColor: '#2563EB',
+                                backgroundColor: 'rgba(37,99,235,0.08)',
+                                fill: true,
+                                tension: 0.3,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { ticks: { callback: v => '₦' + Number(v).toLocaleString() } } }
+                        }
+                    });
+                }
+
+                if (industriesCtx) {
+                    window._adminIndustriesChart = new Chart(industriesCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: industryLabels,
+                            datasets: [{ data: industryValues, backgroundColor: ['#6366F1','#10B981','#F97316','#EF4444','#06B6D4','#8B5CF6'] }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+                    });
+                }
 
             } catch (err) { console.error("Admin Sync Error:", err); }
         };
