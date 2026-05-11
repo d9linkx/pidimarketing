@@ -589,20 +589,265 @@
 
             <!-- SPA CONTAINER: Admin Verification View -->
             <div id="admin-verification-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
-                <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center justify-between mb-6">
                     <div>
                         <h2 class="text-3xl font-bold">Verification Hub</h2>
-                        <p class="text-dash-secondary text-sm">Approve campaign funding receipts & performer proof submissions</p>
+                        <p class="text-dash-secondary text-sm">Approve campaign funding receipts & performer proof submissions. Use the controls to filter, search, and analyze activity.</p>
                     </div>
-                    <span class="bg-red-500/10 text-red-500 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Awaiting Action</span>
-                </div>
-                
-                <div class="grid grid-cols-1 gap-4" id="admin-pending-list">
-                    <div class="bento-card text-center py-20 text-dash-secondary">
-                        <i data-feather="check-circle" class="w-12 h-12 mx-auto mb-4 opacity-20"></i>
-                        <p>All clear. No items pending verification.</p>
+                    <div class="flex items-center gap-3">
+                        <label class="text-[10px] text-dash-secondary mr-2">View</label>
+                        <div class="bg-dash-secondary rounded-lg p-1 flex items-center text-xs">
+                            <button id="view-campaigns-btn" class="px-3 py-1 rounded-md text-dash-secondary font-bold">Campaigns</button>
+                            <button id="view-creators-btn" class="px-3 py-1 rounded-md text-dash-secondary font-bold">Creators</button>
+                            <button id="view-performers-btn" class="px-3 py-1 rounded-md text-dash-secondary font-bold">Performers</button>
+                        </div>
                     </div>
                 </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                    <div class="lg:col-span-2 space-y-3">
+                        <div class="flex flex-col md:flex-row items-start md:items-center gap-3">
+                            <input id="admin-search" type="search" placeholder="Search by campaign name, creator email or URL..." class="flex-1 bg-dash-secondary border border-dash rounded-xl p-2.5 text-sm focus:outline-none">
+                            <select id="filter-status" class="bg-white border border-dash rounded-xl p-2 text-sm">
+                                <option value="all">All statuses</option>
+                                <option value="pending_verification">Pending</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                            <input id="filter-from" type="date" class="bg-white border border-dash rounded-xl p-2 text-sm">
+                            <input id="filter-to" type="date" class="bg-white border border-dash rounded-xl p-2 text-sm">
+                            <button id="refresh-admin-view" class="btn-fintech bg-dash-secondary text-[10px] font-black uppercase tracking-widest px-4 py-2">Refresh</button>
+                        </div>
+
+                        <div class="bento-card p-0 overflow-x-auto">
+                            <table class="w-full text-left text-xs" id="admin-verification-table">
+                                <thead class="bg-dash-secondary/30">
+                                    <tr class="text-dash-secondary border-b border-dash">
+                                        <th class="p-3 font-semibold uppercase tracking-wider">Campaign</th>
+                                        <th class="p-3 font-semibold uppercase tracking-wider">Creator</th>
+                                        <th class="p-3 font-semibold uppercase tracking-wider">Platform</th>
+                                        <th class="p-3 font-semibold uppercase tracking-wider">Location</th>
+                                        <th class="p-3 font-semibold uppercase tracking-wider">Created</th>
+                                        <th class="p-3 font-semibold uppercase tracking-wider">Start → End</th>
+                                        <th class="p-3 font-semibold uppercase tracking-wider">Goal</th>
+                                        <th class="p-3 font-semibold uppercase tracking-wider">Spend</th>
+                                        <th class="p-3 font-semibold uppercase tracking-wider">Status</th>
+                                        <th class="p-3 font-semibold uppercase tracking-wider text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-verification-body" class="divide-y divide-dash">
+                                    <tr><td colspan="10" class="py-8 text-center text-dash-secondary">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bento-card p-4">
+                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary mb-4">Analytics</h4>
+                            <canvas id="admin-analytics-chart" height="220"></canvas>
+                        </div>
+
+                        <div class="bento-card p-4">
+                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary mb-4">Summary</h4>
+                            <div id="admin-analytics-summary" class="text-sm text-dash-secondary"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                (function(){
+                    // Simple admin verification view module
+                    const el = id => document.getElementById(id);
+                    let campaignsCache = [];
+                    let profilesCache = [];
+
+                    async function fetchAllCampaigns(){
+                        try{
+                            if (!window.databases || !window.APPWRITE_CONFIG) throw new Error('Appwrite client not available');
+                            const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS);
+                            campaignsCache = res.documents || [];
+                            return campaignsCache;
+                        }catch(err){
+                            console.error('fetchAllCampaigns', err);
+                            campaignsCache = [];
+                            return [];
+                        }
+                    }
+
+                    async function fetchAllProfiles(){
+                        try{
+                            if (!window.databases || !window.APPWRITE_CONFIG) throw new Error('Appwrite client not available');
+                            const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES);
+                            profilesCache = res.documents || [];
+                            return profilesCache;
+                        }catch(err){
+                            console.error('fetchAllProfiles', err);
+                            profilesCache = [];
+                            return [];
+                        }
+                    }
+
+                    function formatDate(ts){
+                        if(!ts) return '-';
+                        try{ return new Date(ts).toLocaleString(); }catch(e){return ts}
+                    }
+
+                    function findProfileById(id){
+                        return profilesCache.find(p => p.$id === id) || profilesCache.find(p => p.email === id) || {name:'Unknown', email:'-'};
+                    }
+
+                    function renderCampaignsTable(list){
+                        const body = el('admin-verification-body');
+                        body.innerHTML = '';
+                        if(!list.length){
+                            body.innerHTML = '<tr><td colspan="10" class="py-8 text-center text-dash-secondary">No campaigns match the selected filters.</td></tr>';
+                            return;
+                        }
+                        for(const c of list){
+                            const creator = findProfileById(c.creator_id || c.creator);
+                            const tr = document.createElement('tr');
+                            tr.className = 'campaign-row';
+                            tr.innerHTML = `
+                                <td class="p-3 align-top font-semibold">${c.title || c.name || c.target_url || c.$id}</td>
+                                <td class="p-3 align-top">${creator.name || creator.email || '-' }<div class="text-[10px] text-dash-secondary">${creator.email || ''}</div></td>
+                                <td class="p-3 align-top">${c.platform || c.platform_name || '-'}</td>
+                                <td class="p-3 align-top">${c.location || c.country || '-'}</td>
+                                <td class="p-3 align-top">${formatDate(c.$createdAt || c.created_at || c.created)}</td>
+                                <td class="p-3 align-top">${c.start_date ? formatDate(c.start_date) : '-'} → ${c.end_date ? formatDate(c.end_date) : '-'}</td>
+                                <td class="p-3 align-top">${c.goal || c.target_count || '-'}</td>
+                                <td class="p-3 align-top">₦${c.budget || c.total_cost || 0}</td>
+                                <td class="p-3 align-top">${c.status || '-'}</td>
+                                <td class="p-3 align-top text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <button onclick="window.open('/campaign-detail.html?id=${c.$id}', '_blank')" class="text-[10px] bg-dash-secondary px-3 py-1 rounded-lg">View</button>
+                                        <button onclick="adminAction('${c.$id}','approved')" class="text-[10px] bg-green-100 text-green-700 px-3 py-1 rounded-lg">Approve</button>
+                                        <button onclick="adminAction('${c.$id}','rejected')" class="text-[10px] bg-rose-100 text-rose-700 px-3 py-1 rounded-lg">Reject</button>
+                                    </div>
+                                </td>
+                            `;
+                            body.appendChild(tr);
+                        }
+                    }
+
+                    function summarizeCampaigns(list){
+                        const total = list.length;
+                        const byStatus = list.reduce((acc, c) => { acc[c.status] = (acc[c.status]||0)+1; return acc; }, {});
+                        const totalBudget = list.reduce((s,c) => s + Number(c.budget || c.total_cost || 0), 0);
+                        return { total, byStatus, totalBudget };
+                    }
+
+                    let analyticsChart = null;
+                    function renderAnalytics(list){
+                        const summary = summarizeCampaigns(list);
+                        const summaryEl = el('admin-analytics-summary');
+                        summaryEl.innerHTML = `<div class="mb-2"><strong>Total campaigns:</strong> ${summary.total}</div><div class="mb-2"><strong>Total spend:</strong> ₦${summary.totalBudget}</div>`;
+
+                        const labels = Object.keys(summary.byStatus);
+                        const data = labels.map(k => summary.byStatus[k]);
+
+                        const ctx = document.getElementById('admin-analytics-chart').getContext('2d');
+                        if(analyticsChart){ analyticsChart.data.labels = labels; analyticsChart.data.datasets[0].data = data; analyticsChart.update(); return; }
+
+                        analyticsChart = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: { labels, datasets: [{ data, backgroundColor: ['#f97316','#10b981','#ef4444','#60a5fa','#a78bfa'] }] },
+                            options: { plugins: { legend: { position:'bottom' } } }
+                        });
+                    }
+
+                    function applyFiltersAndRender(){
+                        const q = (el('admin-search').value || '').toLowerCase().trim();
+                        const status = el('filter-status').value;
+                        const from = el('filter-from').value ? new Date(el('filter-from').value) : null;
+                        const to = el('filter-to').value ? new Date(el('filter-to').value) : null;
+                        let list = campaignsCache.slice();
+                        if(status && status !== 'all') list = list.filter(c => (c.status||'').toLowerCase() === status.toLowerCase());
+                        if(q) list = list.filter(c => ((c.title||c.name||'')+ (c.target_url||'') + (c.creator_email||'') + (c.$id||'')).toLowerCase().includes(q));
+                        if(from) list = list.filter(c => { const d = new Date(c.$createdAt || c.created_at || c.created); return d >= from; });
+                        if(to) list = list.filter(c => { const d = new Date(c.$createdAt || c.created_at || c.created); return d <= to; });
+
+                        renderCampaignsTable(list);
+                        renderAnalytics(list);
+                    }
+
+                    async function initAdminVerificationView(){
+                        try{
+                            el('admin-verification-body').innerHTML = '<tr><td colspan="10" class="py-8 text-center text-dash-secondary">Loading...</td></tr>';
+                            await Promise.all([fetchAllProfiles(), fetchAllCampaigns()]);
+                            applyFiltersAndRender();
+                        }catch(e){
+                            console.error('initAdminVerificationView', e);
+                            el('admin-verification-body').innerHTML = '<tr><td colspan="10" class="py-8 text-center text-red-500">Failed to load data.</td></tr>';
+                        }
+                    }
+
+                    // Wire UI
+                    el('refresh-admin-view').addEventListener('click', async()=>{ await initAdminVerificationView(); });
+                    el('filter-status').addEventListener('change', applyFiltersAndRender);
+                    el('admin-search').addEventListener('input', () => { setTimeout(applyFiltersAndRender, 150); });
+                    el('filter-from').addEventListener('change', applyFiltersAndRender);
+                    el('filter-to').addEventListener('change', applyFiltersAndRender);
+
+                    // View toggles
+                    el('view-campaigns-btn').addEventListener('click', ()=>{ initAdminVerificationView(); });
+                    el('view-creators-btn').addEventListener('click', async ()=>{
+                        await fetchAllProfiles();
+                        // Render a simple creators list in the campaigns table area
+                        const body = el('admin-verification-body'); body.innerHTML = '';
+                        if(!profilesCache.length) body.innerHTML = '<tr><td colspan="10" class="py-8 text-center text-dash-secondary">No creators found.</td></tr>';
+                        for(const p of profilesCache){
+                            const tr = document.createElement('tr'); tr.innerHTML = `
+                                <td class="p-3 font-semibold">${p.name || p.email || p.$id}</td>
+                                <td class="p-3">${p.email || '-'}</td>
+                                <td class="p-3">${p.role || '-'}</td>
+                                <td class="p-3">₦${p.balance||0}</td>
+                                <td class="p-3">${p.joined || p.$createdAt || '-'}</td>
+                                <td class="p-3" colspan="5"></td>
+                            `; body.appendChild(tr);
+                        }
+                        renderAnalytics(campaignsCache);
+                    });
+
+                    el('view-performers-btn').addEventListener('click', async ()=>{
+                        // quick reuse: fetch engagements to display performer submissions if collection exists
+                        try{
+                            const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS);
+                            const items = res.documents || [];
+                            const body = el('admin-verification-body'); body.innerHTML = '';
+                            if(!items.length) body.innerHTML = '<tr><td colspan="10" class="py-8 text-center text-dash-secondary">No performer submissions found.</td></tr>';
+                            for(const e of items){
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                                    <td class="p-3 font-semibold">${e.title || e.mission_name || e.$id}</td>
+                                    <td class="p-3">${e.performer_name || e.performer_email || e.performer_id || '-'}</td>
+                                    <td class="p-3">${e.platform || '-'}</td>
+                                    <td class="p-3">${e.location || '-'}</td>
+                                    <td class="p-3">${formatDate(e.$createdAt)}</td>
+                                    <td class="p-3">-</td>
+                                    <td class="p-3">₦${e.reward||0}</td>
+                                    <td class="p-3">-</td>
+                                    <td class="p-3">${e.status||'-'}</td>
+                                    <td class="p-3 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <button onclick="adminVerifyEngagement('${e.$id}','approved')" class="text-[10px] bg-green-100 text-green-700 px-3 py-1 rounded-lg">Approve</button>
+                                            <button onclick="adminVerifyEngagement('${e.$id}','rejected')" class="text-[10px] bg-rose-100 text-rose-700 px-3 py-1 rounded-lg">Reject</button>
+                                        </div>
+                                    </td>
+                                `;
+                                body.appendChild(tr);
+                            }
+                            renderAnalytics(campaignsCache);
+                        }catch(err){ console.error('fetch engagements', err); alert('Failed to load performer submissions: ' + (err.message||err)); }
+                    });
+
+                    // Kick off initial load
+                    setTimeout(initAdminVerificationView, 300);
+                    // expose for debugging
+                    window._adminVerification = { init: initAdminVerificationView, refresh: initAdminVerificationView };
+                })();
+                </script>
             </div>
 
             <!-- SPA CONTAINER: User Management View -->
@@ -1202,6 +1447,21 @@
         </div>
     </div>
 
+    <!-- Admin Message Modal -->
+    <div id="admin-message-modal" class="hidden fixed inset-0 z-[400] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card w-full max-w-sm text-center p-10 relative">
+            <button onclick="closeAdminMessageModal()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div id="admin-message-icon-box" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i id="admin-message-icon" class="text-2xl"></i>
+            </div>
+            <h3 id="admin-message-title" class="text-2xl font-bold mb-2"></h3>
+            <p id="admin-message-text" class="text-dash-secondary text-sm mb-8"></p>
+            <button onclick="closeAdminMessageModal()" class="w-full bg-dash-secondary py-4 rounded-2xl font-bold text-sm hover:opacity-80 transition">Close</button>
+        </div>
+    </div>
+
     <script type="module">
         import { account, databases, storage, Query, ID, APPWRITE_CONFIG } from './appwriteClient.js';
 
@@ -1606,6 +1866,24 @@
             document.querySelector('main.content-area').style.visibility = 'visible'; // Make main content visible
             fetchAdminDashboardData();
             fetchAdminPendingMissions();
+        }
+
+        // Helper: check if current user is in the admin whitelist (cached for session)
+        async function checkAdminPrivilege() {
+            try {
+                if (typeof window._isAdminCached !== 'undefined') return window._isAdminCached;
+                const res = await databases.listDocuments(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.COLLECTIONS.ADMIN_WHITELIST,
+                    [Query.equal('email', currentUser.email)]
+                );
+                const isAdmin = res && res.total > 0;
+                window._isAdminCached = isAdmin;
+                return isAdmin;
+            } catch (err) {
+                console.error('Admin privilege check failed:', err);
+                return false;
+            }
         }
 
         window.switchRole = async function(role) {
@@ -2197,12 +2475,23 @@
             } catch (err) { console.warn("Admin fetch error:", err); }
             
             const container = document.getElementById('admin-pending-list');
-            if (!pending || pending.length === 0) {
+            // Fetch pending engagements as well so admins can verify performer proofs
+            let pendingEngs = [];
+            try {
+                const eRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('status', 'pending_verification'), Query.orderAsc('created_at')]);
+                pendingEngs = eRes.documents || [];
+            } catch (e) { console.warn('Failed to fetch engagements:', e); }
+
+            if ((!pending || pending.length === 0) && pendingEngs.length === 0) {
                 container.innerHTML = `<div class="bento-card text-center py-20 text-dash-secondary"><p>All payments verified.</p></div>`;
                 return;
             }
 
-            container.innerHTML = pending.map(c => `
+            // Determine whether the current user has admin privileges before rendering action buttons
+            const isAdminUser = await checkAdminPrivilege();
+
+            // Render campaigns first, then engagement submissions
+            const campsHtml = (pending || []).map(c => `
                 <div class="bento-card flex flex-col md:flex-row gap-6 items-center">
                     <div class="w-full md:w-32 h-32 bg-dash-secondary rounded-2xl overflow-hidden border border-dash">
                         ${c.payment_proof_url ? `<img src="${c.payment_proof_url}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${c.payment_proof_url}')">` : `<div class="flex items-center justify-center h-full text-xs">No Proof</div>`}
@@ -2213,32 +2502,159 @@
                         <p class="text-xs text-dash-secondary truncate max-w-md">${c.target_url || ''}</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="adminAction('${c.$id}', 'active')" class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-green-600 transition">Approve</button>
-                        <button onclick="adminAction('${c.$id}', 'rejected')" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-red-600 transition">Reject</button>
+                        ${isAdminUser ? `<button onclick="adminAction('${c.$id}', 'active')" class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-green-600 transition">Approve</button>
+                        <button onclick="adminAction('${c.$id}', 'rejected')" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-red-600 transition">Reject</button>` : `<span class="text-xs text-dash-secondary">View only</span>`}
                     </div>
                 </div>
             `).join('');
+
+            const engsHtml = pendingEngs.map(e => `
+                <div class="bento-card flex flex-col md:flex-row gap-6 items-center">
+                    <div class="w-full md:w-32 h-32 bg-dash-secondary rounded-2xl overflow-hidden border border-dash">
+                        ${e.proof_url ? `<img src="${e.proof_url}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${e.proof_url}')">` : `<div class="flex items-center justify-center h-full text-xs">No Proof</div>`}
+                    </div>
+                    <div class="flex-1 space-y-1 text-center md:text-left">
+                        <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest">Performer: ${e.performer_name || e.performer_id}</p>
+                        <h4 class="text-xl font-bold">Reward: ₦${(e.reward || 0).toLocaleString()}</h4>
+                        <p class="text-xs text-dash-secondary truncate max-w-md">${(e.proof_text || '').slice(0, 140)}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        ${isAdminUser ? `<button onclick="adminVerifyEngagement('${e.$id}', 'completed')" class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-green-600 transition">Approve</button>
+                        <button onclick="adminVerifyEngagement('${e.$id}', 'rejected')" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-red-600 transition">Reject</button>` : `<span class="text-xs text-dash-secondary">View only</span>`}
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = campsHtml + engsHtml;
         }
 
         async function adminAction(campaignId, newStatus) {
+            // Provide more detailed errors and pre-checks to diagnose failures
+            // Ensure only whitelisted admins can call this
+            const isAdmin = await checkAdminPrivilege();
+            if (!isAdmin) { alert('You are not authorized to perform this action.'); return; }
+            const friendly = newStatus === 'active' ? 'approve and mark as verified' : 'reject';
+            const ok = confirm(`Are you sure you want to ${friendly} this campaign?`);
+            if (!ok) return;
+
+            // Wrap steps so we can surface precise failures
             try {
                 // 1. Update Campaign Status
                 await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, campaignId, { status: newStatus });
 
-                // 2. Update linked Transaction Status
-                const transRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('campaign_id', campaignId)]);
-                if (transRes.total > 0) {
-                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, transRes.documents[0].$id, { status: newStatus === 'active' ? 'completed' : 'failed' });
+                // 2. Update linked Transaction Status (best-effort)
+                try {
+                    const transRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('campaign_id', campaignId)]);
+                    if (transRes && transRes.total > 0 && transRes.documents && transRes.documents[0]) {
+                        await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, transRes.documents[0].$id, { status: newStatus === 'active' ? 'completed' : 'failed' });
+                    }
+                } catch (tErr) {
+                    // Non-fatal: surface warning but continue
+                    console.warn('Failed to update linked transaction:', tErr);
                 }
 
-                alert(`Campaign ${newStatus} successfully.`);
+                showAdminMessageModal('Action Successful', `Campaign ${newStatus === 'active' ? 'Approved' : 'Rejected'} successfully.`, 'success');
+                // Refresh admin lists and dashboards so creators see updated state
                 fetchAdminPendingMissions();
                 fetchAdminDashboardData();
             } catch (err) {
-                console.error("Admin Error:", err);
-                alert("Failed to process action.");
+                console.error('Admin Error:', err);
+                // Show the exact error message to the admin to aid debugging
+                showAdminMessageModal('Action Failed', 'Failed to process action: ' + (err.message || err), 'error');
             }
         }
+        // Make adminAction callable from inline onclick handlers in HTML templates
+        // (module scripts are module-scoped, so expose explicitly to window)
+        window.adminAction = adminAction;
+
+        // Admin verification for performer-submitted engagements (task proofs)
+        async function adminVerifyEngagement(engagementId, newStatus) {
+            // ensure only whitelisted admins can perform this
+            const isAdmin = await checkAdminPrivilege();
+            if (!isAdmin) { alert('You are not authorized to perform this action.'); return; }
+            try {
+                const ok = confirm(`Mark this performer submission as ${newStatus}?`);
+                if (!ok) return;
+
+                // Update engagement record
+                await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, engagementId, { status: newStatus });
+
+                // Fetch the engagement to get performer and amount info
+                const eng = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, engagementId);
+                if (!eng) {
+                    showAdminMessageModal('Error', 'Engagement not found after update', 'error');
+                    fetchAdminPendingMissions();
+                    return;
+                }
+
+                // If approved, credit the performer and record a transaction
+                if (newStatus === 'completed' || newStatus === 'approved') {
+                    const performerId = eng.performer_id;
+                    const amount = eng.reward || 70;
+
+                    // 1. Create a transaction for the performer
+                    await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
+                        user_id: performerId,
+                        engagement_id: engagementId,
+                        amount: amount,
+                        type: 'payout',
+                        status: 'completed',
+                        description: `Reward for engagement ${eng.campaign_id || ''}`,
+                        created_at: new Date().toISOString()
+                    });
+
+                    // 2. Update performer profile (balance and completed count)
+                    try {
+                        const prof = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, performerId);
+                        const newBal = (prof.balance || 0) + amount;
+                        const newCompleted = (prof.completed_tasks || 0) + 1;
+                        await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, performerId, { balance: newBal, completed_tasks: newCompleted });
+                    } catch (e) {
+                        console.warn('Failed to update performer profile:', e);
+                    }
+                }
+
+                showAdminMessageModal('Submission Verified', `Submission marked as ${newStatus} successfully.`, 'success');
+                fetchAdminPendingMissions();
+                fetchAdminDashboardData();
+            } catch (err) {
+                console.error('adminVerifyEngagement error:', err);
+                showAdminMessageModal('Verification Failed', 'Failed to verify submission: ' + (err.message || err), 'error');
+            }
+        }
+        window.adminVerifyEngagement = adminVerifyEngagement;
+
+        window.showAdminMessageModal = function(title, message, type = 'success') {
+            const modal = document.getElementById('admin-message-modal');
+            const iconBox = document.getElementById('admin-message-icon-box');
+            const icon = document.getElementById('admin-message-icon');
+            const titleEl = document.getElementById('admin-message-title');
+            const textEl = document.getElementById('admin-message-text');
+
+            titleEl.innerText = title;
+            textEl.innerText = message;
+
+            // Reset classes
+            iconBox.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6';
+            icon.className = 'text-2xl';
+
+            if (type === 'success') {
+                iconBox.classList.add('bg-green-500/10', 'text-green-500');
+                icon.classList.add('fa-solid', 'fa-check-circle');
+            } else if (type === 'error') {
+                iconBox.classList.add('bg-red-500/10', 'text-red-500');
+                icon.classList.add('fa-solid', 'fa-circle-exclamation');
+            }
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeAdminMessageModal = function() {
+            document.getElementById('admin-message-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        window.adminVerifyEngagement = adminVerifyEngagement;
 
         window.openCampaignWizard = function() {
             try {
@@ -2698,11 +3114,41 @@
             submitBtn.disabled = true;
             submitBtn.querySelector('span').innerText = "Uploading Proof...";
 
-            setTimeout(() => {
+            try {
+                // Upload proof file to storage
+                let proofUrl = null;
+                if (fileInput.files && fileInput.files[0]) {
+                    const uploadRes = await storage.createFile(APPWRITE_CONFIG.BUCKETS.PROOFS, ID.unique(), fileInput.files[0]);
+                    proofUrl = storage.getFileView(APPWRITE_CONFIG.BUCKETS.PROOFS, uploadRes.$id);
+                }
+
+                // Create an engagement record so admins can verify
+                const reward = 70; // default reward per task
+                const eng = await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, ID.unique(), {
+                    performer_id: currentUser.id,
+                    campaign_id: activeTask ? activeTask.$id : null,
+                    proof_text: text,
+                    proof_url: proofUrl,
+                    status: 'pending_verification',
+                    reward: reward,
+                    created_at: new Date().toISOString()
+                });
+
                 window.triggerConfetti();
                 alert("Proof submitted! Our team will verify it within 24 hours. Reward: ₦70 (Pending)");
                 switchSPAView('dashboard-home');
-            }, 1000);
+
+                // Optionally refresh performer dashboard
+                fetchPerformerDashboardData();
+                // Notify admins by refreshing admin lists if an admin is viewing
+                fetchAdminPendingMissions();
+            } catch (err) {
+                console.error('submitTaskProof error:', err);
+                alert('Failed to submit proof.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.querySelector('span').innerText = 'Submit Proof';
+            }
         }
 
         // --- WALLET FLOWS ---
@@ -3051,7 +3497,7 @@
         (function exposeGlobals() {
             const names = [
                 'toggleMobileMenu','switchRole','toggleTheme','openSettings','closeSettings',
-                'confirmSignout','closeSignoutModal','processLogout','openCampaignWizard','closeCampaignWizard',
+                'confirmSignout','closeSignoutModal','processLogout','openCampaignWizard','closeCampaignWizard', 'showAdminMessageModal', 'closeAdminMessageModal',
                 'selectPlatform','updateCalculation','syncInputs','nextStep','prevStep','finishCreation',
                 'openDepositModal','closeDepositModal','processDeposit','switchSettingsView','saveProfileSettings',
                 'updatePassword','togglePref','startTaskFlow','nextTaskStep','updateTaskProofLabel','submitTaskProof'
