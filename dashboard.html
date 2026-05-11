@@ -6,6 +6,8 @@
     <title>PIDItasks | Earn as You Scroll</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Load Plus Jakarta Sans with a full weight range so thin/bold variants are available -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -109,10 +111,10 @@
         }
 
         /* Global Overrides for hardcoded light elements in Dark Mode */
-        body.dark-mode .bg-white, 
-        body.dark-mode .bg-white\/50,
-        body.dark-mode .bg-white\/30,
-        body.dark-mode .bg-white\/20 { background-color: var(--bg-card) !important; }
+    body.dark-mode .bg-white, 
+    body.dark-mode .bg-white\/50,
+    body.dark-mode .bg-white\/30,
+    body.dark-mode .bg-white\/20 { background-color: var(--bg-card) !important; }
         body.dark-mode .bg-slate-100 { background-color: var(--btn-secondary) !important; }
         body.dark-mode .text-black { color: var(--text-primary) !important; }
         body.dark-mode main.content-area::before,
@@ -121,7 +123,7 @@
         body.dark-mode textarea::placeholder { color: var(--text-secondary); opacity: 0.5; }
         
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
             background: var(--bg-body);
             background-attachment: fixed;
             color: var(--text-primary); 
@@ -129,6 +131,25 @@
             max-width: 100vw;
             overflow-x: hidden;
         }
+
+        /* Ensure form controls inherit the dashboard font for visual consistency */
+        input, button, select, textarea { font-family: inherit; }
+
+        /* Explicit weight mappings to use Plus Jakarta Sans textures consistently */
+        body { font-weight: 400; }
+        h1,h2,h3,h4,h5, .text-3xl, .text-2xl { font-weight: 500; }
+        /* Utility weight overrides (Tailwind names) */
+        .font-thin { font-weight: 100 !important; }
+        .font-extralight, .font-light { font-weight: 300 !important; }
+        .font-normal { font-weight: 300 !important; }
+        .font-medium { font-weight: 400 !important; }
+        .font-semibold { font-weight: 500 !important; }
+        .font-bold { font-weight: 600 !important; }
+        .font-extrabold { font-weight: 700 !important; }
+        .font-black { font-weight: 800 !important; }
+
+        /* Make small caps/tight labels slightly bolder for readability */
+        .text-xs, .text-sm { font-weight: 400; }
 
         /* Sidebar Layout for Desktop */
         @media (min-width: 850px) {
@@ -386,7 +407,7 @@
         }
         
         aside.sidebar .text-dash-secondary, #mobile-drawer .text-dash-secondary,
-        aside.sidebar p.text-[9px], #mobile-drawer p.text-[9px] {
+        aside.sidebar p[class~="text-[9px]"], #mobile-drawer p[class~="text-[9px]"] {
             color: rgba(255, 255, 255, 0.5) !important;
         }
         
@@ -400,7 +421,7 @@
             background-color: rgba(255, 255, 255, 0.1) !important;
         }
 
-        aside.sidebar .bg-dash-secondary/50, #mobile-drawer .bg-dash-secondary/50 {
+        aside.sidebar .bg-dash-secondary\/50, #mobile-drawer .bg-dash-secondary\/50 {
             background-color: rgba(255, 255, 255, 0.05) !important;
         }
 
@@ -1127,7 +1148,7 @@
                             <button onclick="filterCampaignArchive('completed')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-completed">Completed</button>
                         </div>
                         <button onclick="openCampaignWizard()" class="btn-fintech btn-primary">
-                            <i data-feather="plus" class="w-4 h-4 mr-2"></i> NEW CAMPAIGN
+                            <i data-feather="plus" class="w-4 h-4 mr-2"></i> CREATE
                         </button>
                     </div>
                 </div>
