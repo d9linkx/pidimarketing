@@ -344,6 +344,24 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        /* Responsive stat card typography to avoid overflow on small screens */
+        #admin-stats-grid .bento-card p { margin: 0; }
+        #admin-stats-grid .bento-card .stat-title { font-size: clamp(9px, 1.8vw, 11px); letter-spacing: 0.02em; }
+        #admin-stats-grid .bento-card .stat-value { font-size: clamp(16px, 3.6vw, 20px); font-weight: 700; }
+        #admin-stats-grid .bento-card .stat-sub { font-size: clamp(8px, 1.6vw, 10px); color: var(--text-secondary); }
+
+        /* Ensure long text truncates and doesn't wrap cards larger than their container */
+        #admin-stats-grid .bento-card .truncate-maybe { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Extra-tight mobile adjustments */
+        @media (max-width: 420px) {
+            #admin-stats-grid { padding-left: 0.5rem; padding-right: 0.5rem; }
+            #admin-stats-grid .bento-card { padding: 0.65rem; }
+            #admin-stats-grid .bento-card .stat-title { font-size: 9px; }
+            #admin-stats-grid .bento-card .stat-value { font-size: 14px; }
+            #admin-stats-grid .bento-card .stat-sub { font-size: 8px; }
+        }
+
         /* Icon Animation: Pop/Jingle on Card Hover */
         @keyframes icon-pop {
             0% { transform: scale(1); }
@@ -565,36 +583,36 @@
                     </div>
                 </div>
 
-                <div class="bento-grid p-6 mt-[-1rem] grid-cols-2 md:grid-cols-3 gap-4">
+                <div id="admin-stats-grid" class="bento-grid p-2 md:p-6 mt-[-1rem] grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 lg:gap-6">
                     <!-- Row 1: Global High-Level Stats (6 cards) -->
                     <div class="bento-card p-4 card-azure flex items-center gap-4">
                         <div class="icon-box bg-blue-500/10 text-blue-500 mb-0 w-10 h-10"><i data-feather="database" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Locked Escrow</p><h4 id="admin-stat-tvl" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">System-wide Funds</p></div>
+                        <div><p class="stat-title text-dash-secondary uppercase font-bold truncate-maybe">Locked Escrow</p><h4 id="admin-stat-tvl" class="stat-value text-lg font-bold">₦0</h4><p class="stat-sub text-[7px] font-bold uppercase truncate-maybe">System-wide Funds</p></div>
                     </div>
 
                     <div class="bento-card p-4 card-emerald flex items-center gap-4">
                         <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="trending-up" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Revenue</p><h4 id="admin-stat-revenue" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">All-time gross</p></div>
+                        <div><p class="stat-title text-dash-secondary uppercase font-bold truncate-maybe">Total Revenue</p><h4 id="admin-stat-revenue" class="stat-value text-lg font-bold">₦0</h4><p class="stat-sub text-[7px] font-bold uppercase truncate-maybe">All-time gross</p></div>
                     </div>
 
                     <div class="bento-card p-4 card-indigo flex items-center gap-4">
                         <div class="icon-box bg-indigo-500/10 text-indigo-500 mb-0 w-10 h-10"><i data-feather="layers" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Campaigns</p><h4 id="admin-stat-campaigns" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">All time</p></div>
+                        <div><p class="stat-title text-dash-secondary uppercase font-bold truncate-maybe">Total Campaigns</p><h4 id="admin-stat-campaigns" class="stat-value text-lg font-bold">0</h4><p class="stat-sub text-[7px] text-dash-secondary font-bold uppercase truncate-maybe">All time</p></div>
                     </div>
 
                     <div class="bento-card p-4 card-amber flex items-center gap-4">
                         <div class="icon-box bg-amber-100 text-amber-600 mb-0 w-10 h-10"><i data-feather="award" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Leading Industries</p><h4 id="admin-stat-industries" class="text-lg font-bold">—</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Top sectors</p></div>
+                        <div><p class="stat-title text-dash-secondary uppercase font-bold truncate-maybe">Leading Industries</p><h4 id="admin-stat-industries" class="stat-value text-lg font-bold truncate-maybe">—</h4><p class="stat-sub text-[7px] text-dash-secondary font-bold uppercase truncate-maybe">Top sectors</p></div>
                     </div>
 
                     <div class="bento-card p-4 card-emerald flex items-center gap-4">
                         <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="dollar-sign" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Paid Out</p><h4 id="admin-stat-paidout" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Rewards & payouts</p></div>
+                        <div><p class="stat-title text-dash-secondary uppercase font-bold truncate-maybe">Total Paid Out</p><h4 id="admin-stat-paidout" class="stat-value text-lg font-bold">₦0</h4><p class="stat-sub text-[7px] text-dash-secondary font-bold uppercase truncate-maybe">Rewards & payouts</p></div>
                     </div>
 
                     <div class="bento-card p-4 card-rose flex items-center gap-4">
                         <div class="icon-box bg-rose-pale text-rose-vibrant mb-0 w-10 h-10"><i data-feather="percent" class="w-5"></i></div>
-                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Profit</p><h4 id="admin-stat-profit" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Revenue minus payouts</p></div>
+                        <div><p class="stat-title text-dash-secondary uppercase font-bold truncate-maybe">Total Profit</p><h4 id="admin-stat-profit" class="stat-value text-lg font-bold">₦0</h4><p class="stat-sub text-[7px] text-dash-secondary font-bold uppercase truncate-maybe">Revenue minus payouts</p></div>
                     </div>
                 </div>
 
