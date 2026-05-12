@@ -487,6 +487,12 @@
         .proof-img { aspect-ratio: 9/16; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-dash); }
 
         #role-chevron.rotate-180, #role-chevron-mobile.rotate-180 { transform: rotate(180deg); }
+
+          /* Remove colored/purple glow shadows from cards specifically
+              This overrides box-shadow on card containers and common shadow utility classes
+              without touching other layout or script code. */
+          .bento-card, .bento-card * { box-shadow: none !important; }
+          .bento-card .shadow-lg, .bento-card .shadow-xl, .bento-card .shadow-2xl { box-shadow: none !important; }
     </style>
 </head>
 <body class="p-0">
@@ -740,7 +746,7 @@
                         <div class="card-explanation">
                             <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
                             <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--amber-vibrant)]">Live Workforce</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Real-time count of humans currently completing tasks and browsing missions in the PIDI network.</p>
+                            <p class="text-[11px] text-dash-secondary leading-relaxed">Real-time count of humans currently completing tasks and browsing campaigns in the PIDI network.</p>
                         </div>
                         <div class="icon-box bg-[var(--amber-pale)] text-[var(--amber-vibrant)] mb-0 w-10 h-10"><i data-feather="users" class="w-5"></i></div>
                         <div>
@@ -786,7 +792,7 @@
     <div class="card-explanation">
         <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
         <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--slate-vibrant)]">Management Center</h4>
-        <p class="text-[11px] text-dash-secondary leading-relaxed">Detailed center for tracking individual mission ROI, viewing verification logs, and managing active content links.</p>
+    <p class="text-[11px] text-dash-secondary leading-relaxed">Detailed center for tracking individual campaign ROI, viewing verification logs, and managing active content links.</p>
     </div>
     
     <h2 class="text-2xl font-normal leading-tight">Your Campaigns</h2>
@@ -830,21 +836,34 @@
                     </div>
 
                     <div class="bento-card col-span-full relative group">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                            <div>
-                                <h2 class="text-2xl font-normal leading-tight">Available Gigs</h2>
-                                <p class="text-[10px] text-dash-secondary font-bold uppercase mt-1">Real-time mission board</p>
+
+
+                        <!-- Quick List: Repeat of the My Gigs table but limited to latest 5 items -->
+                        <div class="mt-6">
+                            <h3 class="text-lg font-bold mb-2">Latest Tasks</h3>
+                            <div class="bento-card p-0">
+                                <div class="overflow-x-auto">
+                                    <table id="performer-available-gigs-table" class="w-full text-left text-xs border-collapse min-w-[640px]">
+                                        <thead>
+                                            <tr class="text-dash-secondary border-b border-dash bg-dash-secondary/30">
+                                                <th class="p-3 uppercase tracking-widest font-bold">Task</th>
+                                                <th class="p-3 uppercase tracking-widest font-bold">Platform</th>
+                                                <th class="p-3 uppercase tracking-widest font-bold">Status</th>
+                                                <th class="p-3 uppercase tracking-widest font-bold">Progress</th>
+                                                <th class="p-3 uppercase tracking-widest font-bold">Reward</th>
+                                                <th class="p-3 text-right uppercase tracking-widest font-bold">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="performer-available-gigs-list" class="divide-y divide-dash">
+                                            <tr><td colspan="6" class="py-6 text-center text-dash-secondary">Loading…</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                            <div class="flex p-1 bg-dash-secondary rounded-xl border border-dash overflow-x-auto no-scrollbar w-full md:w-auto" id="performer-filters">
-                                <button onclick="filterPerformerGigs('all')" class="px-4 py-2 rounded-lg text-xs font-bold transition active-btn whitespace-nowrap" id="p-filter-all">All</button>
-                                <button onclick="filterPerformerGigs('instagram')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary whitespace-nowrap" id="p-filter-instagram">Instagram</button>
-                                <button onclick="filterPerformerGigs('tiktok')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary whitespace-nowrap" id="p-filter-tiktok">TikTok</button>
-                                <button onclick="filterPerformerGigs('twitter')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary whitespace-nowrap" id="p-filter-twitter">X</button>
-                                <button onclick="filterPerformerGigs('google')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary whitespace-nowrap" id="p-filter-google">Google</button>
+
+                            <div class="mt-3 text-right">
+                                <button onclick="switchSPAView('performer-gigs')" class="px-4 py-2 rounded-lg text-xs font-bold border border-dash bg-dash-secondary text-dash-secondary">See more</button>
                             </div>
-                        </div>
-                        <div id="performer-available-tasks" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <p class="text-xs text-dash-secondary text-center py-10 col-span-full">Searching for high-value missions...</p>
                         </div>
                     </div>
 
@@ -864,7 +883,7 @@
                         </div>
                         <div class="bento-card p-4 card-slate flex items-center gap-4">
                             <div class="icon-box bg-slate-100 text-slate-600 mb-0 w-10 h-10"><i data-feather="activity" class="w-5"></i></div>
-                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Global Missions</p><h4 id="admin-stat-active" class="text-lg font-bold">0</h4></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Global Campaigns</p><h4 id="admin-stat-active" class="text-lg font-bold">0</h4></div>
                         </div>
                         <div class="bento-card p-4 card-slate flex items-center gap-4">
                             <div class="icon-box bg-slate-100 text-slate-600 mb-0 w-10 h-10"><i data-feather="user-plus" class="w-5"></i></div>
@@ -878,7 +897,7 @@
 
                     <div class="bento-card col-span-full relative group">
                         <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-2xl font-normal leading-tight">System Monitor: All Creator Missions</h2>
+                            <h2 class="text-2xl font-normal leading-tight">System Monitor: All Creator Campaigns</h2>
                             <button onclick="switchSPAView('admin')" class="btn-fintech bg-dash-secondary text-[10px] font-black uppercase tracking-widest px-4 py-2 hover:opacity-80 transition">Verification Hub</button>
                         </div>
                         <div class="overflow-x-auto">
@@ -904,11 +923,231 @@
 
             <!-- SPA CONTAINER: Performer Gigs View -->
             <div id="performer-gigs-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
-                <h2 class="text-3xl font-bold tracking-tight mb-4">My Gigs (Performer)</h2>
-                <p class="text-dash-secondary text-sm mb-8">View and manage your available tasks.</p>
-                <div class="bento-card p-6">
-                    <p class="text-dash-secondary">Content for Performer Gigs will go here.</p>
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight">My Gigs (Performer)</h2>
+                        <p class="text-dash-secondary text-sm mt-1">Live list of tasks pulled from the campaigns table.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button id="refresh-gigs-btn" class="btn-fintech btn-secondary px-4 py-2 text-xs font-bold rounded-xl" title="Refresh gigs">Refresh</button>
+                        <div class="text-sm text-dash-secondary">Last update: <span id="gigs-last-updated">Never</span></div>
+                    </div>
                 </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6" id="performer-gigs-summary">
+                    <!-- Summary cards populated by script -->
+                </div>
+
+                <div class="bento-card p-0">
+                    <div class="overflow-x-auto">
+                        <table id="performer-gigs-table" class="w-full text-left text-xs border-collapse min-w-[720px]">
+                            <thead>
+                                <tr class="text-dash-secondary border-b border-dash bg-dash-secondary/30">
+                                    <th class="p-4 uppercase tracking-widest font-bold">Task</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Platform</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Status</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Progress</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Reward</th>
+                                    <th class="p-4 text-right uppercase tracking-widest font-bold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="performer-gigs-list" class="divide-y divide-dash">
+                                <tr><td colspan="6" class="py-8 text-center text-dash-secondary">Loading gigs…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Mobile-friendly list fallback (cards) -->
+                <div id="performer-gigs-cards" class="grid grid-cols-1 gap-4 mt-6 hidden lg:hidden">
+                    <!-- populated on mobile for better readability -->
+                </div>
+
+                <script type="module">
+                    import { databases, Query, APPWRITE_CONFIG } from './appwriteClient.js';
+
+                    const shortListEl = document.getElementById('performer-available-gigs-list');
+
+                    function renderShortRows(items) {
+                        if (!shortListEl) return;
+                        if (!items || items.length === 0) {
+                            shortListEl.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-dash-secondary">No recent gigs.</td></tr>';
+                            return;
+                        }
+
+                        shortListEl.innerHTML = items.map(c => {
+                            const progress = Math.round(((c.current_count || 0) / (c.goal_count || 1)) * 100) || 0;
+                            const statusLabel = c.status === 'pending_verification' ? 'Verifying' : (c.status || 'active');
+                            return `
+                                <tr class="hover:bg-dash-secondary/10 transition-colors">
+                                    <td class="p-3 align-top">
+                                        <div class="font-bold truncate max-w-[240px]">${(c.target_url || c.title || 'Untitled Mission')}</div>
+                                        <div class="text-[10px] text-dash-secondary mt-1">By: ${c.full_name || 'Unknown'}</div>
+                                    </td>
+                                    <td class="p-3 align-top"><span class="text-xs font-bold uppercase">${c.platform || ''}</span></td>
+                                    <td class="p-3 align-top"><span class="px-3 py-1 rounded-full text-[10px] font-black ${c.status === 'completed' ? 'bg-green-500/10 text-green-500' : (c.status === 'rejected' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500')}">${statusLabel}</span></td>
+                                    <td class="p-3 align-top"><div class="w-full bg-dash-secondary h-2 rounded-full overflow-hidden"><div style="width:${progress}%" class="h-2 bg-[var(--accent-primary)]"></div></div></td>
+                                    <td class="p-3 align-top font-bold">₦${(c.total_cost ? (c.total_cost / (c.goal_count || 1)).toFixed(0) : 70)}</td>
+                                    <td class="p-3 text-right align-top">
+                                        <button onclick="startTaskFlow('${c.$id}')" class="px-3 py-1 rounded-lg text-xs font-bold bg-[var(--accent-primary)] text-white hover:opacity-90">Start</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+
+                    async function loadLatestFiveGigs() {
+                        try {
+                            const resp = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, [Query.orderDesc('created_at'), Query.limit(5)]);
+                            const docs = resp.documents || [];
+                            renderShortRows(docs);
+                        } catch (err) {
+                            console.error('Failed to load latest gigs', err);
+                            if (shortListEl) shortListEl.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-dash-secondary">Failed to load.</td></tr>';
+                        }
+                    }
+
+                    // Initial load for the performer dashboard
+                    loadLatestFiveGigs();
+
+                    // Optional: refresh when the full gigs page is refreshed
+                    document.getElementById('refresh-gigs-btn')?.addEventListener('click', loadLatestFiveGigs);
+                </script>
+
+                <script type="module">
+                    import { databases, Query, APPWRITE_CONFIG } from './appwriteClient.js';
+
+                    const listEl = document.getElementById('performer-gigs-list');
+                    const summaryEl = document.getElementById('performer-gigs-summary');
+                    const lastUpdatedEl = document.getElementById('gigs-last-updated');
+                    const cardsEl = document.getElementById('performer-gigs-cards');
+                    const refreshBtn = document.getElementById('refresh-gigs-btn');
+
+                    function deriveCategory(c) {
+                        if (!c) return 'new';
+                        if (c.status === 'completed') return 'completed';
+                        if (c.status === 'rejected') return 'rejected';
+                        // If some progress exists, consider it started
+                        if (c.current_count && c.current_count > 0) return 'started';
+                        return 'new';
+                    }
+
+                    function formatDate(iso) {
+                        try { return new Date(iso).toLocaleString(); } catch (e) { return iso || ''; }
+                    }
+
+                    function renderSummary(groups) {
+                        const map = {
+                            new: { label: 'New', color: 'bg-blue-500/10 text-blue-500' },
+                            started: { label: 'Started', color: 'bg-amber-500/10 text-amber-500' },
+                            completed: { label: 'Completed', color: 'bg-green-500/10 text-green-500' },
+                            rejected: { label: 'Rejected', color: 'bg-rose-500/10 text-rose-500' }
+                        };
+                        summaryEl.innerHTML = Object.keys(map).map(key => {
+                            const cfg = map[key];
+                            const count = (groups[key] && groups[key].length) || 0;
+                            return `
+                                <div class="bento-card p-4 ${cfg.color} flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">${cfg.label}</p>
+                                        <h4 class="text-lg font-black">${count}</h4>
+                                    </div>
+                                    <div class="text-xs text-dash-secondary">View</div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+
+                    function renderTableRows(items) {
+                        if (!items || items.length === 0) {
+                            listEl.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-dash-secondary">No gigs found.</td></tr>';
+                            return;
+                        }
+
+                        listEl.innerHTML = items.map(c => {
+                            const progress = Math.round(((c.current_count || 0) / (c.goal_count || 1)) * 100) || 0;
+                            const statusLabel = c.status === 'pending_verification' ? 'Verifying' : (c.status || 'active');
+                            return `
+                                        <tr class="hover:bg-dash-secondary/10 transition-colors">
+                                    <td class="p-4 align-top">
+                                        <div class="font-bold truncate max-w-[320px]">${(c.target_url || c.title || 'Untitled Task')}</div>
+                                        <div class="text-[10px] text-dash-secondary mt-1">By: ${c.full_name || 'Unknown'}</div>
+                                    </td>
+                                    <td class="p-4 align-top"><span class="text-xs font-bold uppercase">${c.platform || ''}</span></td>
+                                    <td class="p-4 align-top"><span class="px-3 py-1 rounded-full text-[10px] font-black ${c.status === 'completed' ? 'bg-green-500/10 text-green-500' : (c.status === 'rejected' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500')}">${statusLabel}</span></td>
+                                    <td class="p-4 align-top"><div class="w-full bg-dash-secondary h-2 rounded-full overflow-hidden"><div style="width:${progress}%" class="h-2 bg-[var(--accent-primary)]"></div></div><div class="text-[10px] text-dash-secondary mt-1">${progress}% • ${c.current_count || 0}/${c.goal_count || 0}</div></td>
+                                    <td class="p-4 align-top font-bold">₦${(c.total_cost ? (c.total_cost / (c.goal_count || 1)).toFixed(0) : 70)}</td>
+                                    <td class="p-4 text-right align-top">
+                                        <button onclick="startTaskFlow('${c.$id}')" class="px-4 py-2 rounded-lg text-xs font-bold bg-[var(--accent-primary)] text-white hover:opacity-90">Start</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+
+                    function renderCards(items) {
+                        if (!cardsEl) return;
+                        cardsEl.innerHTML = items.map(c => {
+                            const progress = Math.round(((c.current_count || 0) / (c.goal_count || 1)) * 100) || 0;
+                            return `
+                                <div class="bento-card p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-bold">${(c.target_url || c.title || 'Untitled Mission')}</div>
+                                            <div class="text-[10px] text-dash-secondary mt-1">${c.platform || ''} • ${c.full_name || 'Unknown'}</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-black">₦${(c.total_cost ? (c.total_cost / (c.goal_count || 1)).toFixed(0) : 70)}</div>
+                                            <div class="text-[10px] text-dash-secondary">${progress}%</div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 text-[10px] text-dash-secondary">${(c.instructions || '').slice(0, 120)}</div>
+                                    <div class="mt-4 text-right">
+                                        <button onclick="startTaskFlow('${c.$id}')" class="px-3 py-2 rounded-lg text-xs font-bold bg-[var(--accent-primary)] text-white hover:opacity-90">Start</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+
+                    async function loadGigs() {
+                        try {
+                            refreshBtn.disabled = true;
+                            refreshBtn.innerText = 'Refreshing...';
+
+                            const resp = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, [Query.orderDesc('created_at')]);
+                            const docs = resp.documents || [];
+
+                            // Group by derived category for summary
+                            const groups = { new: [], started: [], completed: [], rejected: [] };
+                            docs.forEach(d => {
+                                const cat = deriveCategory(d);
+                                groups[cat].push(d);
+                            });
+
+                            renderSummary(groups);
+                            renderTableRows(docs);
+                            renderCards(docs);
+
+                            lastUpdatedEl.innerText = new Date().toLocaleTimeString();
+                        } catch (err) {
+                            console.error('Failed to load gigs', err);
+                            if (listEl) listEl.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-dash-secondary">Failed to load gigs.</td></tr>';
+                        } finally {
+                            refreshBtn.disabled = false;
+                            refreshBtn.innerText = 'Refresh';
+                        }
+                    }
+
+                    refreshBtn.addEventListener('click', loadGigs);
+
+                    // Initial load and periodic refresh
+                    loadGigs();
+                    const intervalId = setInterval(loadGigs, 30000); // refresh every 30s
+
+                    // Clean up if SPA view is removed from DOM later
+                    window.addEventListener('beforeunload', () => clearInterval(intervalId));
+                </script>
             </div>
 
             <!-- SPA CONTAINER: Performer Earnings View -->
@@ -920,14 +1159,7 @@
                 </div>
             </div>
 
-            <!-- SPA CONTAINER: Performer Performance View -->
-            <div id="performer-performance-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
-                <h2 class="text-3xl font-bold tracking-tight mb-4">My Performance (Performer)</h2>
-                <p class="text-dash-secondary text-sm mb-8">Review your task accuracy and reputation score.</p>
-                <div class="bento-card p-6">
-                    <p class="text-dash-secondary">Content for Performer Performance will go here.</p>
-                </div>
-            </div>
+
 
             <!-- SPA CONTAINER: Admin Overview View -->
             <div id="admin-overview-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
@@ -963,7 +1195,7 @@
                     <div class="flex items-center justify-between mb-8">
                         <button onclick="switchSPAView('dashboard-home')" class="text-dash-secondary hover:text-[var(--text-primary)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors group">
                             <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> 
-                            <span>Cancel Mission</span>
+                            <span>Cancel Task</span>
                         </button>
                         
                         <div class="flex gap-1.5" id="task-progress-bars">
@@ -974,11 +1206,11 @@
                     </div>
 
                     <div id="task-step-1" class="task-wizard-step space-y-6">
-                        <!-- Mission Selection: show blurred visual fingerprint and summary -->
+                        <!-- Task Selection: show blurred visual fingerprint and summary -->
                         <div class="flex items-center gap-4 p-6 bg-dash-secondary/30 rounded-3xl border border-dash">
                             <div id="task-platform-icon" class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-2xl shadow-sm"></div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-[9px] font-black text-[var(--accent-primary)] uppercase tracking-widest mb-1">New Campaign Available</p>
+                                <p class="text-[9px] font-black text-[var(--accent-primary)] uppercase tracking-widest mb-1">New Task Available</p>
                                 <h2 class="text-xl font-bold truncate" id="task-detail-url"></h2>
                                 <p class="text-[10px] text-dash-secondary mt-1" id="task-detail-creator"></p>
                             </div>
@@ -997,11 +1229,11 @@
                         </div>
 
                         <div class="space-y-2">
-                            <p class="text-[10px] text-dash-secondary">Accepting this mission moves it to <strong>In-Progress</strong> and starts your <strong class="font-bold">30 minute</strong> timer to complete and submit proof.</p>
+                            <p class="text-[10px] text-dash-secondary">Accepting this task moves it to <strong>In-Progress</strong> and starts your <strong class="font-bold">30 minute</strong> timer to complete and submit proof.</p>
                         </div>
 
                         <button id="accept-mission-btn" onclick="acceptMission()" class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest">
-                            Accept Mission & Start Timer
+                            Accept Task & Start Timer
                         </button>
                     </div>
 
@@ -1183,7 +1415,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <div class="bento-card p-4 flex items-center gap-4">
                         <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="layers" class="w-5"></i></div>
-                        <div><p class="text-[9px] font-bold text-dash-secondary uppercase">Lifetime Missions</p><h4 id="archive-stat-total" class="text-lg font-bold">0</h4></div>
+                        <div><p class="text-[9px] font-bold text-dash-secondary uppercase">Lifetime Campaigns</p><h4 id="archive-stat-total" class="text-lg font-bold">0</h4></div>
                     </div>
                     <div class="bento-card p-4 flex items-center gap-4">
                         <div class="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="check-circle" class="w-5"></i></div>
@@ -1204,7 +1436,7 @@
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="text-dash-secondary border-b border-dash bg-dash-secondary/30">
-                                    <th class="p-4 uppercase tracking-widest font-bold">Mission Name</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Campaign Name</th>
                                     <th class="p-4 uppercase tracking-widest font-bold">Platform</th>
                                     <th class="p-4 uppercase tracking-widest font-bold">Status</th>
                                     <th class="p-4 uppercase tracking-widest font-bold">Spend</th>
@@ -1236,7 +1468,7 @@
                     </button>
                     <div class="flex items-center gap-3">
                         <button id="edit-campaign-btn" class="hidden btn-fintech bg-white border border-dash text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">
-                            <i data-feather="edit-2" class="mr-2 w-3.5 h-3.5"></i> Edit Mission
+                            <i data-feather="edit-2" class="mr-2 w-3.5 h-3.5"></i> Edit Campaign
                         </button>
                         <div id="detail-status-badge"></div>
                     </div>
@@ -1271,7 +1503,7 @@
                         </div>
 
                         <div class="bento-card p-8">
-                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary mb-4">Mission Instructions</h4>
+                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary mb-4">Campaign Instructions</h4>
                             <div id="detail-instructions" class="bg-dash-secondary/30 p-6 rounded-2xl text-sm leading-relaxed italic text-dash-secondary"></div>
                         </div>
                     </div>
@@ -1313,7 +1545,7 @@
                     <div class="bento-card card-amber">
                         <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest mb-3">Working Capital</p>
                         <h3 class="text-3xl font-bold mb-1" id="wallet-working-funds">₦0</h3>
-                        <p class="text-[10px] text-dash-secondary">Active missions funding</p>
+                        <p class="text-[10px] text-dash-secondary">Active campaign funding</p>
                     </div>
                     <div class="bento-card card-emerald">
                         <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest mb-3">Spent/Completed</p>
@@ -1365,16 +1597,152 @@
             </div>
 
             <!-- SPA CONTAINER: Referrals View -->
-            <div id="referrals-view" class="spa-view hidden p-6 lg:p-8 max-w-4xl mx-auto">
-                <h2 class="text-3xl font-bold mb-8">Referral Program</h2>
-                <div class="bento-card card-azure mb-10">
-                    <h4 class="font-bold mb-2">Earn 5% on every deposit</h4>
-                    <p class="text-sm opacity-80 mb-6">Invite other creators to PIDItasks and earn commissions on their campaign spend.</p>
-                    <div class="flex gap-2">
-                        <input type="text" readonly value="https://piditasks.com/ref/${currentUser.id}" class="flex-1 bg-white/20 border border-white/30 rounded-xl p-3 text-xs font-mono">
-                        <button class="bg-white text-black px-6 rounded-xl font-bold text-xs">Copy</button>
+            <div id="referrals-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
+                <div class="flex flex-col lg:flex-row items-start gap-8">
+                    <!-- Hero -->
+                    <div class="flex-1">
+                        <h1 class="text-4xl lg:text-5xl font-extrabold mb-4">Expand the Protocol</h1>
+                        <p class="text-dash-secondary mb-6">We sent your referral code to the email you used to sign up. Share it so your friends get priority access when they join.</p>
+
+                        <div class="flex gap-3 items-center mb-6">
+                            <a id="invite-form-btn" href="#" target="_blank" rel="noopener" class="btn-fintech btn-primary px-6 py-3 text-sm font-black inline-flex items-center justify-center" role="button" aria-label="Invite a Peer">Invite a Peer</a>
+                            <a id="submit-recruit-btn" href="#" target="_blank" rel="noopener" class="btn-fintech btn-secondary px-4 py-3 text-sm font-black inline-flex items-center justify-center" role="button" aria-label="Submit New Recruit">Submit New Recruit</a>
+                        </div>
+
+                        <p class="text-sm text-dash-secondary">Not ready to share widely? Use the toolkit below to message peers directly with a high-conversion template. The system is in Phase 1 — real-time analytics will appear in Phase 2.</p>
+                    </div>
+
+                    <!-- Intelligence Badge -->
+                    <div class="w-full lg:w-64">
+                        <div id="intel-badge" class="p-4 rounded-xl text-xs font-bold uppercase text-white bg-[var(--accent-primary)]/90 flex items-center justify-center animate-pulse">INTELLIGENCE SYNCING: Real-time stats will activate on your dashboard in Phase 2</div>
                     </div>
                 </div>
+
+                <!-- Visual Analytics Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                    <div class="bento-card glass-card p-6 relative overflow-hidden">
+                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Recruits Onboarded</p>
+                        <div class="mt-4">
+                            <div class="skeleton-number w-32 h-12 bg-dash-secondary rounded-md"></div>
+                        </div>
+                    </div>
+
+                    <div class="bento-card glass-card p-6 relative overflow-hidden">
+                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Active Influence</p>
+                        <div class="mt-4">
+                            <div class="skeleton-number w-28 h-12 bg-dash-secondary rounded-md"></div>
+                        </div>
+                    </div>
+
+                    <div class="bento-card glass-card p-6 relative overflow-hidden">
+                        <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest">Protocol Commissions</p>
+                        <div class="mt-4">
+                            <div class="skeleton-number w-36 h-12 bg-dash-secondary rounded-md"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referral Toolkit -->
+                <div class="bento-card p-6 mt-8">
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold mb-2">Referral Toolkit</h3>
+                                <p class="text-sm text-dash-secondary mb-4">A simple message you can copy or share with friends.</p>
+
+                            <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Copy Invite</label>
+                            <div class="flex items-stretch gap-2">
+                                <textarea id="invite-message" class="flex-1 p-4 rounded-xl bg-dash-secondary text-sm resize-none" rows="4">Hi — I use PIDI. Join here: [FORM_LINK]. Use the referral code from my welcome email so I get credit. Thank you!</textarea>
+                                <div class="flex flex-col gap-2">
+                                    <button id="copy-invite-btn" class="px-4 py-2 bg-[var(--accent-primary)] text-white rounded-xl font-bold text-xs">Copy</button>
+                                    <button id="open-form-btn" class="px-4 py-2 border border-dash rounded-xl text-xs font-bold">Open Form</button>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 mt-4 text-sm">
+                                <span class="text-dash-secondary font-semibold">Share on:</span>
+                                <button id="share-wa" class="share-btn px-3 py-2 rounded-xl bg-green-500/10 text-green-500 font-bold text-xs">WhatsApp</button>
+                                <button id="share-x" class="share-btn px-3 py-2 rounded-xl bg-blue-500/10 text-blue-500 font-bold text-xs">X</button>
+                                <button id="share-tg" class="share-btn px-3 py-2 rounded-xl bg-sky-500/10 text-sky-500 font-bold text-xs">Telegram</button>
+                            </div>
+                        </div>
+
+                        <div class="w-full lg:w-72">
+                            <h4 class="text-xs font-bold uppercase text-dash-secondary mb-2">Quick Link</h4>
+                            <input id="referral-form-link-input" readonly class="w-full p-3 rounded-xl bg-white/10 border border-dash font-mono text-xs" value="" />
+
+                            <div class="mt-4 text-sm text-dash-secondary">
+                                <p>Your referral code is in your welcome email. Ask your friend to put it in the "Referrer" field on the form.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rules of Engagement -->
+                <div class="bento-card p-6 mt-6">
+                    <h4 class="text-sm font-bold mb-3">How to share (simple)</h4>
+                    <ol class="text-sm text-dash-secondary list-decimal pl-5 space-y-2">
+                        <li>Check your email for your referral code.</li>
+                        <li>Send the Google Form link to your friend.</li>
+                        <li>Tell them to enter your code in the "Referrer" field.</li>
+                        <li>We will add referrals to your dashboard in the next update.</li>
+                    </ol>
+                </div>
+
+                <style>
+                    /* Local styles for referrals view */
+                    .glass-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.08); }
+                    body.dark-mode .glass-card { background: rgba(24,24,27,0.5); border-color: rgba(255,255,255,0.04); }
+                    .skeleton-number { position: relative; overflow: hidden; }
+                    .skeleton-number::after { content: ''; position: absolute; inset:0; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%); transform: translateX(-100%); animation: shimmer 1.6s infinite; }
+                    @keyframes shimmer { to { transform: translateX(100%); } }
+                    #intel-badge { box-shadow: 0 6px 18px rgba(69,185,110,0.12); }
+                    .share-btn { cursor: pointer; }
+                </style>
+
+                <script>
+                    (function(){
+                        // Replace with your Google Form link
+                        const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScv_h7u6N1mD-2_0pgemrx8hFC2L0TeEZRqc_sgBP0AJY4TDA/viewform?usp=header';
+
+                        // Resolve referral code from client state (if available)
+                        const refCode = (window.currentUser && (window.currentUser.id || window.currentUser.$id)) || '';
+                        const linkInput = document.getElementById('referral-form-link-input');
+                        const fullLink = FORM_URL + (refCode ? ('?ref=' + encodeURIComponent(refCode)) : '');
+                        if (linkInput) linkInput.value = fullLink;
+
+                        // Wire buttons
+                        const inviteBtn = document.getElementById('invite-form-btn');
+                        const submitBtn = document.getElementById('submit-recruit-btn');
+                        const openFormBtn = document.getElementById('open-form-btn');
+                        const copyBtn = document.getElementById('copy-invite-btn');
+                        const inviteArea = document.getElementById('invite-message');
+
+                        function openForm() { window.open(FORM_URL, '_blank', 'noopener'); }
+                        inviteBtn && (inviteBtn.href = FORM_URL);
+                        submitBtn && (submitBtn.href = FORM_URL);
+                        openFormBtn && openFormBtn.addEventListener('click', openForm);
+
+                        copyBtn && copyBtn.addEventListener('click', async () => {
+                            if (!inviteArea) return;
+                            // replace placeholder with actual form link
+                            const text = inviteArea.value.replace('[FORM_LINK]', fullLink);
+                            try { await navigator.clipboard.writeText(text); copyBtn.innerText = 'Copied'; setTimeout(()=> copyBtn.innerText='Copy',1200); } catch(e) { alert('Copy failed — please select and copy manually.'); }
+                        });
+
+                        // Share buttons
+                        const wa = document.getElementById('share-wa');
+                        const x = document.getElementById('share-x');
+                        const tg = document.getElementById('share-tg');
+                        const message = encodeURIComponent((inviteArea?.value || '').replace('[FORM_LINK]', fullLink));
+                        wa && wa.addEventListener('click', () => window.open('https://wa.me/?text=' + message, '_blank'));
+                        x && x.addEventListener('click', () => window.open('https://twitter.com/intent/tweet?text=' + message, '_blank'));
+                        tg && tg.addEventListener('click', () => window.open('https://t.me/share/url?url=' + encodeURIComponent(fullLink) + '&text=' + message, '_blank'));
+
+                        // Also update toolkit message template with form link
+                        if (inviteArea) inviteArea.value = inviteArea.value.replace('[FORM_LINK]', fullLink);
+
+                    })();
+                </script>
             </div>
 
             <!-- SPA CONTAINER: Feedback View -->
@@ -1496,7 +1864,7 @@
                                     <input type="url" id="target-url" placeholder="https://..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
                                     <p class="text-[9px] text-dash-secondary mt-2 flex items-start gap-2 italic">
                                         <i data-feather="lock" class="w-3 h-3 mt-0.5 flex-shrink-0"></i>
-                                        <span>Encrypted Ground Truth: Used by PIDI admins to verify mission success. Performers only see discovery guides.</span>
+                                        <span>Encrypted Ground Truth: Used by PIDI admins to verify campaign success. Performers only see discovery guides.</span>
                                     </p>
                                 </div>
                             </div>
@@ -1898,13 +2266,13 @@
                 <tr class="border-b border-dash task-item">
                     <td class="py-4 font-bold">
                         ${item.isTask ? 
-                            `<button onclick="claimTask('${item.id}')" class="text-[#6a26da] hover:underline">${item.name}</button>` : 
+                            `<button onclick="claimTask('${item.id}')" class="text-[var(--accent-primary)] hover:underline">${item.name}</button>` : 
                             item.name
                         }
                     </td>
                     <td class="py-4"><span class="bg-dash-secondary px-2 py-1 rounded-lg text-[10px] uppercase font-bold">${item.status}</span></td>
                     <td class="py-4 text-dash-secondary">${item.metric}</td>
-                    <td class="py-4 text-right"><button class="hover:text-[#6a26da] text-dash-secondary"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+                    <td class="py-4 text-right"><button class="hover:text-[var(--accent-primary)] text-dash-secondary"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
                 </tr>
             `).join('');
         }
@@ -2276,7 +2644,7 @@
             // Update Switcher UI Config
             const config = {
                 creator: { label: 'Creator Dashboard', icon: 'plus-square', color: 'var(--accent-primary)', cta: 'Create Campaign' },
-                performer: { label: 'Performer Dashboard', icon: 'zap', color: '#3b82f6', cta: 'Find New Task' },
+                performer: { label: 'Performer Dashboard', icon: 'zap', color: '#var(--accent-primary)', cta: 'Find New Task' },
                 admin: { label: 'Admin Console', icon: 'shield', color: '#ef4444', cta: 'Manage System' }
             };
             const c = config[role];
@@ -2311,9 +2679,7 @@
                     <a href="#" onclick="switchSPAView('performer-earnings')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                         <i data-feather="credit-card" class="w-4 text-center"></i> Earnings
                     </a>
-                    <a href="#" onclick="switchSPAView('performer-performance')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                        <i data-feather="activity" class="w-4 text-center"></i> Performance
-                    </a>
+
                 `;
             } else if (role === 'admin') {
                 workspaceNavHTML = `
@@ -2721,13 +3087,13 @@
                 <tr class="border-b border-dash task-item">
                     <td class="py-4 font-bold">
                         ${item.isTask ?
-                            `<button onclick="startTaskFlow('${item.id}')" class="text-[#6a26da] hover:underline">${item.name}</button>` :
+                            `<button onclick="startTaskFlow('${item.id}')" class="text-[var(--accent-primary)] hover:underline">${item.name}</button>` :
                             item.name
                         }
                     </td>
                     <td class="py-4"><span class="bg-dash-secondary px-2 py-1 rounded-lg text-[10px] uppercase font-bold">${item.status}</span></td>
                     <td class="py-4 text-dash-secondary">${item.metric}</td>
-                    <td class="py-4 text-right"><button class="hover:text-[#6a26da] text-dash-secondary"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+                    <td class="py-4 text-right"><button class="hover:text-[var(--accent-primary)] text-dash-secondary"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
                 </tr>
             `).join('');
         }
@@ -3163,17 +3529,17 @@
             const label = document.getElementById('proof-file-label');
             if (input.files && input.files[0]) {
                 label.innerText = `Selected: ${input.files[0].name}`;
-                label.classList.add('text-[#6a26da]');
+                label.classList.add('text-[var(--accent-primary)]');
             } else {
                 label.innerText = "Upload Receipt (IMG/PDF)";
-                label.classList.remove('text-[#6a26da]');
+                label.classList.remove('text-[var(--accent-primary)]');
             }
         }
 
         window.copyAccountNumber = function() {
             navigator.clipboard.writeText('3000487237').then(() => {
                 const toast = document.createElement('div');
-                toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#6a26da] text-white px-6 py-3 rounded-2xl shadow-2xl z-[500] font-bold text-sm transition-all transform translate-y-20 flex items-center gap-2 border border-white/10';
+                toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 bg-[var(--accent-primary)] text-white px-6 py-3 rounded-2xl shadow-2xl z-[500] font-bold text-sm transition-all transform translate-y-20 flex items-center gap-2 border border-white/10';
                 toast.innerHTML = '<i class="fa-solid fa-copy"></i> Account number copied to clipboard!';
                 document.body.appendChild(toast);
 
@@ -3190,12 +3556,12 @@
         function selectPlatform(plt) {
             selectedPlatform = plt;
             document.querySelectorAll('.platform-btn').forEach(b => {
-                b.classList.remove('active', 'border-[#6a26da]', 'bg-[#6a26da]/5');
+                b.classList.remove('active', 'border-[var(--accent-primary)]', 'bg-[var(--accent-primary)]/5');
                 b.classList.add('border-dash'); // Restore default border
             });
             const activeBtn = document.getElementById(`plt-${plt}`);
             if (activeBtn) {
-                activeBtn.classList.add('active', 'border-[#6a26da]', 'bg-[#6a26da]/5');
+                activeBtn.classList.add('active', 'border-[var(--accent-primary)]', 'bg-[var(--accent-primary)]/5');
                 activeBtn.classList.remove('border-dash'); // Remove conflicting !important border
             }
 
@@ -3521,15 +3887,20 @@
 
     window.startTaskFlow = async function(taskId) {
             try {
-                const task = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, taskId);
+                // Navigate to the Task Flow view first so its DOM is mounted, then populate
+                switchSPAView('task-flow');
+                // Allow the SPA view clone to mount
+                await new Promise(res => setTimeout(res, 60));
 
+                const task = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, taskId);
                 activeTask = task;
-        // LOCK: create or upsert an engagement to reserve the spot with a default expiry
-        // Note: Accept uses 30 minutes expiry; claim may still call startTaskFlow after creating engagement
-        const defaultExpiryMs = 30 * 60 * 1000; // 30 minutes
-        const expiresAt = new Date(Date.now() + defaultExpiryMs).toISOString();
+
+                // LOCK: create or upsert an engagement to reserve the spot with a default expiry
+                // Note: Accept uses 30 minutes expiry; claim may still call startTaskFlow after creating engagement
+                const defaultExpiryMs = 30 * 60 * 1000; // 30 minutes
+                const expiresAt = new Date(Date.now() + defaultExpiryMs).toISOString();
                 const existEngage = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', taskId), Query.equal('performer_id', currentUser.id)]);
-                
+
                 if (existEngage.total > 0) {
                     await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, existEngage.documents[0].$id, { status: 'in_progress', expires_at: expiresAt });
                 } else {
@@ -3545,16 +3916,15 @@
                 // Start a client-side countdown timer for the claim (30 minutes by default)
                 startClaimTimer(taskId, defaultExpiryMs / 1000);
 
-                // Populate UI
-                document.getElementById('task-detail-url').innerText = task.target_url;
-                document.getElementById('task-detail-instructions').innerText = task.instructions || "Perform high-quality engagement. At least 10 words if commenting.";
-                document.getElementById('task-platform-icon').innerHTML = `<i class="fa-brands fa-${task.platform}"></i>`;
-                document.getElementById('task-execution-link').href = task.target_url;
+                // Populate UI (now that task-flow DOM is present)
+                const urlEl = document.getElementById('task-detail-url'); if (urlEl) urlEl.innerText = task.target_url || '';
+                const instrEl = document.getElementById('task-detail-instructions'); if (instrEl) instrEl.innerText = task.instructions || "Perform high-quality engagement. At least 10 words if commenting.";
+                const platformEl = document.getElementById('task-platform-icon'); if (platformEl) platformEl.innerHTML = `<i class="fa-brands fa-${task.platform}"></i>`;
+                const execLink = document.getElementById('task-execution-link'); if (execLink) execLink.href = task.target_url || '#';
 
-                // Reset flow state
+                // Reset flow state and show first step
                 currentTaskStep = 1;
                 resetTaskFlowUI();
-                switchSPAView('task-flow');
             } catch (err) {
                 console.error("Task Flow Error:", err);
             }
@@ -3994,10 +4364,22 @@
                                     <button onclick="updatePassword()" class="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-bold">Update Password</button>
                                 </div>
                             </div>
-                            <div><h4 class="font-bold mb-4">Active Sessions</h4>
-                                <div id="session-card" class="p-4 bg-dash-secondary/50 border border-dash rounded-2xl flex items-center justify-between">
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-mobile-screen-button text-2xl text-dash-secondary"></i><div><p class="text-sm font-bold">iPhone 15 Pro • Lagos, NG</p><p class="text-[10px] text-green-500 uppercase font-bold">Current Device</p></div></div>
-                                    <button onclick="terminateSession()" class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Logout</button>
+                            <div>
+                                <h4 class="font-bold mb-4">Active Sessions</h4>
+                                <!-- Session card will be populated dynamically -->
+                                <div id="session-card" class="p-4 bg-dash-secondary/50 border border-dash rounded-2xl">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-mobile-screen-button text-2xl text-dash-secondary"></i>
+                                        <div>
+                                            <p id="session-description" class="text-sm font-bold">Loading device info...</p>
+                                            <p id="session-status" class="text-[10px] text-green-500 uppercase font-bold">Current Device</p>
+                                        </div>
+                                    </div>
+
+                                    <div id="session-actions" class="mt-4 flex gap-3">
+                                        <button onclick="logoutCurrentDevice()" class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Log out of this device</button>
+                                        <button onclick="logoutOtherSessions()" class="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-widest">Log out of other sessions</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -4049,6 +4431,8 @@
                     if (em && currentUser && currentUser.email) em.value = currentUser.email;
                 }
             } catch (e) { console.warn('Failed to populate settings view with profile data', e); }
+            // If security view is active, render the session details live
+            try { if (view === 'security') setTimeout(() => renderSessionInfo(), 60); } catch (e) { /* ignore */ }
         }
 
         // --- SETTINGS HANDLERS ---
@@ -4059,6 +4443,111 @@
                 if (preview) preview.src = url;
             }
         }
+
+        // --- SESSION & SECURITY HELPERS ---
+        function parseUserAgent(uaString) {
+            // Prefer navigator.userAgentData (Chrome, Edge) when available for better fidelity
+            try {
+                if (navigator.userAgentData && navigator.userAgentData.brands) {
+                    const brands = navigator.userAgentData.brands.map(b => b.brand).join(' ');
+                    const ua = uaString || navigator.userAgent || brands;
+                    const browser = navigator.userAgentData.brands[0]?.brand || 'Browser';
+                    const mobile = navigator.userAgentData.mobile ? true : false;
+                    const platform = navigator.userAgentData.platform || navigator.platform || '';
+                    let os = 'Unknown OS';
+                    if (/Windows/i.test(platform)) os = 'Windows';
+                    else if (/Mac/i.test(platform)) os = 'macOS';
+                    else if (/Android/i.test(platform)) os = 'Android';
+                    else if (/iPhone|iPad|iPod/i.test(platform)) os = 'iOS';
+                    let device = mobile ? 'Mobile' : 'Desktop';
+                    if (/iPad/i.test(platform)) device = 'iPad';
+                    return { browser, os, device, raw: ua };
+                }
+            } catch (e) { /* fall back to UA string parsing */ }
+
+            const ua = uaString || navigator.userAgent || '';
+            // Very small UA parser for browser & OS
+            let browser = 'Browser';
+            if (/Chrome\/(\d+)/i.test(ua) && !/Edge|OPR/i.test(ua)) browser = 'Chrome';
+            else if (/Safari\/(\d+)/i.test(ua) && /Version\//i.test(ua)) browser = 'Safari';
+            else if (/Firefox\/(\d+)/i.test(ua)) browser = 'Firefox';
+            else if (/Edg\/(\d+)/i.test(ua)) browser = 'Edge';
+            else if (/OPR\/(\d+)/i.test(ua)) browser = 'Opera';
+
+            let os = 'Unknown OS';
+            if (/Windows NT/i.test(ua)) os = 'Windows';
+            else if (/Macintosh|Mac OS X/i.test(ua)) os = 'macOS';
+            else if (/Android/i.test(ua)) os = 'Android';
+            else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+
+            // Device name guess
+            let device = 'Desktop';
+            if (/Mobile|iPhone|Android/.test(ua)) device = 'Mobile';
+            if (/iPad/.test(ua)) device = 'iPad';
+
+            return { browser, os, device, raw: ua };
+        }
+
+        async function fetchIPandLocation() {
+            // Try a public IP API; fallback to placeholders on failure
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                if (!res.ok) throw new Error('IP API error');
+                const data = await res.json();
+                return {
+                    ip: data.ip || 'Unknown',
+                    city: data.city || '',
+                    country: data.country_name || data.country || '',
+                    region: data.region || ''
+                };
+            } catch (e) {
+                console.warn('IP/location fetch failed', e);
+                return { ip: 'Unknown', city: '', country: '' };
+            }
+        }
+
+        async function renderSessionInfo() {
+            try {
+                const uaInfo = parseUserAgent(navigator.userAgent);
+                const ipInfo = await fetchIPandLocation();
+
+                const descEl = document.getElementById('session-description');
+                const statusEl = document.getElementById('session-status');
+                if (descEl) {
+                    const city = ipInfo.city ? `${ipInfo.city}, ${ipInfo.country}` : (ipInfo.country || 'Unknown Location');
+                    const deviceLabel = `${uaInfo.device === 'Desktop' ? uaInfo.os : uaInfo.device} • ${city}`;
+                    descEl.innerText = `You are currently logged in on a ${uaInfo.device} (${uaInfo.os}) using ${uaInfo.browser} from ${city}. IP Address: ${ipInfo.ip}`;
+                }
+                if (statusEl) statusEl.innerText = 'Current Device';
+            } catch (e) { console.warn('Failed to render session info', e); }
+        }
+
+        // Logout handlers
+        async function logoutCurrentDevice() {
+            try {
+                // delete current session via Appwrite
+                await account.deleteSession('current');
+            } catch (err) {
+                console.error('Logout current device failed:', err);
+            } finally {
+                // Redirect to login or homepage
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function logoutOtherSessions() {
+            try {
+                // Appwrite does not provide a direct 'delete all other sessions' client API,
+                // but you can list and delete sessions on the server. Here we'll call a function
+                // that would perform that action if implemented server-side. For now, we show a message.
+                alert('Request to log out other sessions sent. If this is a production deployment, implement a server-side function to list and delete other sessions using the Appwrite SDK with the service key.');
+            } catch (err) {
+                console.error('Logout other sessions failed:', err);
+            }
+        }
+
+        // Automatically render session info when settings/security view is shown
+        // The switchSettingsView function populates the security view; call renderSessionInfo after it runs.
 
         async function saveProfileSettings() {
             const email = document.getElementById('set-email')?.value?.trim();
@@ -4328,6 +4817,10 @@
                 'selectPlatform','updateCalculation','syncInputs','nextStep','prevStep','finishCreation',
                 'openDepositModal','closeDepositModal','processDeposit','switchSettingsView','saveProfileSettings',
                 'updatePassword','togglePref','startTaskFlow','nextTaskStep','updateTaskProofLabel','submitTaskProof',
+                // Session/security helpers (needed by settings/security view)
+                'parseUserAgent','fetchIPandLocation','renderSessionInfo','logoutCurrentDevice','logoutOtherSessions',
+                // Avatar preview helper used by the profile settings file input
+                'updateProfileAvatarPreview',
                 'showToast'
             ];
 
@@ -4458,8 +4951,13 @@
             <div class="flex items-center gap-3">
                 <img src="assets/dashblack.png" alt="Logo" class="h-8 w-auto logo-img">
             </div>
-            <button onclick="toggleMobileMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100">
-                <i class="fa-solid fa-xmark"></i>
+            <button
+                onclick="toggleMobileMenu()"
+                aria-label="Close menu"
+                title="Close menu"
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white ring-1 ring-white/10 shadow-lg transition-transform transform hover:scale-105"
+            >
+                <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
             </button>
         </div>
 
