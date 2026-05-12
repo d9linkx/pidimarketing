@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
         <script>
             // Runtime Error Overlay: surfaces JS errors to avoid silent white-screen failures
@@ -160,6 +161,14 @@
 
         /* Buttons and CTAs should be readable: medium weight and neutral tracking */
         .btn-fintech, .btn-primary, .btn-secondary, .accent-gradient { font-weight: 600 !important; letter-spacing: 0 !important; }
+
+        /* --- ADMIN TOGGLE SWITCH --- */
+        .switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--border-dash); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-primary); }
+        input:checked + .slider:before { transform: translateX(18px); }
 
         /* Sidebar Layout for Desktop */
         @media (min-width: 850px) {
@@ -492,27 +501,13 @@
                 <a href="#" onclick="switchSPAView('admin-verification')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i data-feather="shield" class="w-4 text-center"></i> Verification Hub
                 </a>
-                <a href="#" onclick="switchSPAView('admin-users')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i data-feather="users" class="w-4 text-center"></i> User Management
-                </a>
                 <a href="#" onclick="switchSPAView('admin-finance')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i data-feather="dollar-sign" class="w-4 text-center"></i> Financial Audit
                 </a>
 
                 <div class="my-4 border-t border-dash"></div>
-                <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Spaces</p>
-                <a href="academy.html" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i class="fa-solid fa-graduation-cap w-4 text-center"></i> PIDIlearn
-                </a>
-                <a href="#" onclick="switchSPAView('referrals')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i class="fa-solid fa-users-line w-4 text-center"></i> Referrals
-                </a>
-                <a href="#" onclick="switchSPAView('feedback')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i class="fa-solid fa-comment-dots w-4 text-center"></i> Feedback
-                </a>
-                <div class="my-4 border-t border-dash"></div>
                 <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account</p>
-                <a href="#" onclick="openSettings('profile')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <a href="#" onclick="openSettings('gamification')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
                 </a>
                 <div class="my-4 border-t border-dash"></div>
@@ -639,7 +634,7 @@
                     <div class="bg-dash-secondary rounded-xl p-1 flex items-center text-[10px] font-black uppercase tracking-widest border border-dash shadow-inner">
                         <button onclick="setHubView('campaigns')" id="hub-tab-campaigns" class="px-4 py-2 rounded-lg transition-all">Campaigns</button>
                         <button onclick="setHubView('performers')" id="hub-tab-performers" class="px-4 py-2 rounded-lg transition-all">Submitted Tasks</button>
-                        <button onclick="setHubView('creators')" id="hub-tab-creators" class="px-4 py-2 rounded-lg transition-all">Directory</button>
+                        <button onclick="setHubView('creators')" id="hub-tab-creators" class="px-4 py-2 rounded-lg transition-all">User Management</button>
                     </div>
                 </div>
 
@@ -698,35 +693,6 @@
                             </thead>
                             <tbody id="hub-table-body" class="divide-y divide-dash">
                                 <!-- Data rows injected via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SPA CONTAINER: User Management View -->
-            <div id="admin-users-view" class="spa-view hidden p-6 lg:p-8 max-w-7xl mx-auto">
-                <div class="flex items-center justify-between mb-8">
-                    <div>
-                        <h2 class="text-3xl font-bold">User Directory</h2>
-                        <p class="text-dash-secondary text-sm">Manage roles, balances, and permissions for all users.</p>
-                    </div>
-                </div>
-                
-                <div class="bento-card p-0">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-dash-secondary/30">
-                                <tr class="text-dash-secondary border-b border-dash">
-                                    <th class="p-4 uppercase tracking-widest font-bold">User</th>
-                                    <th class="p-4 uppercase tracking-widest font-bold">Role</th>
-                                    <th class="p-4 uppercase tracking-widest font-bold">Balance</th>
-                                    <th class="p-4 uppercase tracking-widest font-bold">Joined</th>
-                                    <th class="p-4 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-user-list" class="divide-y divide-dash">
-                                <!-- User list injected here -->
                             </tbody>
                         </table>
                     </div>
@@ -977,26 +943,7 @@
                 </div>
             </div>
 
-            <!-- SPA CONTAINER: Referrals View -->
-            <div id="referrals-view" class="spa-view hidden p-6 lg:p-8 max-w-4xl mx-auto">
-                <h2 class="text-3xl font-bold mb-8">Referral Program</h2>
-                <div class="bento-card card-azure mb-10">
-                    <h4 class="font-bold mb-2">Earn 5% on every deposit</h4>
-                    <p class="text-sm opacity-80 mb-6">Invite other creators to PIDItasks and earn commissions on their campaign spend.</p>
-                    <div class="flex gap-2">
-                        <input type="text" readonly value="https://piditasks.com/ref/${currentUser.id}" class="flex-1 bg-white/20 border border-white/30 rounded-xl p-3 text-xs font-mono">
-                        <button class="bg-white text-black px-6 rounded-xl font-bold text-xs">Copy</button>
-                    </div>
-                </div>
-            </div>
 
-            <!-- SPA CONTAINER: Feedback View -->
-            <div id="feedback-view" class="spa-view hidden p-6 lg:p-8 max-w-2xl mx-auto text-center">
-                <h2 class="text-3xl font-bold mb-4">Help us improve</h2>
-                <p class="text-dash-secondary mb-10">Spotted a bug or have a feature request? Let our engineering team know.</p>
-                <textarea class="w-full bg-dash-secondary border border-dash rounded-3xl p-6 text-sm mb-6" rows="6" placeholder="Tell us anything..."></textarea>
-                <button class="btn-fintech btn-primary w-full py-4 justify-center shadow-lg shadow-blue-500/20">Submit Feedback</button>
-            </div>
 
             <!-- SPA CONTAINER: Settings Hub View -->
             <div id="settings-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
@@ -1009,11 +956,11 @@
                                 <i class="fa-solid fa-arrow-left"></i>
                             </button>
                         </div>
-                        <nav class="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 no-scrollbar">
-                            <button onclick="switchSettingsView('profile')" class="settings-nav-btn active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition whitespace-nowrap w-full text-left" data-view="profile"><i class="fa-solid fa-user-gear w-5"></i> Profile</button>
-                            <button onclick="switchSettingsView('security')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="security"><i class="fa-solid fa-shield-halved w-5"></i> Login & Security</button>
-                            <button onclick="switchSettingsView('notifications')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="notifications"><i class="fa-solid fa-bell w-5"></i> Notifications</button>
-                            <button onclick="switchSettingsView('support')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="support"><i class="fa-solid fa-circle-question w-5"></i> Support Desk</button>
+                        <nav class="flex md:flex-col gap-1 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 no-scrollbar">
+                            <button onclick="switchSettingsView('gamification')" class="settings-nav-btn active flex items-center gap-3 p-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition whitespace-nowrap w-full text-left" data-view="gamification"><i data-feather="award" class="w-4 h-4"></i> Gamification</button>
+                            <button onclick="switchSettingsView('branding')" class="settings-nav-btn flex items-center gap-3 p-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="branding"><i data-feather="palette" class="w-4 h-4"></i> Vibe & Brand</button>
+                            <button onclick="switchSettingsView('operations')" class="settings-nav-btn flex items-center gap-3 p-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="operations"><i data-feather="tool" class="w-4 h-4"></i> System Controls</button>
+                            <button onclick="switchSettingsView('security')" class="settings-nav-btn flex items-center gap-3 p-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="security"><i data-feather="shield" class="w-4 h-4"></i> Security & Comms</button>
                         </nav>
                     </aside>
 
@@ -1276,6 +1223,40 @@
                 </div>
                 <button onclick="processDeposit()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Pay with Paystack</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Edit User Overlay -->
+    <div id="edit-user-overlay" class="hidden fixed inset-0 z-[450] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bento-card w-full max-w-md relative">
+            <button onclick="closeEditUserModal()" class="absolute top-6 right-6 text-dash-secondary hover:text-[var(--text-primary)]">
+                <i data-feather="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-2">Edit User Profile</h3>
+            <p class="text-dash-secondary text-xs mb-8 uppercase font-bold tracking-widest">Administrative Override</p>
+            
+            <form onsubmit="event.preventDefault(); saveUserEdits()" class="space-y-6">
+                <input type="hidden" id="edit-user-id">
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2 px-1">Full Legal Name</label>
+                    <input type="text" id="edit-user-fullname" required class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2 px-1">Access Role</label>
+                    <select id="edit-user-role" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none">
+                        <option value="creator">Creator</option>
+                        <option value="performer">Performer</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2 px-1">Account Balance (₦)</label>
+                    <input type="number" id="edit-user-balance" step="0.01" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm font-bold focus:outline-none">
+                </div>
+                <button type="submit" id="save-user-btn" class="w-full btn-fintech btn-primary justify-center py-4 font-black uppercase tracking-widest shadow-lg">
+                    Save Changes <i data-feather="save" class="ml-2 w-4 h-4"></i>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -1787,32 +1768,167 @@
                     `;
                 }).join('');
 
-                // 3. Render Users Table
-                const userTable = document.getElementById('admin-user-list');
-                if (userTable) userTable.innerHTML = allUsers.map(u => `
-                    <tr class="hover:bg-dash-secondary/20 transition-colors">
-                        <td class="p-4 flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.full_name)}&background=random" class="w-8 h-8 rounded-lg">
-                            <div><p class="font-bold">${u.full_name}</p><p class="text-dash-secondary text-[10px]">${u.email}</p></div>
-                        </td>
-                        <td class="p-4 uppercase font-bold text-[9px] text-dash-secondary">${u.user_role}</td>
-                        <td class="p-4 font-bold">₦${(u.balance || 0).toLocaleString()}</td>
-                        <td class="p-4 text-dash-secondary">${new Date(u.created_at).toLocaleDateString()}</td>
-                        <td class="p-4 text-right"><button class="text-[10px] font-black uppercase text-red-500 hover:underline">Ban</button></td>
-                    </tr>
-                `).join('');
+                allUsersData = allUsers;
+                applyAdminUserFilters();
+                renderAdminLedger(allTx);
+        window.fetchAdminUsers = async function() {
+            try {
+                const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, [Query.orderDesc('created_at')]);
+                allUsersData = res.documents || [];
+                applyAdminUserFilters();
+            } catch (err) { console.error('fetchAdminUsers error:', err); }
+        }
 
-                // 4. Render Ledger Table
-                const txTable = document.getElementById('admin-ledger-list');
-                if (txTable) txTable.innerHTML = allTx.slice(0, 20).map(t => `
-                    <tr class="hover:bg-dash-secondary/20 transition-colors">
-                        <td class="p-4 font-mono opacity-50">#${t.$id.slice(0, 8)}</td>
-                        <td class="p-4 font-semibold">${t.full_name || 'System'}</td>
-                        <td class="p-4 uppercase font-bold text-[9px] text-dash-secondary">${t.type.replace('_',' ')}</td>
-                        <td class="p-4 font-black">₦${(t.amount || 0).toLocaleString()}</td>
-                        <td class="p-4 text-right"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${t.status}</span></td>
-                    </tr>
-                `).join('');
+        window.applyAdminUserFilters = function() {
+            const search = (document.getElementById('admin-user-search')?.value || '').toLowerCase();
+            const role = document.getElementById('admin-user-role-filter')?.value || 'all';
+
+            const filtered = allUsersData.filter(u => {
+                const matchesSearch = (u.full_name || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search);
+                const matchesRole = role === 'all' || u.user_role === role;
+                return matchesSearch && matchesRole;
+            });
+
+            renderAdminUserList(filtered);
+        }
+
+        window.renderAdminUserList = function(users) {
+            const list = document.getElementById('admin-user-list');
+            if (!list) return;
+
+            if (users.length === 0) {
+                list.innerHTML = '<tr><td colspan="8" class="py-20 text-center text-dash-secondary font-bold uppercase tracking-widest opacity-30"><i data-feather="users" class="w-12 h-12 mx-auto mb-4 block"></i>No matching users found</td></tr>';
+                feather.replace();
+                return;
+            }
+
+            list.innerHTML = users.map(u => `
+                <tr class="hover:bg-dash-secondary/20 transition-all border-b border-dash group">
+                    <td class="p-5">
+                        <div class="flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.full_name || 'U')}&background=random&color=fff&size=64" class="w-10 h-10 rounded-xl shadow-sm border border-dash">
+                            <div class="min-w-0">
+                                <p class="font-bold text-[11px] group-hover:text-red-500 transition-colors truncate max-w-[140px]">${u.full_name || 'Anonymous User'}</p>
+                                <p class="text-dash-secondary text-[9px] font-medium truncate max-w-[140px]">${u.email || 'no-email@pidi.tasks'}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-5">
+                        <span class="px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-wider shadow-sm ${
+                            u.user_role === 'admin' ? 'bg-red-500 text-white' : 
+                            (u.user_role === 'creator' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700')
+                        }">${u.user_role || 'performer'}</span>
+                    </td>
+                    <td class="p-5 font-bold text-[11px]">₦${(u.balance || 0).toLocaleString()}</td>
+                    <td class="p-5 font-bold text-dash-secondary text-[11px]">₦${(u.allocated_funds || 0).toLocaleString()}</td>
+                    <td class="p-5 font-bold text-amber-600 text-[11px]">₦${(u.pending_balance || 0).toLocaleString()}</td>
+                    <td class="p-5 text-center">
+                        <div class="inline-flex flex-col items-center">
+                            <p class="font-black text-[11px]">${u.completed_tasks || 0}</p>
+                            <p class="text-[7px] text-dash-secondary uppercase font-bold">Missions</p>
+                        </div>
+                    </td>
+                    <td class="p-5">
+                        <p class="text-dash-secondary text-[9px] font-bold uppercase">${new Date(u.created_at || u.$createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    </td>
+                    <td class="p-5 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="editUser('${u.$id}')" class="p-2 rounded-lg bg-dash-secondary/50 hover:bg-white border border-dash transition-colors" title="Manage Credits"><i data-feather="edit-2" class="w-3.5 h-3.5 text-dash-secondary"></i></button>
+                            <button onclick="banUser('${u.$id}')" class="p-2 rounded-lg bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all" title="Suspend Entity"><i data-feather="slash" class="w-3.5 h-3.5"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            feather.replace();
+        }
+
+        window.renderAdminLedger = function(transactions) {
+            const txTable = document.getElementById('admin-ledger-list');
+            if (!txTable) return;
+            txTable.innerHTML = transactions.slice(0, 20).map(t => `
+                <tr class="hover:bg-dash-secondary/20 transition-colors border-b border-dash">
+                    <td class="p-4 font-mono opacity-50 text-[10px]">#${t.$id.slice(0, 8)}</td>
+                    <td class="p-4 font-semibold">${t.full_name || 'System'}</td>
+                    <td class="p-4 uppercase font-bold text-[9px] text-dash-secondary">${t.type.replace('_',' ')}</td>
+                    <td class="p-4 font-black">₦${(t.amount || 0).toLocaleString()}</td>
+                    <td class="p-4 text-right"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${t.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        window.editUser = function(userId) {
+            const user = allUsersData.find(u => u.$id === userId);
+            if (!user) return;
+
+            document.getElementById('edit-user-id').value = user.$id;
+            document.getElementById('edit-user-fullname').value = user.full_name || '';
+            document.getElementById('edit-user-role').value = user.user_role || 'performer';
+            document.getElementById('edit-user-balance').value = user.balance || 0;
+            
+            document.getElementById('edit-user-overlay').classList.remove('hidden');
+            feather.replace();
+        };
+
+        window.closeEditUserModal = () => document.getElementById('edit-user-overlay').classList.add('hidden');
+
+        window.saveUserEdits = async function() {
+            const id = document.getElementById('edit-user-id').value;
+            const btn = document.getElementById('save-user-btn');
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            try {
+                await databases.updateDocument(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.COLLECTIONS.PROFILES,
+                    id,
+                    {
+                        full_name: document.getElementById('edit-user-fullname').value,
+                        user_role: document.getElementById('edit-user-role').value,
+                        balance: parseFloat(document.getElementById('edit-user-balance').value)
+                    }
+                );
+                showAdminMessageModal('Update Successful', 'The user profile has been synchronized.', 'success');
+                closeEditUserModal();
+                applyAdminUserFilters();
+            } catch (err) {
+                showAdminMessageModal('Error', 'Failed to update: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Save Changes";
+                feather.replace();
+            }
+        };
+
+        window.banUser = async function(userId) {
+            const ok = confirm('SECURITY PROTOCOL: Are you sure you want to suspend this user access?');
+            if (!ok) return;
+            try {
+                await databases.deleteDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, userId);
+                showAdminMessageModal('Entity Suspended', 'User profile has been purged from the active directory.', 'success');
+            } catch (err) {
+                showAdminMessageModal('Error', 'Failed to purge entity: ' + err.message, 'error');
+            }
+        };
+
+        function setupAdminRealtime() {
+            const profileChannel = `databases.${APPWRITE_CONFIG.DATABASE_ID}.collections.${APPWRITE_CONFIG.COLLECTIONS.PROFILES}.documents`;
+            client.subscribe(profileChannel, response => {
+                const event = response.events[0];
+                const doc = response.payload;
+                if (event.includes('.create')) {
+                    if (!allUsersData.find(u => u.$id === doc.$id)) allUsersData.unshift(doc);
+                } else if (event.includes('.update')) {
+                    const idx = allUsersData.findIndex(u => u.$id === doc.$id);
+                    if (idx !== -1) allUsersData[idx] = doc;
+                } else if (event.includes('.delete')) {
+                    allUsersData = allUsersData.filter(u => u.$id !== doc.$id);
+                }
+                applyAdminUserFilters();
+                const userStat = document.getElementById('admin-stat-users');
+                if (userStat) userStat.innerText = allUsersData.length;
+            });
+        }
 
                 // 5. Prepare time-series for Revenue Trend (monthly buckets, last 12 months)
                 const now = new Date();
@@ -1973,6 +2089,7 @@
             document.querySelector('main.content-area').style.visibility = 'visible'; // Make main content visible
             fetchAdminDashboardData();
             fetchAdminPendingMissions();
+            setupAdminRealtime();
         }
 
         // Helper: check if current user is in the admin whitelist (cached for session)
@@ -3350,7 +3467,7 @@
             switchSPAView('dashboard-home');
         }
 
-        function switchSettingsView(view) {
+        window.switchSettingsView = function(view) {
             // Update Sidebar UI
             document.querySelectorAll('.settings-nav-btn').forEach(btn => {
                 const isActive = btn.getAttribute('data-view') === view;
@@ -3359,84 +3476,200 @@
             });
 
             const area = document.getElementById('settings-content-area');
-            const currentRole = 'creator';
-
             let content = '';
 
             switch(view) {
-                case 'profile':
+                case 'gamification':
                     content = `
-                        <h2 class="text-3xl font-bold mb-2">Profile Settings</h2>
-                        <p class="text-dash-secondary mb-8">Manage your personal brand identity on PIDI.</p>
-                        <div class="space-y-6 max-w-xl">
-                            <div class="flex items-center gap-6 mb-8">
-                                <div class="relative group cursor-pointer">
-                                    <img src="${currentUser.avatar}" class="w-24 h-24 rounded-3xl border-4 border-dash">
-                                    <div class="absolute inset-0 bg-black/40 rounded-3xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-camera text-white"></i></div>
+                        <h2 class="text-3xl font-bold mb-2">Growth & Gamification</h2>
+                        <p class="text-dash-secondary mb-8">Configure incentives and progression for the performer network.</p>
+                        <div class="space-y-8 max-w-2xl">
+                            <div class="p-6 bg-dash-secondary/30 rounded-2xl border border-dash">
+                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Performer Level-Up Logic</label>
+                                <div class="flex items-center gap-4">
+                                    <input type="number" value="50" class="w-24 bg-white border border-dash rounded-xl p-3 text-sm font-bold focus:outline-none focus:border-red-500">
+                                    <p class="text-xs text-dash-secondary">Successful tasks required to move from <b>"Rookie"</b> to <b>"Legendary"</b> status.</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-5 bg-dash-secondary/30 rounded-2xl border border-dash flex items-center justify-between">
+                                    <div><p class="font-bold text-sm">Winning Streak Bonus</p><p class="text-[10px] text-dash-secondary">Give extra ₦50 for 5 perfect missions.</p></div>
+                                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                                </div>
+                                <div class="p-5 bg-dash-secondary/30 rounded-2xl border border-dash flex items-center justify-between">
+                                    <div><p class="font-bold text-sm">Top 10 Leaderboard</p><p class="text-[10px] text-dash-secondary">Enable public earnings ranking.</p></div>
+                                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                                </div>
+                            </div>
+
+                            <div class="p-6 bg-dash-secondary/30 rounded-2xl border border-dash">
+                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-4">Badge Factory</label>
+                                <div class="border-2 border-dashed border-dash rounded-2xl p-8 flex flex-col items-center gap-3 cursor-pointer hover:bg-white transition-all group">
+                                    <i data-feather="upload-cloud" class="w-8 h-8 text-dash-secondary group-hover:text-red-500"></i>
+                                    <p class="text-[10px] font-bold uppercase text-dash-secondary">Upload custom achievement icons (.SVG / .PNG)</p>
+                                </div>
+                                <div class="flex gap-2 mt-4">
+                                    <span class="px-3 py-1 rounded-lg bg-white border border-dash text-[9px] font-bold">Early Bird</span>
+                                    <span class="px-3 py-1 rounded-lg bg-white border border-dash text-[9px] font-bold">Weekend Warrior</span>
+                                </div>
+                            </div>
+
+                            <div class="p-5 bg-red-500/5 rounded-2xl border border-red-500/20 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-500/20"><i data-feather="zap" class="w-5 h-5"></i></div>
+                                    <div><p class="font-bold text-sm">Happy Hour XP Multiplier</p><p class="text-[10px] text-dash-secondary">Double experience points during slow hours.</p></div>
+                                </div>
+                                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'branding':
+                    content = `
+                        <h2 class="text-3xl font-bold mb-2">Vibe & Branding</h2>
+                        <p class="text-dash-secondary mb-8">Override the system interface and atmosphere.</p>
+                        <div class="space-y-8 max-w-2xl">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Dashboard Mood Switcher</label>
+                                    <select class="w-full bg-dash-secondary/50 border border-dash rounded-xl p-3.5 text-sm font-bold focus:outline-none">
+                                        <option value="emerald">Growth Green (Default)</option>
+                                        <option value="gold">Success Gold</option>
+                                        <option value="red">Action Red</option>
+                                        <option value="slate">High-Tech Slate</option>
+                                    </select>
                                 </div>
                                 <div>
-                                    <button class="bg-dash-secondary px-4 py-2 rounded-xl text-xs font-bold mb-2">Change Avatar</button>
-                                    <div class="flex items-center gap-2 text-[10px] font-bold text-green-500 uppercase tracking-widest"><i class="fa-solid fa-circle-check"></i> Verified ${currentRole}</div>
+                                    <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Display Mode</label>
+                                    <div class="p-3.5 bg-dash-secondary/50 border border-dash rounded-xl flex items-center justify-between">
+                                        <p class="text-sm font-bold">Force Dark Mode</p>
+                                        <label class="switch"><input type="checkbox" onchange="document.body.classList.toggle('dark-mode')"><span class="slider"></span></label>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 gap-5">
-                                <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Full Legal Name</label><input type="text" id="set-full-name" value="${currentUser.fullName}" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
-                                ${currentRole === 'creator' ? `
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Business Name</label><input type="text" value="${currentUser.fullName}'s Brand" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Website URL</label><input type="url" value="https://pidimarketing.com" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
-                                ` : `
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Social Handles (Instagram, X)</label><input type="text" value="@princedike, @pidihq" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Performer Bio</label><textarea class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]" rows="3">Performance marketer specializing in high-velocity organic engagement.</textarea></div>
-                                `}
+
+                            <div>
+                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Global Announcement Banner</label>
+                                <div class="flex gap-2">
+                                    <input type="text" placeholder="Breaking News: New Instagram multipliers are live..." class="flex-1 bg-dash-secondary/50 border border-dash rounded-xl p-3.5 text-sm focus:outline-none focus:border-red-500">
+                                    <button class="px-6 py-3.5 bg-red-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-red-500/20">Push</button>
+                                </div>
                             </div>
-                            <button onclick="saveProfileSettings()" class="btn-fintech btn-primary px-8 py-3 shadow-lg shadow-blue-500/20 mt-4">SAVE CHANGES</button>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Reaction Emoji Pack</label>
+                                    <input type="text" value="🔥, 🚀, 💎, 🙌, 📈" class="w-full bg-dash-secondary/50 border border-dash rounded-xl p-3.5 text-sm focus:outline-none">
+                                    <p class="text-[9px] text-dash-secondary mt-2">Comma separated emojis allowed for task reactions.</p>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Aural Feedback</label>
+                                    <div class="p-3.5 bg-dash-secondary/50 border border-dash rounded-xl flex items-center justify-between">
+                                        <p class="text-sm font-bold">Sound Effects</p>
+                                        <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                                    </div>
+                                    <p class="text-[9px] text-dash-secondary mt-2">Play "Cha-Ching!" sounds on mission completion.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'operations':
+                    content = `
+                        <h2 class="text-3xl font-bold mb-2">Operational Controls</h2>
+                        <p class="text-dash-secondary mb-8">Hard business logic and quality guardrails.</p>
+                        <div class="space-y-8 max-w-2xl">
+                            <div class="p-5 bg-dash-secondary/30 rounded-2xl border border-dash flex items-center justify-between">
+                                <div><p class="font-bold text-sm">"God Mode" View</p><p class="text-[10px] text-dash-secondary">See exactly what specific users see for troubleshooting.</p></div>
+                                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                            </div>
+
+                            <div class="p-6 bg-dash-secondary/30 rounded-2xl border border-dash">
+                                <div class="flex justify-between items-center mb-4">
+                                    <label class="block text-[10px] font-black text-dash-secondary uppercase">Auto-Approve "Grace Period"</label>
+                                    <span class="text-xs font-black text-red-500" id="grace-val">24 Hours</span>
+                                </div>
+                                <input type="range" min="1" max="72" value="24" oninput="document.getElementById('grace-val').innerText = this.value + ' Hours'" class="w-full h-1.5 bg-dash-secondary rounded-lg appearance-none cursor-pointer accent-red-500">
+                                <p class="text-[9px] text-dash-secondary mt-4 uppercase font-bold tracking-widest italic">Time before system automatically pays tasker if creator is idle.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Withdrawal "Payday" Window</label>
+                                <div class="flex flex-wrap gap-2">
+                                    ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(day => `
+                                        <button class="px-4 py-2 rounded-lg border border-dash text-[10px] font-black uppercase tracking-tighter ${day === 'Fri' ? 'bg-red-500 text-white border-red-500' : 'bg-white text-dash-secondary'}">${day}</button>
+                                    `).join('')}
+                                </div>
+                                <p class="text-[9px] text-dash-secondary mt-2 italic">Selected days when the withdrawal button becomes active for performers.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Min. Character Guard</label>
+                                    <input type="number" value="50" class="w-full bg-dash-secondary/50 border border-dash rounded-xl p-3.5 text-sm font-bold focus:outline-none">
+                                    <p class="text-[9px] text-dash-secondary mt-2 italic">Minimum characters for valid mission proof.</p>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Blacklisted Keywords</label>
+                                    <textarea class="w-full bg-dash-secondary/50 border border-dash rounded-xl p-3.5 text-xs focus:outline-none" rows="2">Nice, Good, Scam, Fake, Bad</textarea>
+                                    <p class="text-[9px] text-dash-secondary mt-1 italic">Triggers instant rejection.</p>
+                                </div>
+                            </div>
                         </div>
                     `;
                     break;
                 case 'security':
                     content = `
-                        <h2 class="text-3xl font-bold mb-2">Security & Access</h2>
-                        <p class="text-dash-secondary mb-8">Protect your wallet and login credentials.</p>
-                        <div class="space-y-8">
-                            <div class="max-w-xl"><h4 class="font-bold mb-4">Change Password</h4>
-                                <div class="space-y-3">
-                                    <input type="password" id="cur-pass" placeholder="Current Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
-                                    <input type="password" id="new-pass" placeholder="New Password" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
-                                    <button onclick="updatePassword()" class="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-bold">Update Password</button>
+                        <h2 class="text-3xl font-bold mb-2">Communication & Security</h2>
+                        <p class="text-dash-secondary mb-8">Internal protocols and network safety.</p>
+                        <div class="space-y-8 max-w-2xl">
+                            <div>
+                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">WhatsApp Support Hotline</label>
+                                <div class="flex gap-2">
+                                    <div class="bg-dash-secondary flex items-center px-4 rounded-xl border border-dash text-xs font-mono text-dash-secondary">wa.me/</div>
+                                    <input type="text" value="2347070989034" class="flex-1 bg-dash-secondary/50 border border-dash rounded-xl p-3.5 text-sm font-bold focus:outline-none">
                                 </div>
                             </div>
-                            <div><h4 class="font-bold mb-4">Active Sessions</h4>
-                                <div id="session-card" class="p-4 bg-dash-secondary/50 border border-dash rounded-2xl flex items-center justify-between">
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-mobile-screen-button text-2xl text-dash-secondary"></i><div><p class="text-sm font-bold">iPhone 15 Pro • Lagos, NG</p><p class="text-[10px] text-green-500 uppercase font-bold">Current Device</p></div></div>
-                                    <button onclick="terminateSession()" class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Logout</button>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-5 bg-dash-secondary/30 rounded-2xl border border-dash flex items-center justify-between">
+                                    <div><p class="font-bold text-sm">"Big Fish" Alerts</p><p class="text-[10px] text-dash-secondary">Ping phone for 100+ interactions.</p></div>
+                                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                                </div>
+                                <div class="p-5 bg-dash-secondary/30 rounded-2xl border border-dash flex items-center justify-between">
+                                    <div><p class="font-bold text-sm">IP Ghosting Guard</p><p class="text-[10px] text-dash-secondary">Block >2 accounts per connection.</p></div>
+                                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                    break;
-                case 'notifications':
-                    content = `
-                        <h2 class="text-3xl font-bold mb-2">Notifications</h2>
-                        <p class="text-dash-secondary mb-8">Choose how you want to be alerted about task updates.</p>
-                        <div class="space-y-6 max-w-xl">
-                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Email Alerts</p><p class="text-xs text-dash-secondary">Summary of campaigns and performance</p></div><label class="switch"><input type="checkbox" checked onchange="togglePref('email')"><span class="slider"></span></label></div>
-                            <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">In-App Push</p><p class="text-xs text-dash-secondary">Real-time milestone hits and task verification status</p></div><label class="switch"><input type="checkbox" checked onchange="togglePref('push')"><span class="slider"></span></label></div>
-                        </div>
-                    `;
-                    break;
-                case 'support':
-                    content = `
-                        <h2 class="text-3xl font-bold mb-2">Support Desk</h2>
-                        <p class="text-dash-secondary mb-8">Need help? We typically respond within 15 minutes.</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                            <div onclick="alert('Support Ticket System Initialized. Please describe your issue.')" class="p-6 bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/30 rounded-2xl text-center cursor-pointer hover:bg-[var(--accent-primary)]/20 transition"><i class="fa-solid fa-ticket text-xl text-[var(--accent-primary)] mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Open Ticket</p></div>
-                            <div onclick="window.open('https://pidimarketing.com/guides', '_blank')" class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl text-center cursor-pointer hover:bg-dash-secondary transition"><i class="fa-solid fa-book-open text-xl text-dash-secondary mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Knowledge Base</p></div>
-                            <div onclick="alert('Connecting to WhatsApp Live Support...')" class="p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center cursor-pointer hover:bg-green-500/20 transition"><i class="fa-brands fa-whatsapp text-xl text-green-500 mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Live Chat</p></div>
-                        </div>
-                        <h4 class="font-bold mb-4 text-sm uppercase tracking-widest text-dash-secondary">Quick FAQ</h4>
-                        <div class="space-y-2">
-                            <div class="p-4 bg-dash-secondary/30 rounded-xl border border-dash flex justify-between items-center cursor-pointer"><p class="text-sm font-semibold">How do I withdraw my earnings?</p><i class="fa-solid fa-chevron-right text-[10px]"></i></div>
-                            <div class="p-4 bg-dash-secondary/30 rounded-xl border border-dash flex justify-between items-center cursor-pointer"><p class="text-sm font-semibold">What is the "Rule of 10"?</p><i class="fa-solid fa-chevron-right text-[10px]"></i></div>
+
+                            <div class="p-8 bg-black rounded-3xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+                                <div class="text-center md:text-left">
+                                    <p class="text-white font-black text-lg mb-1 tracking-tight">System Maintenance Cloak</p>
+                                    <p class="text-white/50 text-[10px] uppercase font-bold tracking-widest">Hide dashboard with animation</p>
+                                </div>
+                                <button class="btn-fintech bg-white text-black px-8 py-4 rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-xl">Engage Cloak</button>
+                            </div>
+
+                            <div class="p-6 bg-dash-secondary/30 rounded-2xl border border-dash">
+                                <div class="flex items-center justify-between mb-4">
+                                    <label class="block text-[10px] font-black text-dash-secondary uppercase tracking-widest">Admin Audit Trail</label>
+                                    <div class="relative w-48">
+                                        <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-dash-secondary"></i>
+                                        <input type="text" placeholder="Filter logs..." class="w-full bg-white border border-dash rounded-lg py-1.5 pl-8 pr-3 text-[10px] focus:outline-none">
+                                    </div>
+                                </div>
+                                <div class="space-y-2 max-h-[150px] overflow-y-auto pr-2 no-scrollbar">
+                                    <div class="p-3 bg-white rounded-xl border border-dash flex items-center justify-between">
+                                        <p class="text-[10px] font-bold"><span class="text-red-500">Admin_PD</span> changed "Grace Period" to 48h</p>
+                                        <p class="text-[8px] text-dash-secondary">2m ago</p>
+                                    </div>
+                                    <div class="p-3 bg-white rounded-xl border border-dash flex items-center justify-between">
+                                        <p class="text-[10px] font-bold"><span class="text-red-500">Admin_SY</span> moved ₦50k to Escrow</p>
+                                        <p class="text-[8px] text-dash-secondary">15m ago</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     `;
                     break;
@@ -3576,6 +3809,7 @@
                 'confirmSignout','closeSignoutModal','processLogout','openCampaignWizard','closeCampaignWizard', 'showAdminMessageModal', 'closeAdminMessageModal',
                 'selectPlatform','updateCalculation','syncInputs','nextStep','prevStep','finishCreation',
                 'openDepositModal','closeDepositModal','processDeposit','switchSettingsView','saveProfileSettings',
+                'fetchAdminUsers','applyAdminUserFilters','renderAdminUserList', 'editUser', 'closeEditUserModal', 'saveUserEdits', 'banUser',
                 'updatePassword','togglePref','startTaskFlow','nextTaskStep','updateTaskProofLabel','submitTaskProof'
             ];
 
@@ -3710,9 +3944,6 @@
             </a>
             <a href="#" onclick="switchSPAView('admin-verification'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i data-feather="shield" class="w-4 text-center"></i> Verification Hub
-            </a>
-            <a href="#" onclick="switchSPAView('admin-users'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i data-feather="users" class="w-4 text-center"></i> User Management
             </a>
             <a href="#" onclick="switchSPAView('admin-finance'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i data-feather="dollar-sign" class="w-4 text-center"></i> Financial Audit
