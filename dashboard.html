@@ -2655,11 +2655,12 @@
                 const event = response.events[0];
                 const doc = response.payload;
                 
-                // If a Campaign doc is updated
+                // If a Campaign doc is created/updated/deleted, refresh relevant views.
                 if (event.includes('collections.' + APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS)) {
+                    // If this user is the creator of the changed campaign, refresh their creator view
                     if (doc.creator_id === currentUser.id) {
                         fetchRoleData('creator');
-                        
+
                         if (event.includes('.update')) {
                             if (doc.status === 'active') {
                                 showToast(`Campaign Approved: Your ${doc.platform.toUpperCase()} mission is now live!`, 'success');
@@ -2669,9 +2670,15 @@
                             }
                         }
                     }
-                    
-                    // Refresh performer data if a task becomes active
-                    if (doc.status === 'active' && doc.creator_id !== currentUser.id) fetchPerformerDashboardData();
+
+                    // Always refresh performer dashboard when any campaign doc changes and
+                    // current role is performer and the campaign wasn't created by the current user.
+                    // This ensures the performer board is always backed by the campaigns table in real time.
+                    try {
+                        if (currentRole === 'performer' && doc.creator_id !== currentUser.id) {
+                            fetchPerformerDashboardData();
+                        }
+                    } catch (e) { console.warn('Realtime performer refresh failed', e); }
                 }
 
                 // If an Engagement doc is updated
