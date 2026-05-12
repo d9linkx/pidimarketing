@@ -595,11 +595,18 @@
                         </div>
                     </div>
 
-                    <!-- Right: Theme toggle and (desktop) avatar -->
+                    <!-- Right: Theme toggle and avatars (desktop + mobile/tablet) -->
                     <div class="flex items-center gap-3 order-3 md:order-2">
+                        <!-- Mobile/Tablet avatar (visible on screens smaller than lg) -->
+                        <div class="relative group lg:hidden">
+                            <img src="" class="w-9 h-9 rounded-xl border-2 border-dash cursor-pointer user-avatar-display" alt="User Avatar" onclick="openSettings('profile')">
+                        </div>
+
                         <button onclick="toggleTheme()" class="w-9 h-9 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[var(--accent-primary)] transition focus:outline-none theme-toggle" title="Switch Theme (System / Light / Dark)">
                             <i data-feather="monitor" class="w-4 h-4"></i>
                         </button>
+
+                        <!-- Desktop avatar (visible on md and larger) -->
                         <div class="relative group hidden md:block">
                             <img src="" class="w-9 h-9 rounded-xl border-2 border-dash cursor-pointer user-avatar-display" alt="User Avatar" onclick="openSettings('profile')">
                         </div>
@@ -2214,6 +2221,26 @@
             if (profile) {
                 roles.creator.availableBalance = profile.balance || 0;
                 roles.creator.allocatedFunds = profile.allocated_funds || 0;
+                // Expose profile for other parts of the UI
+                window.userProfile = profile;
+            }
+
+            // If the profile contains an avatar URL, ensure it's used everywhere
+            try {
+                const profileAvatar = profile && profile.avatar ? profile.avatar : null;
+                if (profileAvatar) {
+                    currentUser.avatar = profileAvatar;
+                    // Update any header avatar displays
+                    document.querySelectorAll('.user-avatar-display').forEach(img => {
+                        try { img.src = currentUser.avatar; } catch(e) { /* ignore */ }
+                    });
+
+                    // If the settings preview exists in the DOM, update it too
+                    const preview = document.getElementById('profile-avatar-preview');
+                    if (preview) preview.src = currentUser.avatar;
+                }
+            } catch (e) {
+                console.warn('Failed to apply profile avatar to UI', e);
             }
 
             // Initialize View based on query param OR user's stored role preference
@@ -3916,34 +3943,45 @@
 
             switch(view) {
                 case 'profile':
-                    content = `
-                        <h2 class="text-3xl font-bold mb-2">Profile Settings</h2>
-                        <p class="text-dash-secondary mb-8">Manage your personal brand identity on PIDI.</p>
-                        <div class="space-y-6 max-w-xl">
-                            <div class="flex items-center gap-6 mb-8">
-                                <div class="relative group cursor-pointer">
-                                    <img src="${currentUser.avatar}" class="w-24 h-24 rounded-3xl border-4 border-dash">
-                                    <div class="absolute inset-0 bg-black/40 rounded-3xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-camera text-white"></i></div>
+                        content = `
+                            <h2 class="text-3xl font-bold mb-2">Profile Settings</h2>
+                            <p class="text-dash-secondary mb-8">Manage your personal identity and contact details.</p>
+                            <div class="space-y-6 max-w-xl">
+                                <div class="flex items-center gap-6 mb-6">
+                                    <div class="relative">
+                                        <img id="profile-avatar-preview" src="${currentUser.avatar}" class="w-24 h-24 rounded-3xl border-4 border-dash object-cover">
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold">${currentUser.fullName}</p>
+                                        <p class="text-[10px] text-dash-secondary">Full name (non-editable)</p>
+                                        <div class="mt-4">
+                                            <input type="file" id="profile-avatar-file" accept="image/*" class="hidden" onchange="updateProfileAvatarPreview(this)">
+                                            <label for="profile-avatar-file" class="inline-flex items-center gap-3 cursor-pointer bg-dash-secondary px-4 py-2 rounded-xl border border-dash text-xs font-bold">Change Photo</label>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <button class="bg-dash-secondary px-4 py-2 rounded-xl text-xs font-bold mb-2">Change Avatar</button>
-                                    <div class="flex items-center gap-2 text-[10px] font-bold text-green-500 uppercase tracking-widest"><i class="fa-solid fa-circle-check"></i> Verified ${currentRole}</div>
+
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Full Legal Name</label>
+                                        <input type="text" id="set-full-name" value="${currentUser.fullName}" readonly class="w-full bg-white/5 border border-dash rounded-xl p-3 text-sm cursor-not-allowed">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Email Address</label>
+                                        <input type="email" id="set-email" value="${currentUser.email || ''}" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">WhatsApp Number</label>
+                                        <input type="tel" id="set-whatsapp" placeholder="+2347012345678" value="" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                    </div>
+                                </div>
+
+                                <div class="pt-2">
+                                    <button onclick="saveProfileSettings()" class="btn-fintech btn-primary px-8 py-3 shadow-lg shadow-blue-500/20">SAVE CHANGES</button>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 gap-5">
-                                <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Full Legal Name</label><input type="text" id="set-full-name" value="${currentUser.fullName}" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
-                                ${currentRole === 'creator' ? `
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Business Name</label><input type="text" value="${currentUser.fullName}'s Brand" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Website URL</label><input type="url" value="https://pidimarketing.com" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
-                                ` : `
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Social Handles (Instagram, X)</label><input type="text" value="@princedike, @pidihq" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></div>
-                                    <div><label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Performer Bio</label><textarea class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none focus:border-[var(--accent-primary)]" rows="3">Performance marketer specializing in high-velocity organic engagement.</textarea></div>
-                                `}
-                            </div>
-                            <button onclick="saveProfileSettings()" class="btn-fintech btn-primary px-8 py-3 shadow-lg shadow-blue-500/20 mt-4">SAVE CHANGES</button>
-                        </div>
-                    `;
-                    break;
+                        `;
+                        break;
                 case 'security':
                     content = `
                         <h2 class="text-3xl font-bold mb-2">Security & Access</h2>
@@ -3995,19 +4033,100 @@
 
             area.innerHTML = content;
             feather.replace();
+
+            // Populate any dynamic profile fields from fetched profile data
+            try {
+                if (window.userProfile) {
+                    const wa = document.getElementById('set-whatsapp');
+                    const em = document.getElementById('set-email');
+                    const preview = document.getElementById('profile-avatar-preview');
+                    if (wa && window.userProfile.whatsapp_number) wa.value = window.userProfile.whatsapp_number;
+                    if (em && window.userProfile.email) em.value = window.userProfile.email;
+                    if (preview && window.userProfile.avatar) preview.src = window.userProfile.avatar;
+                } else {
+                    // Fallback: set email from currentUser if available
+                    const em = document.getElementById('set-email');
+                    if (em && currentUser && currentUser.email) em.value = currentUser.email;
+                }
+            } catch (e) { console.warn('Failed to populate settings view with profile data', e); }
         }
 
         // --- SETTINGS HANDLERS ---
-        function saveProfileSettings() {
-            const name = document.getElementById('set-full-name')?.value;
-            if (name) {
-                currentUser.fullName = name;
-                currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=059669&color=fff`;
-                
-                document.querySelectorAll('.user-name-display').forEach(el => el.innerText = name.split(' ')[0]);
+        function updateProfileAvatarPreview(input) {
+            const preview = document.getElementById('profile-avatar-preview');
+            if (input.files && input.files[0]) {
+                const url = URL.createObjectURL(input.files[0]);
+                if (preview) preview.src = url;
+            }
+        }
+
+        async function saveProfileSettings() {
+            const email = document.getElementById('set-email')?.value?.trim();
+            const whatsapp = document.getElementById('set-whatsapp')?.value?.trim();
+            const avatarInput = document.getElementById('profile-avatar-file');
+
+            if (!currentUser || !currentUser.id) return alert('User not loaded. Please refresh and try again.');
+
+            const profilePayload = {
+                // keep basic shape; profile fields allowed by Appwrite schema
+                email: email || currentUser.email || '',
+                whatsapp_number: whatsapp || '',
+                // Ensure required user_role is present. Prefer existing profile value,
+                // then any global currentRole, otherwise default to 'creator'.
+                user_role: (window.userProfile && window.userProfile.user_role) || window.currentRole || 'creator'
+            };
+
+            // Show a small loader by disabling the button
+            const btn = document.querySelector('#settings-content-area button[onclick="saveProfileSettings()"]');
+            if (btn) { btn.disabled = true; btn.innerText = 'Saving...'; }
+
+            try {
+                // If there's a new avatar file, upload it to proofs bucket and store URL
+                if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+                    const file = avatarInput.files[0];
+                    const uploadRes = await storage.createFile(APPWRITE_CONFIG.BUCKETS.PROOFS, ID.unique(), file);
+                    const avatarUrl = storage.getFileView(APPWRITE_CONFIG.BUCKETS.PROOFS, uploadRes.$id);
+                    profilePayload.avatar = avatarUrl;
+                } else if (window.userProfile && window.userProfile.avatar) {
+                    profilePayload.avatar = window.userProfile.avatar;
+                } else {
+                    profilePayload.avatar = currentUser.avatar;
+                }
+
+                // Upsert into profiles collection using currentUser.id as document ID
+                try {
+                    // Attempt to get existing profile; if exists update, else create
+                    const existing = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(() => null);
+                    if (existing && existing.$id) {
+                        await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id, Object.assign({}, existing, profilePayload));
+                    } else {
+                        await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id, Object.assign({ full_name: currentUser.fullName, created_at: new Date().toISOString() }, profilePayload));
+                    }
+                } catch (e) {
+                    console.warn('Profile upsert failed, attempting create...', e);
+                    // fallback create (include created_at to satisfy required attribute)
+                    await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id, Object.assign({ full_name: currentUser.fullName, created_at: new Date().toISOString() }, profilePayload));
+                }
+
+                // Refresh local state
+                window.userProfile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(() => null);
+                if (window.userProfile) {
+                    currentUser.email = window.userProfile.email || currentUser.email;
+                    currentUser.avatar = window.userProfile.avatar || currentUser.avatar;
+                }
+
+                // Update displayed avatar/name/email in UI
+                document.querySelectorAll('.user-name-display').forEach(el => el.innerText = currentUser.fullName.split(' ')[0]);
                 document.querySelectorAll('.user-avatar-display').forEach(img => img.src = currentUser.avatar);
-                
-                alert(`Profile updated successfully!`);
+                const emailInputs = document.querySelectorAll('input[type="email"][id="set-email"]');
+                if (emailInputs && emailInputs.length) emailInputs.forEach(i => i.value = currentUser.email || '');
+
+                alert('Profile saved successfully.');
+            } catch (err) {
+                console.error('Failed to save profile:', err);
+                alert('Failed to save profile: ' + (err.message || err));
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerText = 'SAVE CHANGES'; }
             }
         }
 
