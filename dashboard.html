@@ -2105,7 +2105,7 @@
 
                     const claimable = spotsLeft > 0;
                     const outerOnclick = claimable ? `claimTask('${t.$id}')` : '';
-                    const buttonText = claimable ? 'Claim Mission (15m)' : 'Slots Full';
+                    const buttonText = claimable ? 'Accept Mission (30m)' : 'Slots Full';
                     const buttonClasses = claimable ? 'w-full bg-[var(--accent-primary)] text-white text-[10px] font-black py-3 rounded-xl uppercase tracking-widest group-hover:scale-[1.02] active:scale-[0.98] transition-all' : 'w-full bg-dash-secondary text-[10px] font-black py-3 rounded-xl uppercase tracking-widest text-dash-secondary cursor-not-allowed';
 
                     return `
@@ -2655,12 +2655,11 @@
                 const event = response.events[0];
                 const doc = response.payload;
                 
-                // If a Campaign doc is created/updated/deleted, refresh relevant views.
+                // If a Campaign doc is updated
                 if (event.includes('collections.' + APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS)) {
-                    // If this user is the creator of the changed campaign, refresh their creator view
                     if (doc.creator_id === currentUser.id) {
                         fetchRoleData('creator');
-
+                        
                         if (event.includes('.update')) {
                             if (doc.status === 'active') {
                                 showToast(`Campaign Approved: Your ${doc.platform.toUpperCase()} mission is now live!`, 'success');
@@ -2670,15 +2669,9 @@
                             }
                         }
                     }
-
-                    // Always refresh performer dashboard when any campaign doc changes and
-                    // current role is performer and the campaign wasn't created by the current user.
-                    // This ensures the performer board is always backed by the campaigns table in real time.
-                    try {
-                        if (currentRole === 'performer' && doc.creator_id !== currentUser.id) {
-                            fetchPerformerDashboardData();
-                        }
-                    } catch (e) { console.warn('Realtime performer refresh failed', e); }
+                    
+                    // Refresh performer data if a task becomes active
+                    if (doc.status === 'active' && doc.creator_id !== currentUser.id) fetchPerformerDashboardData();
                 }
 
                 // If an Engagement doc is updated
@@ -3574,7 +3567,6 @@
                     await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, ID.unique(), {
                         campaign_id: campaignId,
                         performer_id: currentUser.id,
-                        creator_id: campaign.creator_id || null,
                         status: 'in_progress',
                         expires_at: expiresAt,
                         created_at: new Date().toISOString()
@@ -3660,7 +3652,6 @@
                     await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, ID.unique(), {
                         campaign_id: activeTask.$id,
                         performer_id: currentUser.id,
-                        creator_id: activeTask.creator_id || null,
                         status: 'in_progress',
                         expires_at: expiresAt,
                         created_at: new Date().toISOString()
@@ -3669,15 +3660,26 @@
 
                 startClaimTimer(activeTask.$id, 30 * 60);
 
-                // Move to briefing step (no links) and show clear visual fingerprint
-                document.getElementById('task-visual-clear').src = activeTask.visual_fingerprint || document.getElementById('task-visual-blur').src;
-                document.getElementById('task-search-seed').innerText = activeTask.search_seed || `Open ${activeTask.platform} and search for ${activeTask.creator_handle || activeTask.username || '@seller'}`;
-                document.getElementById('task-navigation').innerText = activeTask.navigation || 'Scroll down until you find the post that matches the image above.';
+                // Ensure the task-flow view is mounted into the dashboard viewport before touching its internals
+                switchSPAView('task-flow');
+                // small delay to allow switchSPAView to clone/mount the template
+                await new Promise(res => setTimeout(res, 60));
 
-                // Advance to step 2
-                document.getElementById('task-step-1').classList.add('hidden');
+                // Move to briefing step (no links) and show clear visual fingerprint
+                const visualClear = document.getElementById('task-visual-clear');
+                const visualBlur = document.getElementById('task-visual-blur');
+                if (visualClear) visualClear.src = activeTask.visual_fingerprint || (visualBlur ? visualBlur.src : 'assets/headshot-placeholder.svg');
+                const seedEl = document.getElementById('task-search-seed');
+                if (seedEl) seedEl.innerText = activeTask.search_seed || `Open ${activeTask.platform} and search for ${activeTask.creator_handle || activeTask.username || '@seller'}`;
+                const navEl = document.getElementById('task-navigation');
+                if (navEl) navEl.innerText = activeTask.navigation || 'Scroll down until you find the post that matches the image above.';
+
+                // Advance to step 2 in the mounted template
+                const step1 = document.getElementById('task-step-1');
+                const step2 = document.getElementById('task-step-2');
+                if (step1) step1.classList.add('hidden');
                 currentTaskStep = 2;
-                document.getElementById('task-step-2').classList.remove('hidden');
+                if (step2) step2.classList.remove('hidden');
                 updateTaskFlowNav();
             } catch (err) {
                 console.error('Accept mission failed:', err);
@@ -3786,17 +3788,21 @@
                 // Update existing engagement as pending (attach proof)
                 const existEngage = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', activeTask.$id), Query.equal('performer_id', currentUser.id)]);
                 
+                // compute auto-approve timestamp (24 hours from now)
+                const autoApproveAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
                 if (existEngage.total > 0) {
-                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, existEngage.documents[0].$id, {
+                    const engagementId = existEngage.documents[0].$id;
+                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, engagementId, {
                         platform: activeTask.platform,
                         performer_handle: handle,
                         proof_url: proofUrl,
                         status: 'pending',
+                        auto_approve_at: autoApproveAt,
                         metadata: JSON.stringify({ comment_text: text })
                     });
                     // create a transaction record to mark funds locked for this engagement
                     try {
-                        const engagementId = existEngage.documents[0].$id;
                         const rewardAmount = Math.round(((activeTask.total_cost || activeTask.reward || 0) / (activeTask.goal_count || 1)) || 0);
                         await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
                             user_id: activeTask.creator_id || null,
@@ -3810,21 +3816,24 @@
                         });
                     } catch (e) { console.warn('Failed to create escrow transaction', e); }
                 } else {
-                    await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, ID.unique(), {
+                    // create engagement and capture returned document to get its id
+                    const createdEngagement = await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, ID.unique(), {
                         campaign_id: activeTask.$id,
                         performer_id: currentUser.id,
                         platform: activeTask.platform,
                         performer_handle: handle,
                         proof_url: proofUrl,
                         status: 'pending',
+                        auto_approve_at: autoApproveAt,
                         metadata: JSON.stringify({ comment_text: text }),
                         created_at: new Date().toISOString()
                     });
-                    // create a transaction record to mark funds locked for this new engagement
                     try {
+                        const engagementId = createdEngagement.$id;
                         const rewardAmount = Math.round(((activeTask.total_cost || activeTask.reward || 0) / (activeTask.goal_count || 1)) || 0);
                         await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
                             user_id: activeTask.creator_id || null,
+                            engagement_id: engagementId,
                             campaign_id: activeTask.$id,
                             amount: rewardAmount,
                             type: 'escrow_lock',
