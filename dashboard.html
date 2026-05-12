@@ -967,11 +967,13 @@
                     </div>
 
                     <div id="task-step-1" class="task-wizard-step space-y-6">
+                        <!-- Mission Selection: show blurred visual fingerprint and summary -->
                         <div class="flex items-center gap-4 p-6 bg-dash-secondary/30 rounded-3xl border border-dash">
                             <div id="task-platform-icon" class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-2xl shadow-sm"></div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-[9px] font-black text-[var(--accent-primary)] uppercase tracking-widest mb-1">New Campaign Available</p>
                                 <h2 class="text-xl font-bold truncate" id="task-detail-url"></h2>
+                                <p class="text-[10px] text-dash-secondary mt-1" id="task-detail-creator"></p>
                             </div>
                             <div class="text-right">
                                 <p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Reward</p>
@@ -980,38 +982,50 @@
                         </div>
 
                         <div class="space-y-4">
-                            <h4 class="text-xs font-bold uppercase tracking-widest text-dash-secondary">Your Instructions</h4>
-                            <div class="p-6 bg-white border border-dash rounded-2xl text-sm leading-relaxed text-dash-secondary" id="task-detail-instructions"></div>
+                            <h4 class="text-xs font-bold uppercase tracking-widest text-dash-secondary">Visual Fingerprint</h4>
+                            <div class="p-4 bg-white border border-dash rounded-2xl text-sm leading-relaxed text-dash-secondary flex items-center justify-center">
+                                <!-- show a blurred thumbnail to identify the post visually; will be clearer in briefing -->
+                                <img id="task-visual-blur" src="assets/headshot-placeholder.svg" class="w-48 h-28 object-cover rounded-lg filter blur-sm" alt="visual fingerprint" />
+                            </div>
                         </div>
 
-                        <button onclick="nextTaskStep()" class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest">
-                            Start Mission <i data-feather="zap" class="ml-2 w-4"></i>
+                        <div class="space-y-2">
+                            <p class="text-[10px] text-dash-secondary">Accepting this mission moves it to <strong>In-Progress</strong> and starts your <strong class="font-bold">30 minute</strong> timer to complete and submit proof.</p>
+                        </div>
+
+                        <button id="accept-mission-btn" onclick="acceptMission()" class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest">
+                            Accept Mission & Start Timer
                         </button>
                     </div>
 
                     <div id="task-step-2" class="task-wizard-step hidden space-y-6">
                         <div class="text-center space-y-2">
-                            <h3 class="text-2xl font-bold">Execution Phase</h3>
-                            <p class="text-sm text-dash-secondary">Open the link and perform the engagement as instructed.</p>
+                            <h3 class="text-2xl font-bold">Briefing — Discovery Guide (No Links)</h3>
+                            <p class="text-sm text-dash-secondary">Follow the search seed and visual fingerprint to find the exact post in the native app.</p>
                         </div>
 
-                        <div class="p-8 border-2 border-dashed border-dash rounded-3xl flex flex-col items-center gap-6">
-                            <div class="w-20 h-20 rounded-full bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] flex items-center justify-center animate-pulse">
-                                <i data-feather="external-link" class="w-10 h-10"></i>
+                        <div class="p-6 border border-dash rounded-2xl bg-white text-left">
+                            <p class="text-[10px] font-bold uppercase text-dash-secondary">Search Seed</p>
+                            <p id="task-search-seed" class="mb-4 text-sm">Open Instagram and search for @UserHandle</p>
+
+                            <p class="text-[10px] font-bold uppercase text-dash-secondary">Visual Fingerprint</p>
+                            <div class="mt-2 mb-4 flex items-center justify-center">
+                                <img id="task-visual-clear" src="assets/headshot-placeholder.svg" class="w-64 h-36 object-cover rounded-lg" alt="visual fingerprint clear" />
                             </div>
-                            <a id="task-execution-link" href="#" target="_blank" class="btn-fintech btn-primary px-10 py-4 shadow-xl">OPEN CONTENT</a>
-                            <p class="text-[10px] font-bold text-dash-secondary uppercase text-center max-w-xs">Don't forget to take a screenshot of your comment/like for submission.</p>
+
+                            <p class="text-[10px] font-bold uppercase text-dash-secondary">Navigation Instruction</p>
+                            <p id="task-navigation" class="text-sm">Scroll down until you find the post that matches the image above. Do not use direct links from this dashboard.</p>
                         </div>
 
-                        <button onclick="nextTaskStep()" class="w-full btn-fintech bg-dash-secondary border border-dash justify-center py-4 font-black uppercase text-dash-secondary">
-                            I've Completed the Task
+                        <button onclick="startLingerPhase()" id="start-linger-btn" class="w-full btn-fintech btn-primary justify-center py-4 shadow-xl font-black uppercase tracking-widest">
+                            I opened the native app — Start Linger Phase
                         </button>
                     </div>
 
                     <div id="task-step-3" class="task-wizard-step hidden space-y-6">
                         <div class="text-center space-y-2">
-                            <h3 class="text-2xl font-bold">Submit Proof</h3>
-                            <p class="text-sm text-dash-secondary">Upload verification of your work for audit.</p>
+                            <h3 class="text-2xl font-bold">Proof Capture & Submission</h3>
+                            <p class="text-sm text-dash-secondary">Upload the screenshot of your interaction and confirm your handle. The submit button will activate after a <strong>60s dwell timer</strong>.</p>
                         </div>
 
                         <div class="space-y-4">
@@ -1031,9 +1045,13 @@
                                     <span id="task-proof-label" class="text-[10px] font-bold uppercase tracking-widest text-dash-secondary">Upload Screenshot</span>
                                 </label>
                             </div>
+
+                            <div class="text-center">
+                                <p class="text-[10px] text-dash-secondary">Dwell Timer: <span id="retention-timer">01:00</span></p>
+                            </div>
                         </div>
 
-                        <button onclick="submitTaskProof()" id="task-submit-btn" class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg">
+                        <button onclick="submitTaskProof()" id="task-submit-btn" class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg" disabled>
                             <span>Submit for Verification</span>
                             <i data-feather="check-circle" class="ml-2 w-4"></i>
                         </button>
@@ -2056,15 +2074,42 @@
                     return;
                 }
 
-                // Render task cards with creator info
+                // To accurately show remaining slots we must count active engagements
+                // (in_progress or pending) for the fetched campaigns and subtract those
+                // from the campaign's goal_count + current_count. This prevents overbooking.
+                const campaignIds = tasks.map(t => t.$id);
+                let engagementDocs = [];
+                try {
+                    if (campaignIds.length > 0) {
+                        const engageRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', campaignIds)]);
+                        engagementDocs = engageRes.documents || [];
+                    }
+                } catch (e) { console.warn('Failed to fetch engagements for slot calc', e); }
+
+                const activeStatuses = ['in_progress', 'pending'];
+                const activeCountsByCampaign = {}; // campaignId -> number of active/reserved slots
+                engagementDocs.forEach(ed => {
+                    if (!ed || !ed.campaign_id) return;
+                    if (!activeStatuses.includes(ed.status)) return;
+                    activeCountsByCampaign[ed.campaign_id] = (activeCountsByCampaign[ed.campaign_id] || 0) + 1;
+                });
+
+                // Render task cards with creator info and accurate spots left
                 taskList.innerHTML = tasks.map(t => {
                     const progress = Math.round((t.current_count / t.goal_count) * 100) || 0;
-                    const spotsLeft = Math.max(0, (t.goal_count || 0) - (t.current_count || 0));
+                    const reserved = activeCountsByCampaign[t.$id] || 0;
+                    // current_count already reflects approved/completed engagements
+                    const spotsLeft = Math.max(0, (t.goal_count || 0) - ((t.current_count || 0) + reserved));
                     const reward = t.total_cost || t.reward || t.price || 0;
                     const creator = (creators || []).find(c => c.$id === t.creator_id) || { full_name: 'Creator', avatar: '' };
 
+                    const claimable = spotsLeft > 0;
+                    const outerOnclick = claimable ? `claimTask('${t.$id}')` : '';
+                    const buttonText = claimable ? 'Claim Mission (15m)' : 'Slots Full';
+                    const buttonClasses = claimable ? 'w-full bg-[var(--accent-primary)] text-white text-[10px] font-black py-3 rounded-xl uppercase tracking-widest group-hover:scale-[1.02] active:scale-[0.98] transition-all' : 'w-full bg-dash-secondary text-[10px] font-black py-3 rounded-xl uppercase tracking-widest text-dash-secondary cursor-not-allowed';
+
                     return `
-                        <div class="bento-card p-4 flex flex-col gap-4 group hover:border-[var(--accent-primary)] transition-all">
+                        <div ${outerOnclick ? `onclick="${outerOnclick}"` : ''} class="bento-card p-4 flex flex-col gap-4 group hover:border-[var(--accent-primary)] transition-all ${claimable ? 'cursor-pointer' : ''}">
                             <div class="flex justify-between items-start">
                                 <div class="flex items-center gap-3">
                                     <img src="${creator.avatar || 'assets/headshot-placeholder.svg'}" alt="${creator.full_name}" class="w-10 h-10 rounded-full object-cover border border-dash" />
@@ -2090,8 +2135,8 @@
                                 </div>
                             </div>
 
-                            <button onclick="claimTask('${t.$id}')" class="w-full bg-[var(--accent-primary)] text-white text-[10px] font-black py-3 rounded-xl uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all">
-                                Claim (15m)
+                            <button class="${buttonClasses}" ${claimable ? '' : 'disabled'}>
+                                ${buttonText}
                             </button>
                         </div>
                     `;
@@ -2981,6 +3026,14 @@
                     created_at: new Date().toISOString()
                 });
 
+                // Mark any escrow_lock transaction for this engagement as completed
+                try {
+                    const escRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('engagement_id', engagement.$id), Query.equal('type', 'escrow_lock')]);
+                    if (escRes.total > 0) {
+                        await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, escRes.documents[0].$id, { status: 'completed' });
+                    }
+                } catch (err) { console.warn('Failed to update escrow transaction status on approval', err); }
+
                 alert('Engagement approved and performer rewarded.');
                 fetchAdminPendingMissions();
                 fetchPerformerDashboardData();
@@ -2995,6 +3048,11 @@
             try {
                 await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, engagementId, { status: 'rejected', reviewed_at: new Date().toISOString() });
                 alert('Engagement rejected.');
+                // Mark escrow as failed/released
+                try {
+                    const escRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('engagement_id', engagementId), Query.equal('type', 'escrow_lock')]);
+                    if (escRes.total > 0) await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, escRes.documents[0].$id, { status: 'failed' });
+                } catch (err) { console.warn('Failed to update escrow transaction status on rejection', err); }
                 fetchAdminPendingMissions();
             } catch (err) {
                 console.error('Reject error:', err);
@@ -3434,14 +3492,15 @@
         let currentTaskStep = 1;
         let activeTask = null;
 
-        window.startTaskFlow = async function(taskId) {
+    window.startTaskFlow = async function(taskId) {
             try {
                 const task = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, taskId);
 
                 activeTask = task;
-
-                // LOCK: create or upsert an engagement to reserve the spot with a 15-minute expiry
-                const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+        // LOCK: create or upsert an engagement to reserve the spot with a default expiry
+        // Note: Accept uses 30 minutes expiry; claim may still call startTaskFlow after creating engagement
+        const defaultExpiryMs = 30 * 60 * 1000; // 30 minutes
+        const expiresAt = new Date(Date.now() + defaultExpiryMs).toISOString();
                 const existEngage = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', taskId), Query.equal('performer_id', currentUser.id)]);
                 
                 if (existEngage.total > 0) {
@@ -3456,8 +3515,8 @@
                     });
                 }
 
-                // Start a client-side countdown timer for the claim
-                startClaimTimer(taskId, 15 * 60);
+                // Start a client-side countdown timer for the claim (30 minutes by default)
+                startClaimTimer(taskId, defaultExpiryMs / 1000);
 
                 // Populate UI
                 document.getElementById('task-detail-url').innerText = task.target_url;
@@ -3477,8 +3536,29 @@
         // Claim a task directly from the Available Gigs board
         window.claimTask = async function(campaignId) {
             try {
-                // Upsert engagement with in_progress and expires_at = now + 15min
-                const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+                // To avoid race conditions where multiple performers try to claim the
+                // last remaining slots at once, re-check the campaign and current
+                // reserved engagements on the server before creating an engagement.
+                const campaign = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, campaignId);
+                if (!campaign) throw new Error('Campaign not found');
+
+                // Count active engagements for this campaign (in_progress or pending)
+                const engageRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', campaignId)]);
+                const activeStatuses = ['in_progress', 'pending'];
+                const activeCount = (engageRes.documents || []).filter(e => activeStatuses.includes(e.status)).length;
+
+                const effectiveFilled = (campaign.current_count || 0) + activeCount;
+                const spotsLeft = Math.max(0, (campaign.goal_count || 0) - effectiveFilled);
+
+                if (spotsLeft <= 0) {
+                    showToast('Sorry — this mission is full. You can still view details but cannot claim.', 'error');
+                    // Refresh list to reflect the updated state
+                    fetchPerformerDashboardData();
+                    return;
+                }
+
+                // Upsert engagement with in_progress and expires_at = now + 30min
+                const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
                 
                 const existEngage = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', campaignId), Query.equal('performer_id', currentUser.id)]);
                 if (existEngage.total > 0) {
@@ -3487,14 +3567,15 @@
                     await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, ID.unique(), {
                         campaign_id: campaignId,
                         performer_id: currentUser.id,
+                        creator_id: campaign.creator_id || null,
                         status: 'in_progress',
                         expires_at: expiresAt,
                         created_at: new Date().toISOString()
                     });
                 }
 
-                // start timer and open task flow
-                startClaimTimer(campaignId, 15 * 60);
+                // start timer and open task flow (30 minutes)
+                startClaimTimer(campaignId, 30 * 60);
                 // load campaign and set activeTask then open the flow
                 await startTaskFlow(campaignId);
             } catch (err) {
@@ -3548,8 +3629,8 @@
                 document.getElementById(`task-step-${currentTaskStep}`).classList.remove('hidden');
                 updateTaskFlowNav();
                 
-                const config = PLATFORM_CONFIG[activeTask.platform] || { timer: 15 };
-                startRetentionTimer(config.timer);
+                // Keep retention timer off here; retention (dwell) starts after the performer
+                // confirms they opened the native app and clicks 'Start Linger Phase'.
             } else if (currentTaskStep < 3) {
                 document.getElementById(`task-step-${currentTaskStep}`).classList.add('hidden');
                 currentTaskStep++;
@@ -3558,11 +3639,63 @@
             }
         }
 
+        // Called when a performer clicks Accept Mission on step 1
+        window.acceptMission = async function() {
+            if (!activeTask) return alert('No active task selected');
+
+            try {
+                // Create or update engagement and set expiry to 30 minutes
+                const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+                const existEngage = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', activeTask.$id), Query.equal('performer_id', currentUser.id)]);
+                if (existEngage.total > 0) {
+                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, existEngage.documents[0].$id, { status: 'in_progress', expires_at: expiresAt });
+                } else {
+                    await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, ID.unique(), {
+                        campaign_id: activeTask.$id,
+                        performer_id: currentUser.id,
+                        creator_id: activeTask.creator_id || null,
+                        status: 'in_progress',
+                        expires_at: expiresAt,
+                        created_at: new Date().toISOString()
+                    });
+                }
+
+                startClaimTimer(activeTask.$id, 30 * 60);
+
+                // Move to briefing step (no links) and show clear visual fingerprint
+                document.getElementById('task-visual-clear').src = activeTask.visual_fingerprint || document.getElementById('task-visual-blur').src;
+                document.getElementById('task-search-seed').innerText = activeTask.search_seed || `Open ${activeTask.platform} and search for ${activeTask.creator_handle || activeTask.username || '@seller'}`;
+                document.getElementById('task-navigation').innerText = activeTask.navigation || 'Scroll down until you find the post that matches the image above.';
+
+                // Advance to step 2
+                document.getElementById('task-step-1').classList.add('hidden');
+                currentTaskStep = 2;
+                document.getElementById('task-step-2').classList.remove('hidden');
+                updateTaskFlowNav();
+            } catch (err) {
+                console.error('Accept mission failed:', err);
+                alert('Failed to accept mission: ' + (err.message || err));
+            }
+        }
+
+        // Performer clicked 'I opened the native app' — start linger/dwell phase and then enable submission
+        function startLingerPhase() {
+            // move to step 3 which contains the proof capture and dwell timer
+            document.getElementById('task-step-2').classList.add('hidden');
+            currentTaskStep = 3;
+            document.getElementById('task-step-3').classList.remove('hidden');
+            updateTaskFlowNav();
+
+            // Start dwell timer (60s) before enabling submission button
+            startRetentionTimer(60);
+        }
+
         function startRetentionTimer(seconds) {
             const timerEl = document.getElementById('retention-timer');
-            const completeBtn = document.getElementById('task-complete-btn');
-            if (!timerEl || !completeBtn) return;
-            
+            const submitBtn = document.getElementById('task-submit-btn');
+            if (!timerEl || !submitBtn) return;
+
+            // Initialize display
             let remaining = seconds;
             const interval = setInterval(() => {
                 const m = String(Math.floor(remaining / 60)).padStart(2, '0');
@@ -3570,10 +3703,11 @@
                 timerEl.innerText = `${m}:${s}`;
                 if (remaining <= 0) {
                     clearInterval(interval);
-                    completeBtn.disabled = false;
-                    completeBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-dash-secondary');
-                    completeBtn.classList.add('btn-primary', 'text-white');
-                    completeBtn.innerText = "Dwell-Time Met: Submit Evidence";
+                    // Enable submit button
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-dash-secondary');
+                    submitBtn.classList.add('btn-primary', 'text-white');
+                    const span = submitBtn.querySelector('span'); if (span) span.innerText = "Submit for Verification";
                 }
                 remaining--;
             }, 1000);
@@ -3653,6 +3787,21 @@
                         status: 'pending',
                         metadata: JSON.stringify({ comment_text: text })
                     });
+                    // create a transaction record to mark funds locked for this engagement
+                    try {
+                        const engagementId = existEngage.documents[0].$id;
+                        const rewardAmount = Math.round(((activeTask.total_cost || activeTask.reward || 0) / (activeTask.goal_count || 1)) || 0);
+                        await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
+                            user_id: activeTask.creator_id || null,
+                            engagement_id: engagementId,
+                            campaign_id: activeTask.$id,
+                            amount: rewardAmount,
+                            type: 'escrow_lock',
+                            status: 'pending',
+                            description: 'Locked funds for pending engagement',
+                            created_at: new Date().toISOString()
+                        });
+                    } catch (e) { console.warn('Failed to create escrow transaction', e); }
                 } else {
                     await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, ID.unique(), {
                         campaign_id: activeTask.$id,
@@ -3664,6 +3813,19 @@
                         metadata: JSON.stringify({ comment_text: text }),
                         created_at: new Date().toISOString()
                     });
+                    // create a transaction record to mark funds locked for this new engagement
+                    try {
+                        const rewardAmount = Math.round(((activeTask.total_cost || activeTask.reward || 0) / (activeTask.goal_count || 1)) || 0);
+                        await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
+                            user_id: activeTask.creator_id || null,
+                            campaign_id: activeTask.$id,
+                            amount: rewardAmount,
+                            type: 'escrow_lock',
+                            status: 'pending',
+                            description: 'Locked funds for pending engagement',
+                            created_at: new Date().toISOString()
+                        });
+                    } catch (e) { console.warn('Failed to create escrow transaction', e); }
                 }
 
                 // Clear any local claim timer
