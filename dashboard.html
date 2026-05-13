@@ -494,6 +494,11 @@
 
         #role-chevron.rotate-180, #role-chevron-mobile.rotate-180 { transform: rotate(180deg); }
 
+        /* FAQ Chevron Styles */
+        .faq-item summary .chevron { transform: rotate(45deg); transition: transform 0.3s ease; margin-bottom: 2px; border-color: var(--text-secondary); }
+        .faq-item[open] summary .chevron { transform: rotate(-135deg); margin-bottom: -2px; }
+        .faq-item summary::-webkit-details-marker { display: none; }
+
           /* Remove colored/purple glow shadows from cards specifically
               This overrides box-shadow on card containers and common shadow utility classes
               without touching other layout or script code. */
@@ -1610,13 +1615,13 @@
                     
                     <!-- Role Toggle Switch -->
                     <div class="p-1.5 bg-dash-secondary/50 border border-dash rounded-2xl flex items-center gap-1">
-                        <button id="toggle-creator-view" onclick="switchHowItWorksView('creator')" class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all btn-primary shadow-lg">For Creators</button>
+                        <button id="toggle-creator-view" onclick="switchHowItWorksView('creator')" class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all btn-primary shadow-lg shadow-[var(--accent-primary)]/20">For Creators</button>
                         <button id="toggle-performer-view" onclick="switchHowItWorksView('performer')" class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-dash-secondary hover:text-[var(--text-primary)]">For Performers</button>
                     </div>
                 </div>
 
                 <!-- Workflow Content Areas -->
-                <div class="relative min-h-[500px]">
+                <div class="relative min-h-[500px] overflow-hidden">
                     <!-- CREATOR WORKFLOW -->
                     <div id="creator-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300">
                         <div class="space-y-6">
@@ -1657,7 +1662,7 @@
                     </div>
 
                     <!-- PERFORMER WORKFLOW -->
-                    <div id="performer-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300 hidden">
+                    <div id="performer-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300 hidden opacity-0">
                         <div class="space-y-6">
                             <div class="bento-card p-8 border-l-4 border-l-blue-500 group">
                                 <div class="flex items-center gap-4 mb-4">
@@ -1696,108 +1701,7 @@
                     </div>
                 </div>
 
-                <!-- Global Footer CTA -->
-                <div class="mt-16 text-center border-t border-dash pt-12">
-                    <h4 class="text-lg font-bold mb-6">Ready to get started?</h4>
-                    <button onclick="switchRole(currentRole)" class="btn-fintech btn-primary px-12 py-4">LAUNCH WORKSPACE</button>
-                </div>
-            </div>
-
-            <!-- SPA CONTAINER: How it Works View -->
-            <div id="how-it-works-view" class="spa-view hidden p-4 lg:p-8 max-w-5xl mx-auto min-h-[80vh]">
-                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                    <div class="space-y-1">
-                        <h2 class="text-4xl font-normal leading-tight tracking-tight">System Protocol</h2>
-                        <p class="text-dash-secondary text-sm opacity-80">Bridging the gap between brands and human attention.</p>
-                    </div>
-                    
-                    <!-- Role Toggle Switch -->
-                    <div class="p-1.5 bg-dash-secondary/50 border border-dash rounded-2xl flex items-center gap-1">
-                        <button id="toggle-creator-view" onclick="switchHowItWorksView('creator')" class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all btn-primary shadow-lg">For Creators</button>
-                        <button id="toggle-performer-view" onclick="switchHowItWorksView('performer')" class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-dash-secondary hover:text-[var(--text-primary)]">For Performers</button>
-                    </div>
-                </div>
-
-                <!-- Workflow Content Areas -->
-                <div class="relative min-h-[500px]">
-                    <!-- CREATOR WORKFLOW -->
-                    <div id="creator-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300">
-                        <div class="space-y-6">
-                            <div class="bento-card p-8 border-l-4 border-l-[var(--accent-primary)] group">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] flex items-center justify-center"><i data-feather="target" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">01. Mission Briefing</h4>
-                                </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Select your platform (Instagram, Google, etc.). Define your engagement goals and the specific instructions our performers must follow to ensure brand alignment.</p>
-                            </div>
-
-                            <div class="bento-card p-8 group">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="search" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">02. Organic Discovery</h4>
-                                </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">We don't use links. You provide a <b>Search Seed</b> and a <b>Visual Fingerprint</b>. This forces performers to find your content organically, signaling high quality to algorithms.</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-6">
-                            <div class="bento-card p-8 group">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="lock" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">03. Escrow Security</h4>
-                                </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Funds are locked in Escrow upon campaign launch. You only pay for verified, high-quality human work that meets the "Rule of 10 Words" and our quality standards.</p>
-                            </div>
-
-                            <div class="bento-card p-8 group">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center"><i data-feather="bar-chart" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">04. Growth Audit</h4>
-                                </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Track interactions in real-time. Access detailed analytics showing the retention impact and algorithm breakthrough achieved by your campaign missions.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- PERFORMER WORKFLOW -->
-                    <div id="performer-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300 hidden">
-                        <div class="space-y-6">
-                            <div class="bento-card p-8 border-l-4 border-l-blue-500 group">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="check-square" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">01. Acceptance</h4>
-                                </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Browse the board and claim a mission. Once accepted, you have <b>30 minutes</b> to complete the task and submit proof before the spot is released.</p>
-                            </div>
-
-                            <div class="bento-card p-8 group">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="eye" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">02. Dwell Phase</h4>
-                                </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Find the post organically using the Search Seed. You must stay on the content for at least <b>60 seconds</b> before engaging to prove genuine human attention.</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-6">
-                            <div class="bento-card p-8 group">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="message-circle" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">03. The 10-Word Rule</h4>
-                                </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Every comment must be at least 10 words long and contextually relevant. No "Cool!" or "Nice!". We only reward high-value human interactions.</p>
-                            </div>
-
-                            <div class="bento-card p-8 group">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] flex items-center justify-center"><i data-feather="zap" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">04. Verification</h4>
-                                </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Upload a screenshot and paste your text. Our admins verify submissions within 24 hours. Rewards are credited to your balance upon approval.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
 
                 <!-- Global Footer CTA -->
                 <div class="mt-16 text-center border-t border-dash pt-12">
@@ -5324,20 +5228,13 @@
             </div>
             <div class="my-4 border-t border-dash"></div>
             <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Tools</p>
-            <a href="academy.html" onclick="toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-graduation-cap w-4 text-center"></i> PIDIlearn
-            </a>
+
             <a href="#" onclick="switchSPAView('how-it-works'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i class="fa-solid fa-circle-info w-4 text-center"></i> How it Works
             </a>
             <a href="#" onclick="switchSPAView('referrals')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i class="fa-solid fa-user-group w-4 text-center"></i> Referrals
             </a>
-            <a href="#" onclick="switchSPAView('feedback')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-comment-dots w-4 text-center"></i> Feedback
-            </a>
-            <div class="my-4 border-t border-dash"></div>
-            <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account</p>
             <a href="#" onclick="openSettings('profile'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
             </a>
