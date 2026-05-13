@@ -1301,9 +1301,13 @@
             <!-- SPA CONTAINER: Analytics View -->
             <div id="analytics-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <div>
-                        <h2 class="text-3xl font-bold">Analytics (in real-time)</h2>
-                        <p class="text-dash-secondary text-sm">Real-time proof of human attention & engagement ROI</p>
+                    <div class="space-y-1">
+                        <h2 class="text-lg md:text-xl font-normal text-3xl text-dash-secondary">
+                            Analytics (in real-time) <span class="text-[var(--text-primary)] font-semibold"></span>
+                        </h2>
+                        <p class="text-xs md:text-sm text-dash-secondary opacity-80">
+                            Real-time proof of human attention & engagement ROI
+                        </p>
                     </div>
                     <div class="flex gap-2">
                         <button class="bg-dash-secondary px-4 py-2 rounded-xl text-xs font-bold border border-dash">Last 30 Days</button>
@@ -1380,8 +1384,10 @@
             <div id="campaigns-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                     <div class="bento-card border-none md:!bg-transparent p-0 shadow-none hover:shadow-none group relative before:hidden md:ml-0">
+
                         <div class="flex items-center gap-2">
-                            <h2 class="text-3xl font-bold tracking-tight">Campaigns</h2>
+                            
+                            <h2 class="text-3xl tracking-tight md:text-xl font-normal text-3xl text-dash-secondary">Campaigns</h2>
                             <button onclick="toggleCardInfo(event)" class="text-dash-secondary hover:text-[var(--accent-primary)] transition-colors">
                                 <i data-feather="info" class="w-5 h-5"></i>
                             </button>
@@ -1527,9 +1533,13 @@
             <!-- SPA CONTAINER: Wallet View -->
             <div id="wallet-view" class="spa-view hidden p-6 lg:p-8 max-w-4xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-                    <div>
-                        <h2 class="text-3xl font-bold">Track Your Money</h2>
-                        <p class="text-dash-secondary text-sm">Financial overview of your marketing spend</p>
+                    <div class="space-y-1">
+                        <h2 class="text-lg md:text-xl font-normal text-3xl text-dash-secondary">
+                            Track Your Money <span class="text-[var(--text-primary)] font-semibold"></span>
+                        </h2>
+                        <p class="text-xs md:text-sm text-dash-secondary opacity-80">
+                            A financial overview of your marketing spend
+                        </p>
                     </div>
                     <button onclick="openCampaignWizard()" class="btn-fintech btn-primary shadow-lg">
                         <i data-feather="plus" class="w-4 h-4 mr-2"></i> FUND NEW CAMPAIGN
@@ -1581,7 +1591,7 @@
             <div id="admin-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
                 <div class="flex items-center justify-between mb-8">
                     <div>
-                        <h2 class="text-3xl font-bold">Admin Verification Hub</h2>
+                        <h2 class="text-3xl font-normal">Admin Verification Hub</h2>
                         <p class="text-dash-secondary text-sm">Review receipts and approve campaign deployments</p>
                     </div>
                     <span class="bg-red-500/10 text-red-500 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Confidential</span>
@@ -1600,11 +1610,14 @@
             <div id="referrals-view" class="spa-view hidden p-6 lg:p-8 max-w-6xl mx-auto">
                 <div class="flex flex-col lg:flex-row items-start gap-8">
                     <!-- Hero -->
-                    <div class="flex-1">
-                        <h2 class="text-4xl lg:text-4xl font-normal mb-4">Refer & Earn (Optional)</h2>
-                        <p class="text-dash-secondary mb-6">We sent your referral code to the email you used to sign up. Share it so your friends get priority access when they join.</p>
-
-                     </div>
+                    <div class="space-y-1">
+                        <h2 class="text-lg md:text-xl font-normal text-3xl text-dash-secondary">
+                            Refer & Earn (Optional) <span class="text-[var(--text-primary)] font-semibold"></span>
+                        </h2>
+                        <p class="text-xs md:text-sm text-dash-secondary opacity-80">
+                            We sent your referral code to the email you used to sign up. Share it so your friends get priority access when they join
+                        </p>
+                    </div>
 
                 </div>
 
@@ -1614,46 +1627,20 @@
                 <div class="bento-card p-6 mt-8">
                     <div class="flex flex-col lg:flex-row gap-6">
                         <div class="flex-1">
-                            <h3 class="text-lg font-bold mb-2">Referral Toolkit</h3>
-                                <p class="text-sm text-dash-secondary mb-4">A simple message you can copy or share with friends.</p>
-
-                            <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Copy Invite</label>
-                            <div class="flex items-stretch gap-2">
-                                <textarea id="invite-message" class="flex-1 p-4 rounded-xl bg-dash-secondary text-sm resize-none" rows="4">Hi — I use PIDI. Join here: [FORM_LINK]. Use the referral code from my welcome email so I get credit. Thank you!</textarea>
-                                <div class="flex flex-col gap-2">
-                                    <button id="copy-invite-btn" class="px-4 py-2 bg-[var(--accent-primary)] text-white rounded-xl font-bold text-xs">Copy</button>
-                                    <button id="open-form-btn" class="px-4 py-2 border border-dash rounded-xl text-xs font-bold">Open Form</button>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-3 mt-4 text-sm">
-                                <span class="text-dash-secondary font-semibold">Share on:</span>
-                                <button id="share-wa" class="share-btn px-3 py-2 rounded-xl bg-green-500/10 text-green-500 font-bold text-xs">WhatsApp</button>
-                                <button id="share-x" class="share-btn px-3 py-2 rounded-xl bg-blue-500/10 text-blue-500 font-bold text-xs">X</button>
-                                <button id="share-tg" class="share-btn px-3 py-2 rounded-xl bg-sky-500/10 text-sky-500 font-bold text-xs">Telegram</button>
-                            </div>
+                            <h3 class="text-lg font-bold mb-2">QUICK LINK</h3>
                         </div>
 
                         <div class="w-full lg:w-72">
-                            <h4 class="text-xs font-bold uppercase text-dash-secondary mb-2">Quick Link</h4>
                             <input id="referral-form-link-input" readonly class="w-full p-3 rounded-xl bg-white/10 border border-dash font-mono text-xs" value="" />
-
-                            <div class="mt-4 text-sm text-dash-secondary">
-                                <p>Your referral code is in your welcome email. Ask your friend to put it in the "Referrer" field on the form.</p>
-                            </div>
                         </div>
+                        <h4 class="text-sm font-bold mb-3">How to share (simple)</h4>
+                        <ol class="text-sm text-dash-secondary list-decimal pl-5 space-y-2">
+                            <li>Check your email for your referral code.</li>
+                            <li>Send the Google Form link to your friend.</li>
+                            <li>Tell them to enter your code in the "Referrer" field.</li>
+                            <li>We will add referrals to your dashboard in the next update.</li>
+                        </ol>
                     </div>
-                </div>
-
-                <!-- Rules of Engagement -->
-                <div class="bento-card p-6 mt-6">
-                    <h4 class="text-sm font-bold mb-3">How to share (simple)</h4>
-                    <ol class="text-sm text-dash-secondary list-decimal pl-5 space-y-2">
-                        <li>Check your email for your referral code.</li>
-                        <li>Send the Google Form link to your friend.</li>
-                        <li>Tell them to enter your code in the "Referrer" field.</li>
-                        <li>We will add referrals to your dashboard in the next update.</li>
-                    </ol>
                 </div>
 
                 <style>
