@@ -1774,7 +1774,29 @@
         window.fetchAdminUsers = async function() {
             try {
                 const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, [Query.orderDesc('created_at')]);
-                allUsersData = res.documents || [];
+                let users = res.documents || [];
+                // Batch fetch vaults for these users and merge canonical financial fields
+                try {
+                    if (users.length > 0) {
+                        const ids = users.map(u => u.$id);
+                        const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', ids)]).catch(()=>({ documents: [] }));
+                        const vaults = (vres && vres.documents) || [];
+                        const vaultMap = {};
+                        vaults.forEach(v => { if (v && v.user_id) vaultMap[v.user_id] = v; });
+                        users = users.map(u => {
+                            const v = vaultMap[u.$id] || null;
+                            return Object.assign({}, u, {
+                                balance: (v && typeof v.balance !== 'undefined') ? v.balance : 0,
+                                allocated_funds: (v && typeof v.allocated_funds !== 'undefined') ? v.allocated_funds : 0,
+                                pending_balance: (v && typeof v.pending_balance !== 'undefined') ? v.pending_balance : 0,
+                                completed_tasks: (v && typeof v.completed_tasks !== 'undefined') ? v.completed_tasks : 0,
+                                _vault: v
+                            });
+                        });
+                    }
+                } catch(e) { console.warn('Failed merging vaults for admin users list', e); }
+
+                allUsersData = users;
                 applyAdminUserFilters();
             } catch (err) { console.error('fetchAdminUsers error:', err); }
         }
@@ -1819,12 +1841,12 @@
                             (u.user_role === 'creator' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700')
                         }">${u.user_role || 'performer'}</span>
                     </td>
-                    <td class="p-5 font-bold text-[11px]">₦${(u.balance || 0).toLocaleString()}</td>
-                    <td class="p-5 font-bold text-dash-secondary text-[11px]">₦${(u.allocated_funds || 0).toLocaleString()}</td>
-                    <td class="p-5 font-bold text-amber-600 text-[11px]">₦${(u.pending_balance || 0).toLocaleString()}</td>
+                    <td class="p-5 font-bold text-[11px]">₦${(u.balance).toLocaleString()}</td>
+                    <td class="p-5 font-bold text-dash-secondary text-[11px]">₦${(u.allocated_funds).toLocaleString()}</td>
+                    <td class="p-5 font-bold text-amber-600 text-[11px]">₦${(u.pending_balance).toLocaleString()}</td>
                     <td class="p-5 text-center">
                         <div class="inline-flex flex-col items-center">
-                            <p class="font-black text-[11px]">${u.completed_tasks || 0}</p>
+                            <p class="font-black text-[11px]">${u.completed_tasks}</p>
                             <p class="text-[7px] text-dash-secondary uppercase font-bold">Missions</p>
                         </div>
                     </td>
@@ -1856,14 +1878,21 @@
             `).join('');
         }
 
-        window.editUser = function(userId) {
+    window.editUser = async function(userId) {
             const user = allUsersData.find(u => u.$id === userId);
             if (!user) return;
 
             document.getElementById('edit-user-id').value = user.$id;
             document.getElementById('edit-user-fullname').value = user.full_name || '';
             document.getElementById('edit-user-role').value = user.user_role || 'performer';
-            document.getElementById('edit-user-balance').value = user.balance || 0;
+            // Load balance from vault if available (migration from profile.balance)
+            let displayedBalance = user.balance || 0;
+            try {
+                const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', user.$id), Query.limit(1)]).catch(()=>({ documents: [] }));
+                const v = (vres && vres.documents && vres.documents[0]) || null;
+                if (v && typeof v.balance !== 'undefined') displayedBalance = v.balance;
+            } catch(e) { /* ignore */ }
+            document.getElementById('edit-user-balance').value = displayedBalance || 0;
             
             document.getElementById('edit-user-overlay').classList.remove('hidden');
             feather.replace();
@@ -1878,16 +1907,30 @@
             btn.innerText = "Processing...";
 
             try {
+                // Update profile metadata (no balance write). Balance is stored in VAULTS collection.
                 await databases.updateDocument(
                     APPWRITE_CONFIG.DATABASE_ID,
                     APPWRITE_CONFIG.COLLECTIONS.PROFILES,
                     id,
                     {
                         full_name: document.getElementById('edit-user-fullname').value,
-                        user_role: document.getElementById('edit-user-role').value,
-                        balance: parseFloat(document.getElementById('edit-user-balance').value)
+                        user_role: document.getElementById('edit-user-role').value
                     }
                 );
+
+                // Upsert vault document with new balance value
+                try {
+                    const newBal = parseFloat(document.getElementById('edit-user-balance').value) || 0;
+                    const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', id), Query.limit(1)]).catch(()=>({ documents: [] }));
+                    const existing = (vres && vres.documents && vres.documents[0]) || null;
+                    if (existing) {
+                        await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, existing.$id, Object.assign({}, existing, { balance: newBal }));
+                    } else {
+                        await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, ID.unique(), { user_id: id, balance: newBal, created_at: new Date().toISOString() });
+                    }
+                } catch(e) {
+                    console.warn('Failed to upsert vault balance', e);
+                }
                 showAdminMessageModal('Update Successful', 'The user profile has been synchronized.', 'success');
                 closeEditUserModal();
                 applyAdminUserFilters();
@@ -1913,16 +1956,33 @@
 
         function setupAdminRealtime() {
             const profileChannel = `databases.${APPWRITE_CONFIG.DATABASE_ID}.collections.${APPWRITE_CONFIG.COLLECTIONS.PROFILES}.documents`;
-            client.subscribe(profileChannel, response => {
+            client.subscribe(profileChannel, async response => {
                 const event = response.events[0];
                 const doc = response.payload;
-                if (event.includes('.create')) {
-                    if (!allUsersData.find(u => u.$id === doc.$id)) allUsersData.unshift(doc);
-                } else if (event.includes('.update')) {
-                    const idx = allUsersData.findIndex(u => u.$id === doc.$id);
-                    if (idx !== -1) allUsersData[idx] = doc;
-                } else if (event.includes('.delete')) {
-                    allUsersData = allUsersData.filter(u => u.$id !== doc.$id);
+                // Attempt to merge vault data for the incoming profile document
+                try {
+                    let merged = doc;
+                    const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', doc.$id), Query.limit(1)]).catch(()=>({ documents: [] }));
+                    const v = (vres && vres.documents && vres.documents[0]) || null;
+                    if (v) merged = Object.assign({}, doc, { balance: (typeof v.balance !== 'undefined') ? v.balance : 0, allocated_funds: (typeof v.allocated_funds !== 'undefined') ? v.allocated_funds : 0, pending_balance: (typeof v.pending_balance !== 'undefined') ? v.pending_balance : 0, completed_tasks: (typeof v.completed_tasks !== 'undefined') ? v.completed_tasks : 0, _vault: v });
+                    if (event.includes('.create')) {
+                        if (!allUsersData.find(u => u.$id === merged.$id)) allUsersData.unshift(merged);
+                    } else if (event.includes('.update')) {
+                        const idx = allUsersData.findIndex(u => u.$id === merged.$id);
+                        if (idx !== -1) allUsersData[idx] = merged;
+                    } else if (event.includes('.delete')) {
+                        allUsersData = allUsersData.filter(u => u.$id !== merged.$id);
+                    }
+                } catch(e) {
+                    // fallback to original behavior if vault merge failed
+                    if (event.includes('.create')) {
+                        if (!allUsersData.find(u => u.$id === doc.$id)) allUsersData.unshift(doc);
+                    } else if (event.includes('.update')) {
+                        const idx = allUsersData.findIndex(u => u.$id === doc.$id);
+                        if (idx !== -1) allUsersData[idx] = doc;
+                    } else if (event.includes('.delete')) {
+                        allUsersData = allUsersData.filter(u => u.$id !== doc.$id);
+                    }
                 }
                 applyAdminUserFilters();
                 const userStat = document.getElementById('admin-stat-users');
@@ -2005,9 +2065,25 @@
                 const tasks = tasksRes.documents || [];
 
                 if (profile) {
-                    document.getElementById('performer-stat-earnings').innerText = `₦${((profile.balance || 0)).toLocaleString()}`;
-                    document.getElementById('performer-stat-pending').innerText = profile.pending_balance || 0;
-                    document.getElementById('performer-stat-approved').innerText = profile.completed_tasks || 0;
+                    // profile may already have _vault merged by fetchHubData; prefer those values
+                    const bal = (profile._vault && typeof profile._vault.balance !== 'undefined') ? profile._vault.balance : null;
+                    const pending = (profile._vault && typeof profile._vault.pending_balance !== 'undefined') ? profile._vault.pending_balance : null;
+                    const completed = (profile._vault && typeof profile._vault.completed_tasks !== 'undefined') ? profile._vault.completed_tasks : null;
+                    let finalBal = 0;
+                    if (bal !== null) finalBal = bal;
+                    else {
+                        // compute from transactions
+                        try {
+                            const txResLocal = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', profile.$id), Query.orderDesc('created_at'), Query.limit(500)]).catch(()=>({ documents: [] }));
+                            const allTxLocal = (txResLocal && txResLocal.documents) || [];
+                            const payouts = allTxLocal.filter(t => t.type === 'payout' && t.status === 'completed').reduce((s,t)=>s+(t.amount||0),0);
+                            const withdrawalsCompleted = allTxLocal.filter(t => t.type === 'withdrawal' && t.status === 'completed').reduce((s,t)=>s+(t.amount||0),0);
+                            finalBal = payouts - withdrawalsCompleted;
+                        } catch(e) { finalBal = 0; }
+                    }
+                    document.getElementById('performer-stat-earnings').innerText = `₦${(bal || 0).toLocaleString()}`;
+                    document.getElementById('performer-stat-pending').innerText = pending || 0;
+                    document.getElementById('performer-stat-approved').innerText = completed || 0;
                 }
 
                 const taskList = document.getElementById('performer-available-tasks');
@@ -2061,8 +2137,16 @@
             }
 
             if (profile) {
-                roles.creator.availableBalance = profile.balance || 0;
-                roles.creator.allocatedFunds = profile.allocated_funds || 0;
+                // Prefer vaults if present (vaults is the new canonical financial store)
+                try {
+                    const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', profile.$id), Query.limit(1)]).catch(()=>({ documents: [] }));
+                    const pv = (vres && vres.documents && vres.documents[0]) || null;
+                    roles.creator.availableBalance = (pv && typeof pv.balance !== 'undefined') ? pv.balance : 0;
+                    roles.creator.allocatedFunds = (pv && typeof pv.allocated_funds !== 'undefined') ? pv.allocated_funds : 0;
+                } catch(e) {
+                    roles.creator.availableBalance = 0;
+                    roles.creator.allocatedFunds = 0;
+                }
             }
 
             const urlParams = new URLSearchParams(window.location.search);
@@ -2783,7 +2867,27 @@
                 ]);
                 hubState.campaigns = cRes.documents || [];
                 hubState.engagements = eRes.documents || [];
-                hubState.profiles = pRes.documents || [];
+                let profiles = pRes.documents || [];
+                try {
+                    if (profiles.length > 0) {
+                        const ids = profiles.map(p => p.$id);
+                        const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', ids)]).catch(()=>({ documents: [] }));
+                        const vaults = (vres && vres.documents) || [];
+                        const vaultMap = {};
+                        vaults.forEach(v => { if (v && v.user_id) vaultMap[v.user_id] = v; });
+                        profiles = profiles.map(p => {
+                            const v = vaultMap[p.$id] || null;
+                            return Object.assign({}, p, {
+                                balance: (v && typeof v.balance !== 'undefined') ? v.balance : (p.balance || 0),
+                                allocated_funds: (v && typeof v.allocated_funds !== 'undefined') ? v.allocated_funds : (p.allocated_funds || 0),
+                                pending_balance: (v && typeof v.pending_balance !== 'undefined') ? v.pending_balance : (p.pending_balance || 0),
+                                completed_tasks: (v && typeof v.completed_tasks !== 'undefined') ? v.completed_tasks : (p.completed_tasks || 0),
+                                _vault: v
+                            });
+                        });
+                    }
+                } catch(e) { console.warn('Failed merging vaults into hub profiles', e); }
+                hubState.profiles = profiles;
                 // Re-render current table view with fresh data
                 renderHubTable();
             } catch (err) {
@@ -2872,14 +2976,18 @@
                         created_at: new Date().toISOString()
                     });
 
-                    // 2. Update performer profile (balance and completed count)
+                    // 2. Upsert VAULTS document (canonical balance + completed_tasks)
                     try {
-                        const prof = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, performerId);
-                        const newBal = (prof.balance || 0) + amount;
-                        const newCompleted = (prof.completed_tasks || 0) + 1;
-                        await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, performerId, { balance: newBal, completed_tasks: newCompleted });
+                        const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', performerId), Query.limit(1)]).catch(()=>({ documents: [] }));
+                        const existing = (vres && vres.documents && vres.documents[0]) || null;
+                        if (existing) {
+                            const updated = Object.assign({}, existing, { balance: (existing.balance || 0) + amount, completed_tasks: (existing.completed_tasks || 0) + 1 });
+                            await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, existing.$id, updated);
+                        } else {
+                            await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, ID.unique(), { user_id: performerId, balance: amount, completed_tasks: 1, created_at: new Date().toISOString() });
+                        }
                     } catch (e) {
-                        console.warn('Failed to update performer profile:', e);
+                        console.warn('Failed to upsert vault:', e);
                     }
                 }
 

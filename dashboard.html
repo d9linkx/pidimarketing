@@ -20,25 +20,16 @@
                 script.onerror = function() { /* silently ignore if not present */ };
                 document.head.appendChild(script);
             } catch (e) { console.warn('No local supabase config loaded:', e); }
-            // Runtime Error Overlay: surfaces JS errors to avoid silent white-screen failures
+            // Runtime error handling: log errors but avoid showing an intrusive overlay during load
             window.__showRuntimeError = function(message) {
-                try {
-                    let overlay = document.getElementById('runtime-error-overlay');
-                    if (!overlay) {
-                        overlay = document.createElement('div');
-                        overlay.id = 'runtime-error-overlay';
-                        overlay.style = 'position:fixed;inset:10px;background:rgba(0,0,0,0.85);color:#fff;padding:16px;border-radius:8px;z-index:99999;font-family:monospace;font-size:13px;overflow:auto;max-height:calc(100vh - 20px);';
-                        document.body.appendChild(overlay);
-                    }
-                    overlay.innerText = 'Runtime Error:\n\n' + String(message);
-                } catch (e) { console.error('Failed to show runtime overlay', e); }
+                // No visual overlay to avoid blocking the UI during load; log to console instead
+                try { console.error('Runtime Error:', message); } catch (e) { /* silent */ }
             };
-            // Global handlers: surface uncaught exceptions and unhandled promise rejections to the overlay
+            // Global handlers: log uncaught exceptions and unhandled rejections without creating an overlay
             window.onerror = function(message, source, lineno, colno, error) {
                 try {
                     const details = `${message} at ${source}:${lineno}:${colno}\n${error && error.stack ? error.stack : ''}`;
                     console.error('Global uncaught error:', details);
-                    window.__showRuntimeError(details);
                 } catch (e) { console.error('Error in window.onerror handler', e); }
             };
 
@@ -46,7 +37,6 @@
                 try {
                     const reason = ev && ev.reason ? (ev.reason.stack || ev.reason) : String(ev);
                     console.error('Unhandled rejection:', reason);
-                    window.__showRuntimeError('Unhandled Rejection:\n\n' + reason);
                 } catch (e) { console.error('Error in onunhandledrejection handler', e); }
             };
     </script>
@@ -88,6 +78,74 @@
             --amber-vibrant: #f59e0b;
             --amber-pale: #fffbeb;
         }
+
+    </style>
+    <script>
+    // Populate bank select and wire add-bank button when settings view is shown
+    (function(){
+        function populateBankSelect() {
+            try {
+                const sel = document.getElementById('profile-bank-select');
+                if (!sel) return;
+                // clear existing
+                sel.innerHTML = '<option value="">Choose saved account</option>';
+                const profile = window.userProfile || {};
+                const accounts = profile.bank_accounts || [];
+                accounts.forEach((a, idx) => {
+                    const val = a.account_number || `${a.bank_name}-${idx}`;
+                    const label = `${a.bank_name || 'Bank'} • ${String(a.account_number).slice(-4)} • ${a.account_name || ''}`;
+                    const opt = document.createElement('option');
+                    opt.value = idx; // index in array
+                    opt.text = label;
+                    sel.appendChild(opt);
+                });
+                // select default if present
+                if (profile.selected_bank) {
+                    sel.value = profile.selected_bank;
+                }
+                // toggle remove button
+                const rem = document.getElementById('remove-bank-btn');
+                if (rem) rem.classList.toggle('hidden', (accounts.length === 0));
+            } catch(e) { console.warn('populateBankSelect failed', e); }
+        }
+
+        // Hook save bank button
+        setTimeout(() => {
+            const saveBtn = document.getElementById('save-bank-btn');
+            if (saveBtn) saveBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                // reuse saveProfileSettings to persist new bank
+                try { await saveProfileSettings(); populateBankSelect(); document.getElementById('add-bank-form')?.classList.add('hidden'); } catch(err){ console.warn(err); }
+            });
+
+            const sel = document.getElementById('profile-bank-select');
+            if (sel) sel.addEventListener('change', () => {
+                // show remove button if an account is selected
+                const rem = document.getElementById('remove-bank-btn'); if (rem) rem.classList.toggle('hidden', !sel.value);
+            });
+
+            const rem = document.getElementById('remove-bank-btn');
+            if (rem) rem.addEventListener('click', async () => {
+                try {
+                    const sel = document.getElementById('profile-bank-select');
+                    if (!sel || !sel.value) return;
+                    const idx = parseInt(sel.value, 10);
+                    const profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(()=>null);
+                    if (!profile) return;
+                    const accounts = profile.bank_accounts || [];
+                    if (accounts[idx]) accounts.splice(idx,1);
+                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id, Object.assign({}, profile, { bank_accounts: accounts }));
+                    window.userProfile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(()=>null);
+                    populateBankSelect();
+                } catch(e) { console.warn('remove bank failed', e); }
+            });
+
+            // Populate initially if settings already loaded
+            setTimeout(populateBankSelect, 120);
+        }, 80);
+    })();
+    </script>
+    <style>
 
         body.dark-mode {
             /* Modern Neutral Dark: Deep charcoal for the layout background */
@@ -557,7 +615,7 @@
                 </a>
 
                 <a href="#" onclick="openSettings('profile')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
+                    <i class="fa-solid fa-user-gear w-4 text-center"></i> Settings
                 </a>
                 <a href="#" onclick="openSettings('support')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i class="fa-solid fa-circle-question w-4 text-center"></i> Support Desk
@@ -603,19 +661,33 @@
 
                     <!-- Right: Theme toggle and avatars (desktop + mobile/tablet) -->
                     <div class="flex items-center gap-3 order-3 md:order-2">
-                        <!-- Mobile/Tablet avatar (visible on screens smaller than lg) -->
-                        <div class="relative group lg:hidden">
-                            <img src="" class="w-9 h-9 rounded-xl border-2 border-dash cursor-pointer user-avatar-display" alt="User Avatar" onclick="openSettings('profile')">
-                        </div>
+                                    <!-- Mobile/Tablet avatar (visible on small screens) -->
+                                    <div class="relative group lg:hidden">
+                                        <img src="" class="w-9 h-9 rounded-xl border-2 border-dash cursor-pointer user-avatar-display" alt="User Avatar" onclick="openSettings('profile')">
+                                    </div>
 
-                        <button onclick="toggleTheme()" class="w-9 h-9 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[var(--accent-primary)] transition focus:outline-none theme-toggle" title="Switch Theme (System / Light / Dark)">
-                            <i data-feather="monitor" class="w-4 h-4"></i>
-                        </button>
+                                    <!-- Notification center placed in header between the search and avatar -->
+                                    <div id="global-notification-center" class="relative">
+                                        <button id="global-notification-bell" onclick="(function(){const panel=document.getElementById('global-notification-panel'); if(!panel) return; panel.style.display = panel.style.display === 'block' ? 'none' : 'block'; const count=document.getElementById('global-notification-count'); if(count) count.style.display='none';})()" title="Notifications" class="w-9 h-9 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[var(--accent-primary)] transition focus:outline-none">
+                                            <i data-feather="bell" class="w-4 h-4"></i>
+                                            <span id="global-notification-count" style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:999px;padding:2px 6px;font-size:10px;display:none"></span>
+                                        </button>
 
-                        <!-- Desktop avatar (visible on md and larger) -->
-                        <div class="relative group hidden md:block">
-                            <img src="" class="w-9 h-9 rounded-xl border-2 border-dash cursor-pointer user-avatar-display" alt="User Avatar" onclick="openSettings('profile')">
-                        </div>
+                                        <!-- Inline dropdown panel (hidden by default) -->
+                                        <div id="global-notification-panel" style="display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:320px;max-width:420px;max-height:60vh;overflow:auto;border-radius:12px;background:var(--bg-card);border:1px solid var(--border-dash);box-shadow:0 8px 30px rgba(2,6,23,0.08);padding:8px;z-index:60;">
+                                            <div style="font-weight:400;padding:8px 12px;border-bottom:1px solid var(--border-dash);">Notifications</div>
+                                            <div id="global-notification-list" style="display:flex;flex-direction:column;gap:8px;padding:8px"></div>
+                                        </div>
+                                    </div>
+
+                                    <button onclick="toggleTheme()" class="w-9 h-9 rounded-xl bg-dash-secondary border border-dash flex items-center justify-center hover:border-[var(--accent-primary)] transition focus:outline-none theme-toggle" title="Switch Theme (System / Light / Dark)">
+                                        <i data-feather="monitor" class="w-4 h-4"></i>
+                                    </button>
+
+                                    <!-- Desktop avatar (visible on md and larger) -->
+                                    <div class="relative group hidden md:block">
+                                        <img src="" class="w-9 h-9 rounded-xl border-2 border-dash cursor-pointer user-avatar-display" alt="User Avatar" onclick="openSettings('profile')">
+                                    </div>
                     </div>
                 </header>
 
@@ -704,55 +776,55 @@
 
                 <!-- Row 2: Insight Stats Strip -->
                 <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
-                    <!-- Card 1: Total Reach (Validation) -->
+                    <!-- Card 1: Total Campaigns -->
                     <div class="bento-card p-4 card-azure flex items-center gap-4">
                         <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
                         <div class="card-explanation">
                             <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--azure-vibrant)]">Total Reach</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">The estimated visibility generated across social algorithms by human interactions and secondary shares.</p>
+                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--azure-vibrant)]">All Campaigns</h4>
+                            <p class="text-[11px] text-dash-secondary leading-relaxed">Total number of campaigns you've launched on the platform.</p>
                         </div>
                         <div class="icon-box bg-[var(--azure-pale)] text-[var(--azure-vibrant)] mb-0 w-10 h-10"><i data-feather="eye" class="w-5"></i></div>
-                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Reach</p><h4 id="total-reach-val" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Potential Impressions</p></div>
+                    <div><p class="text-dash-secondary text-[8px] uppercase font-bold">All Campaigns</p><h4 id="total-reach-val" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Campaigns launched</p></div>
                     </div>
 
-                    <!-- Card 2: Submission Accuracy (Quality Control) -->
+                    <!-- Card 2: Total Spent (Finance) -->
                     <div class="bento-card p-4 card-emerald flex items-center gap-4">
                         <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
                         <div class="card-explanation">
                             <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">Accuracy Score</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Our 'Bot-Killer' metric ensuring all interactions are authentic and strictly follow the 10-word rule.</p>
+                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">Total Spent</h4>
+                            <p class="text-[11px] text-dash-secondary leading-relaxed">Total amount spent across all campaigns (displayed in your chosen currency).</p>
                         </div>
                         <div class="icon-box bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] mb-0 w-10 h-10"><i data-feather="shield" class="w-5"></i></div>
-                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Accuracy</p><h4 id="accuracy-score-val" class="text-lg font-bold">0%</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Verified Human Work</p></div>
+                    <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Spent</p><h4 id="accuracy-score-val" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Total spent</p></div>
                     </div>
 
-                    <!-- Card 3: Cost Per Engagement (ROI) -->
+                    <!-- Card 3: Total Engagements -->
                     <div class="bento-card p-4 card-indigo flex items-center gap-4">
                         <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
                         <div class="card-explanation">
                             <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--indigo-vibrant)]">Avg. CPE</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">ROI metric representing the average amount spent per verified human engagement compared to high ad costs.</p>
+                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--indigo-vibrant)]">Engagements</h4>
+                            <p class="text-[11px] text-dash-secondary leading-relaxed">Total verified engagements across all campaigns (likes, comments, shares).</p>
                         </div>
                         <div class="icon-box bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)] mb-0 w-10 h-10"><i data-feather="target" class="w-5"></i></div>
-                         <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Avg. CPE</p><h4 id="avg-cpe-val" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Better than IG Ads</p></div>
+                    <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Engagements</p><h4 id="avg-cpe-val" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Verified interactions</p></div>
                     </div>
 
-                    <!-- Card 4: Active Creators (Social Proof) -->
+                    <!-- Card 4: Average CPE -->
                     <div class="bento-card p-4 card-amber flex items-center gap-4">
                         <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
                         <div class="card-explanation">
                             <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--amber-vibrant)]">Live Workforce</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Real-time count of humans currently completing tasks and browsing campaigns in the PIDI network.</p>
+                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--amber-vibrant)]">Average CPE</h4>
+                            <p class="text-[11px] text-dash-secondary leading-relaxed">Average cost per verified engagement compared to ads on social media and search (e.g., Google).</p>
                         </div>
                         <div class="icon-box bg-[var(--amber-pale)] text-[var(--amber-vibrant)] mb-0 w-10 h-10"><i data-feather="users" class="w-5"></i></div>
                         <div>
-                            <p class="text-dash-secondary text-[8px] uppercase font-bold">Live Workforce</p>
-                             <h4 id="live-workforce-val" class="text-lg font-bold">0</h4>
-                            <p class="text-[7px] text-dash-secondary font-bold uppercase">Creators at work</p>
+                            <p class="text-dash-secondary text-[8px] uppercase font-bold">Average CPE</p>
+                             <h4 id="live-workforce-val" class="text-lg font-bold">₦0</h4>
+                            <p class="text-[7px] text-dash-secondary font-bold uppercase">Compared to ads</p>
                         </div>
                         
                         <!-- Hidden Wallet IDs to maintain JS compatibility -->
@@ -765,6 +837,51 @@
                         </div>
                     </div>
                 </div>
+
+                <script type="module">
+                    import { databases, Query, APPWRITE_CONFIG } from './appwriteClient.js';
+
+                    async function updateCreatorInsightCards(){
+                        try{
+                            if(!window.currentUser || !window.currentUser.id) return;
+                            // Fetch campaigns for current creator
+                            const campsRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, [Query.equal('creator_id', currentUser.id)]);
+                            const camps = (campsRes && campsRes.documents) ? campsRes.documents : [];
+
+                            const totalCampaigns = camps.length;
+                            const totalSpent = camps.reduce((acc, c) => acc + (c.total_cost || 0), 0);
+
+                            // Count approved engagements for these campaigns
+                            let totalEngagements = 0;
+                            if (camps.length > 0) {
+                                const campaignIds = camps.map(c => c.$id);
+                                const engRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', campaignIds), Query.equal('status','approved')]);
+                                totalEngagements = (engRes && engRes.documents) ? engRes.documents.length : 0;
+                            }
+
+                            const avgCPE = totalEngagements > 0 ? Math.round(totalSpent / totalEngagements) : 0;
+
+                            const elTotalCampaigns = document.getElementById('total-reach-val');
+                            const elTotalSpent = document.getElementById('accuracy-score-val');
+                            const elTotalEngagements = document.getElementById('avg-cpe-val');
+                            const elAvgCPE = document.getElementById('live-workforce-val');
+
+                            if(elTotalCampaigns) elTotalCampaigns.innerText = totalCampaigns.toLocaleString();
+                            if(elTotalSpent) elTotalSpent.innerText = `₦${totalSpent.toLocaleString()}`;
+                            if(elTotalEngagements) elTotalEngagements.innerText = totalEngagements.toLocaleString();
+                            if(elAvgCPE) elAvgCPE.innerText = `₦${avgCPE.toLocaleString()}`;
+                        }catch(err){
+                            console.warn('Failed to update insight cards:', err);
+                        }
+                    }
+
+                    // Initial load and periodic refresh
+                    updateCreatorInsightCards();
+                    const __insightInterval = setInterval(updateCreatorInsightCards, 30000);
+
+                    // Clean up if the window unloads
+                    window.addEventListener('beforeunload', () => clearInterval(__insightInterval));
+                </script>
 
 <div class="bento-card col-span-full card-slate flex flex-col min-h-[150px] h-auto relative overflow-hidden group w-full p-6">
     <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
@@ -1152,11 +1269,378 @@
 
             <!-- SPA CONTAINER: Performer Earnings View -->
             <div id="performer-earnings-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
-                <h2 class="text-3xl font-bold tracking-tight mb-4">My Earnings (Performer)</h2>
-                <p class="text-dash-secondary text-sm mb-8">Track your payouts and completed tasks.</p>
-                <div class="bento-card p-6">
-                    <p class="text-dash-secondary">Content for Performer Earnings will go here.</p>
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight">My Earnings (Performer)</h2>
+                        <p class="text-dash-secondary text-sm mt-1">Net balance, pending verifications, and performance analytics.</p>
+                    </div>
+                    <div class="text-sm text-dash-secondary">Last updated: <span id="earnings-last-updated">Never</span></div>
                 </div>
+
+                <!-- Top stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bento-card p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] font-bold text-dash-secondary uppercase">Net Balance (Available)</p>
+                            <h3 id="performer-net-balance" class="text-2xl font-black">₦0</h3>
+                            <p class="text-[11px] text-dash-secondary mt-1">Cash you can withdraw now</p>
+                        </div>
+                        <div class="icon-box bg-blue-500/10 text-blue-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="wallet" class="w-5"></i></div>
+                    </div>
+
+                    <div class="bento-card p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] font-bold text-dash-secondary uppercase">Pending Verification</p>
+                            <h3 id="performer-pending-verification" class="text-2xl font-black">₦0</h3>
+                            <p class="text-[11px] text-dash-secondary mt-1">Locked in escrow (under review)</p>
+                        </div>
+                        <div class="icon-box bg-amber-500/10 text-amber-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="clock" class="w-5"></i></div>
+                    </div>
+
+                    <div class="bento-card p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] font-bold text-dash-secondary uppercase">All-Time Earnings</p>
+                            <h3 id="performer-all-time" class="text-2xl font-black">₦0</h3>
+                            <p class="text-[11px] text-dash-secondary mt-1">Total received since joining</p>
+                        </div>
+                        <div class="icon-box bg-emerald-500/10 text-emerald-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="award" class="w-5"></i></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="bento-card p-4 lg:col-span-2">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-sm">Performance Analytics</h4>
+                            <div class="text-xs text-dash-secondary">Velocity • Success • Earnings Trend</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-4 bg-white border border-dash rounded-2xl text-center">
+                                <p class="text-[10px] text-dash-secondary uppercase font-bold">Velocity Score</p>
+                                <canvas id="velocityGauge" width="120" height="100"></canvas>
+                                <div id="velocity-score" class="text-[14px] font-black mt-2">0</div>
+                                <p class="text-[10px] text-dash-secondary mt-1">Avg completion speed</p>
+                            </div>
+
+                            <div class="p-4 bg-white border border-dash rounded-2xl text-center">
+                                <p class="text-[10px] text-dash-secondary uppercase font-bold">Success Rate</p>
+                                <div id="success-rate" class="text-3xl font-black mt-4">0%</div>
+                                <p class="text-[10px] text-dash-secondary mt-1">Approved vs rejected</p>
+                            </div>
+
+                            <div class="p-4 bg-white border border-dash rounded-2xl md:col-span-3">
+                                <p class="text-[10px] text-dash-secondary uppercase font-bold mb-2">Earnings Trend (Last 7 days)</p>
+                                <div class="h-40"><canvas id="earningsTrendChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bento-card p-4">
+                        <h4 class="font-bold text-sm mb-3">Withdrawal Protocol</h4>
+                        <p class="text-[11px] text-dash-secondary mb-4">Withdraw your Available Balance to your linked bank. USD/NGN conversions handled server-side.</p>
+
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Amount to withdraw</label>
+                                <input id="withdraw-amount" type="number" min="100" placeholder="₦0" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none" />
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Saved Bank</label>
+                                <div id="saved-bank-details" class="p-3 bg-white border border-dash rounded-xl text-sm">No bank details saved</div>
+                            </div>
+
+                            <div>
+                                <button id="withdraw-btn" class="w-full btn-fintech btn-primary py-3 font-black">Request Withdrawal</button>
+                            </div>
+
+                            <div id="withdraw-progress" class="mt-4 hidden">
+                                <p class="text-[10px] text-dash-secondary mb-2">Withdrawal Progress</p>
+                                <div class="w-full bg-dash-secondary rounded-full h-3 overflow-hidden border border-dash">
+                                    <div id="withdraw-progress-bar" style="width:0%" class="h-3 bg-[var(--accent-primary)] transition-all"></div>
+                                </div>
+                                <div id="withdraw-progress-text" class="text-[11px] text-dash-secondary mt-2">Request Received</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction history (recent payouts & withdrawals) -->
+                <div class="bento-card p-4 mt-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold">Recent Transactions</h4>
+                        <div class="text-xs text-dash-secondary">All records are pulled from your transactions ledger</div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-dash-secondary border-b border-dash bg-dash-secondary/30">
+                                    <th class="p-3 font-semibold text-[10px] uppercase">Date</th>
+                                    <th class="p-3 font-semibold text-[10px] uppercase">Type</th>
+                                    <th class="p-3 font-semibold text-[10px] uppercase">Amount</th>
+                                    <th class="p-3 font-semibold text-[10px] uppercase">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="performer-transactions-list" class="divide-y divide-dash">
+                                <tr><td colspan="4" class="py-6 text-center text-dash-secondary">Loading…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <script type="module">
+                    import { databases, Query, APPWRITE_CONFIG } from './appwriteClient.js';
+
+                    let _earningsChart = null;
+                    let _velocityChart = null;
+
+                    async function fetchPerformerEarningsData() {
+                        try {
+                            if (!window.currentUser || !window.currentUser.id) return;
+                            const uid = currentUser.id;
+
+                            // Profile (may contain balance & saved bank details)
+                            let profile = window.userProfile || null;
+                            try { profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, uid).catch(()=>profile); } catch(e) { /* ignore */ }
+
+                            // Transactions for user
+                            const txRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', uid), Query.orderDesc('created_at'), Query.limit(100)]);
+                            const tx = txRes.documents || [];
+
+                            // Pending escrow locks
+                            const escrow = tx.filter(t => t.type === 'escrow_lock' && t.status !== 'completed');
+                            const pendingSum = escrow.reduce((s, t) => s + (t.amount || 0), 0);
+
+                            // All-time earnings: payouts completed
+                            const payouts = tx.filter(t => t.type === 'payout' && t.status === 'completed');
+                            const allTime = payouts.reduce((s, t) => s + (t.amount || 0), 0);
+
+                            // Net available: prefer vault.balance (new canonical store). Fall back to profile.balance if vault missing.
+                            let net = null;
+                            let vault = null;
+                            try {
+                                const vaultRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', uid), Query.limit(1)]).catch(()=>({ documents: [] }));
+                                vault = (vaultRes && vaultRes.documents && vaultRes.documents[0]) || null;
+                            } catch(e) { /* ignore vault lookup errors */ }
+
+                            if (vault && typeof vault.balance !== 'undefined') {
+                                net = vault.balance;
+                            } else {
+                                // No vault present: compute from ledger (all completed payouts minus completed withdrawals)
+                                const withdrawals = tx.filter(t => t.type === 'withdrawal' && t.status === 'completed').reduce((s,t)=>s+(t.amount||0),0);
+                                net = allTime - withdrawals;
+                            }
+
+                            document.getElementById('performer-net-balance').innerText = `₦${Math.round(net||0).toLocaleString()}`;
+                            document.getElementById('performer-pending-verification').innerText = `₦${Math.round(pendingSum||0).toLocaleString()}`;
+                            document.getElementById('performer-all-time').innerText = `₦${Math.round(allTime||0).toLocaleString()}`;
+
+                            // Saved bank: prefer explicit primary bank fields on profile and mask the account number
+                            const bankEl = document.getElementById('saved-bank-details');
+                            try {
+                                if (profile && (profile.bank_name || profile.bank_account_number || profile.bank_account_holder)) {
+                                    const bn = profile.bank_name || 'Bank';
+                                    const holder = profile.bank_account_holder || '';
+                                    const acct = profile.bank_account_number ? String(profile.bank_account_number) : '';
+                                    const masked = acct ? (acct.length > 4 ? '****' + acct.slice(-4) : '****' + acct) : '';
+                                    bankEl.innerText = `${bn} • ${masked}${holder ? ' • ' + holder : ''}`;
+                                } else {
+                                    const bankInfo = (profile && (profile.bank_details || profile.bank)) || null;
+                                    bankEl.innerText = bankInfo ? (typeof bankInfo === 'string' ? bankInfo : JSON.stringify(bankInfo)) : 'No bank details saved';
+                                }
+                            } catch(e) { if (bankEl) bankEl.innerText = 'No bank details saved'; }
+
+                            renderTransactionList(tx.slice(0,50));
+                            renderEarningsTrend(tx);
+                            await computePerformanceMetrics(uid);
+
+                            document.getElementById('earnings-last-updated').innerText = new Date().toLocaleString();
+                        } catch (err) {
+                            console.error('Earnings fetch failed', err);
+                        }
+                    }
+
+                    function renderTransactionList(tx) {
+                        const tbody = document.getElementById('performer-transactions-list');
+                        if (!tbody) return;
+                        if (!tx || tx.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-dash-secondary">No transactions found.</td></tr>';
+                            return;
+                        }
+                        tbody.innerHTML = tx.map(t => `
+                            <tr class="hover:bg-dash-secondary/10 transition-colors">
+                                <td class="p-3">${new Date(t.created_at).toLocaleString()}</td>
+                                <td class="p-3 font-bold">${(t.type || '').replace('_',' ').toUpperCase()}</td>
+                                <td class="p-3 font-bold">₦${(t.amount||0).toLocaleString()}</td>
+                                <td class="p-3"><span class="px-2 py-1 rounded-lg text-[10px] font-black uppercase ${t.status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}">${t.status}</span></td>
+                            </tr>
+                        `).join('');
+                    }
+
+                    async function computePerformanceMetrics(uid) {
+                        try {
+                            // engagements for this performer
+                            const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('performer_id', uid), Query.orderDesc('created_at'), Query.limit(200)]);
+                            const engagements = res.documents || [];
+
+                            // Success rate: approved / (approved + rejected)
+                            const approved = engagements.filter(e => e.status === 'approved').length;
+                            const rejected = engagements.filter(e => e.status === 'rejected').length;
+                            const totalDecisions = approved + rejected;
+                            const successRate = totalDecisions === 0 ? 0 : Math.round((approved / totalDecisions) * 100);
+                            document.getElementById('success-rate').innerText = `${successRate}%`;
+
+                            // Velocity: average approval time in minutes for approved
+                            const approvedEng = engagements.filter(e => e.status === 'approved' && e.reviewed_at && e.created_at);
+                            let avgSeconds = 0;
+                            if (approvedEng.length > 0) {
+                                const totalSec = approvedEng.reduce((acc, e) => acc + (new Date(e.reviewed_at).getTime() - new Date(e.created_at).getTime())/1000, 0);
+                                avgSeconds = totalSec / approvedEng.length;
+                            }
+                            // Map avgSeconds to a 0-100 velocity score (fast approvals -> higher score)
+                            // We'll assume 0s -> 100, 3600s (1hr) -> 50, 86400s (24h) -> 0
+                            const score = Math.max(0, Math.min(100, Math.round((1 - Math.min(avgSeconds,86400)/86400) * 100)));
+                            document.getElementById('velocity-score').innerText = `${score}`;
+                            renderVelocityGauge(score);
+                        } catch (e) { console.warn('Performance metrics failed', e); }
+                    }
+
+                    function renderVelocityGauge(score) {
+                        try {
+                            const ctx = document.getElementById('velocityGauge');
+                            if (!_velocityChart) {
+                                _velocityChart = new Chart(ctx, {
+                                    type: 'doughnut',
+                                    data: {
+                                        labels: ['Score','Remainder'],
+                                        datasets: [{ data: [score, 100-score], backgroundColor: ['#10b981','#e5e7eb'], hoverBackgroundColor: ['#10b981','#e5e7eb'], borderWidth: 0 }]
+                                    },
+                                    options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+                                });
+                            } else {
+                                _velocityChart.data.datasets[0].data = [score, 100-score];
+                                _velocityChart.update();
+                            }
+                        } catch (e) { console.warn('renderVelocityGauge failed', e); }
+                    }
+
+                    function renderEarningsTrend(tx) {
+                        try {
+                            const days = 7;
+                            const labels = [];
+                            const now = new Date();
+                            for (let i = days-1; i >=0; i--) {
+                                const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+                                labels.push(d.toLocaleDateString());
+                            }
+
+                            const sums = labels.map(lbl => 0);
+                            tx.forEach(t => {
+                                if (t.type === 'payout' && t.status === 'completed' && t.created_at) {
+                                    const d = new Date(t.created_at).toLocaleDateString();
+                                    const idx = labels.indexOf(d);
+                                    if (idx >= 0) sums[idx] += (t.amount||0);
+                                }
+                            });
+
+                            const ctx = document.getElementById('earningsTrendChart');
+                            if (_earningsChart) { try { _earningsChart.destroy(); } catch(e){} _earningsChart = null; }
+                            _earningsChart = new Chart(ctx, {
+                                type: 'line',
+                                data: { labels, datasets: [{ label: '₦', data: sums, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.08)', tension: 0.25, fill: true }] },
+                                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => v ? '₦' + v : '₦0' } } } }
+                            });
+                        } catch (e) { console.warn('renderEarningsTrend failed', e); }
+                    }
+
+                    function clampWithdrawalAmount(input) {
+                        const v = Number(input.value || 0);
+                        if (v < 0) input.value = 0;
+                    }
+
+                    async function submitWithdrawal() {
+                        try {
+                            if (!currentUser || !currentUser.id) return alert('User not loaded.');
+                            const amt = Math.round(Number(document.getElementById('withdraw-amount').value || 0));
+                            if (!amt || amt <= 0) return alert('Enter a valid withdrawal amount.');
+
+                            // Fetch profile for bank details and fetch vault for canonical balance
+                            const profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(()=>null);
+                            let vaultForWithdrawal = null;
+                            try { const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', currentUser.id), Query.limit(1)]).catch(()=>({ documents: [] })); vaultForWithdrawal = (vres && vres.documents && vres.documents[0]) || null; } catch(e) { /* ignore */ }
+                            let balance = 0;
+                            if (vaultForWithdrawal && typeof vaultForWithdrawal.balance !== 'undefined') {
+                                balance = vaultForWithdrawal.balance;
+                            } else {
+                                // compute from transactions as a fallback (no profile fallback)
+                                try {
+                                    const txRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', currentUser.id), Query.orderDesc('created_at'), Query.limit(500)]).catch(()=>({ documents: [] }));
+                                    const allTx = (txRes && txRes.documents) || [];
+                                    const payouts = allTx.filter(t => t.type === 'payout' && t.status === 'completed').reduce((s,t)=>s+(t.amount||0),0);
+                                    const withdrawalsCompleted = allTx.filter(t => t.type === 'withdrawal' && t.status === 'completed').reduce((s,t)=>s+(t.amount||0),0);
+                                    balance = payouts - withdrawalsCompleted;
+                                } catch(e) { balance = 0; }
+                            }
+                            if (amt > balance) return alert('Insufficient balance.');
+
+                            // Create a withdrawal transaction (status: pending)
+                            const tx = await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
+                                user_id: currentUser.id,
+                                amount: amt,
+                                type: 'withdrawal',
+                                status: 'pending',
+                                bank_details: profile && (profile.bank_details || profile.bank_name || profile.bank) || null,
+                                description: 'Performer withdrawal request',
+                                created_at: new Date().toISOString()
+                            });
+
+                            // Optimistic: update UI and start progress
+                            document.getElementById('withdraw-progress').classList.remove('hidden');
+                            updateWithdrawProgress(10, 'Request Received');
+
+                            // Reduce displayed balance optimistically
+                            const netEl = document.getElementById('performer-net-balance');
+                            const currentNet = parseInt((netEl.innerText || '0').replace(/[₦,]/g,'')) || 0;
+                            netEl.innerText = `₦${Math.max(0, currentNet-amt).toLocaleString()}`;
+
+                            // Poll the transaction status every 5s until changed from pending
+                            pollWithdrawalStatus(tx.$id);
+                            showToast('Withdrawal request submitted. Processing will continue in the background.', 'success');
+                        } catch (e) { console.error('Withdrawal failed', e); alert('Failed to submit withdrawal: ' + (e.message || e)); }
+                    }
+
+                    async function pollWithdrawalStatus(txId) {
+                        try {
+                            let progress = 10;
+                            const id = setInterval(async () => {
+                                try {
+                                    const res = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, txId).catch(()=>null);
+                                    if (!res) return;
+                                    // Map status to progress
+                                    if (res.status === 'pending') { progress = Math.min(60, progress + 10); updateWithdrawProgress(progress, 'Processing'); }
+                                    else if (res.status === 'completed') { updateWithdrawProgress(100, 'Disbursed'); clearInterval(id); fetchPerformerEarningsData(); }
+                                    else if (res.status === 'failed') { updateWithdrawProgress(100, 'Failed'); clearInterval(id); fetchPerformerEarningsData(); }
+                                } catch (e) { console.warn('pollWithdrawalStatus check failed', e); }
+                            }, 5000);
+                        } catch (e) { console.warn('pollWithdrawalStatus failed', e); }
+                    }
+
+                    function updateWithdrawProgress(percent, text) {
+                        const bar = document.getElementById('withdraw-progress-bar');
+                        const txt = document.getElementById('withdraw-progress-text');
+                        if (bar) bar.style.width = percent + '%';
+                        if (txt) txt.innerText = text;
+                    }
+
+                    // Wire up UI
+                    document.getElementById('withdraw-amount')?.addEventListener('input', e => clampWithdrawalAmount(e.target));
+                    document.getElementById('withdraw-btn')?.addEventListener('click', submitWithdrawal);
+
+                    // Initial load
+                    fetchPerformerEarningsData();
+                    // Poll balances and transactions periodically
+                    setInterval(fetchPerformerEarningsData, 30000);
+                </script>
             </div>
 
 
@@ -1382,15 +1866,24 @@
 
             <!-- SPA CONTAINER: Campaigns View -->
             <div id="campaigns-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+                <div class="flex flex-col justify-between items-start gap-8 md:gap-8 mb-8">
                     <div class="bento-card border-none !bg-none !bg-transparent p-0 shadow-none hover:shadow-none group relative before:hidden md:ml-0">
 
-                        <div class="flex items-center gap-2">
-                            
-                            <h2 class="text-3xl tracking-tight md:text-xl font-normal text-3xl text-dash-secondary">Campaigns</h2>
-                            <button onclick="toggleCardInfo(event)" class="text-dash-secondary hover:text-[var(--accent-primary)] transition-colors">
-                                <i data-feather="info" class="w-5 h-5"></i>
-                            </button>
+                        <div class="flex items-center justify-between gap-2 w-full">
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-3xl tracking-tight md:text-xl font-normal text-3xl text-dash-secondary">Campaigns</h2>
+                                <button onclick="toggleCardInfo(event)" class="text-dash-secondary hover:text-[var(--accent-primary)] transition-colors">
+                                    <i data-feather="info" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+
+                            <!-- CTA visible at md+ (tablet and desktop) -->
+                            <div>
+                                <button id="main-cta-btn" onclick="openCampaignWizard()" class="hidden md:inline-flex btn-fintech btn-primary items-center justify-center py-4 px-6 text-sm whitespace-nowrap">
+                                    <i data-feather="plus" class="w-4 h-4 mr-2"></i>
+                                    <span id="main-cta" class="font-bold uppercase tracking-wider">Create Campaign</span>
+                                </button>
+                            </div>
                         </div>
                         <div class="card-explanation">
                             <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
@@ -1398,18 +1891,81 @@
                             <p class="text-[11px] text-dash-secondary leading-relaxed">Track and manage every engagement mission you've launched. This view allows you to filter active deployments, review verifying receipts, and access detailed performance reports for completed tasks.</p>
                         </div>
                     </div>
-                    <div class="flex flex-wrap md:flex-nowrap items-center gap-3 w-full md:w-auto">
-                        <div class="flex p-1 bg-dash-secondary rounded-xl border border-dash" id="campaign-tabs">
-                            <button onclick="filterCampaignArchive('all')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-all">All</button>
-                            <button onclick="filterCampaignArchive('active')" class="px-4 py-2 rounded-lg text-xs font-bold transition active-btn" id="tab-active">Active</button>
-                            <button onclick="filterCampaignArchive('pending_verification')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-verifying">Verifying</button>
-                            <button onclick="filterCampaignArchive('completed')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-completed">Completed</button>
+                    <div class="flex flex-col md:flex-row md:items-center md:gap-3 w-full space-y-4 md:space-y-0">
+                        <!-- Row 1 (mobile): Tabs -->
+                        <div class="flex flex-wrap items-center gap-3 w-full md:flex-nowrap md:items-center md:justify-start">
+                            <div class="flex p-1 bg-dash-secondary rounded-xl border border-dash" id="campaign-tabs">
+                                <button onclick="filterCampaignArchive('all')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-all">All</button>
+                                <button onclick="filterCampaignArchive('active')" class="px-4 py-2 rounded-lg text-xs font-bold transition active-btn" id="tab-active">Active</button>
+                                <button onclick="filterCampaignArchive('pending_verification')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-verifying">Verifying</button>
+                                <button onclick="filterCampaignArchive('completed')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-completed">Completed</button>
+                            </div>
+                            <!-- (CTA moved to header for md+ to align with desktop) -->
                         </div>
-                        <button id="main-cta-btn" onclick="openCampaignWizard()" 
-                            class="btn-fintech btn-primary flex items-center justify-center w-full md:w-auto py-4 px-6 md:px-8 text-sm whitespace-nowrap">
-                            <i data-feather="plus" class="w-4 h-4 mr-2"></i> 
-                            <span id="main-cta" class="font-bold uppercase tracking-wider">Create Campaign</span>
-                        </button>
+
+                        <!-- Row 2 (mobile): Date inputs -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2 text-xs text-dash-secondary">
+                                <label class="font-bold">From</label>
+                                <input id="campaign-date-start" type="date" class="rounded-lg border border-dash p-2 text-xs bg-white" />
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-dash-secondary">
+                                <label class="font-bold">To</label>
+                                <input id="campaign-date-end" type="date" class="rounded-lg border border-dash p-2 text-xs bg-white" />
+                            </div>
+                        </div>
+
+                        <!-- Row 3 (mobile): Mobile CTA (desktop CTA hidden here) -->
+                        <div class="flex items-center gap-3 w-full">
+                            <!-- Mobile CTA (visible on mobile, hidden on md+) -->
+                            <div class="ml-auto md:hidden">
+                                <button id="main-cta-btn-mobile" onclick="openCampaignWizard()" class="btn-fintech btn-primary flex items-center justify-center py-3 px-4 text-sm">
+                                    <i data-feather="plus" class="w-4 h-4 mr-2"></i>
+                                    <span class="font-bold uppercase tracking-wider">Create Campaign</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <script>
+                            // Ensure date inputs cannot exceed today and clamp invalid ranges
+                            (function(){
+                                const startEl = document.getElementById('campaign-date-start');
+                                const endEl = document.getElementById('campaign-date-end');
+                                const today = new Date();
+                                const todayStr = today.toISOString().slice(0,10); // YYYY-MM-DD
+                                const daysAgo30 = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
+                                const date30Str = daysAgo30.toISOString().slice(0,10);
+
+                                if (startEl) startEl.max = todayStr;
+                                if (endEl) endEl.max = todayStr;
+
+                                function clampDates() {
+                                    if (!startEl || !endEl) return;
+                                    // Clamp end to today
+                                    if (endEl.value && endEl.value > todayStr) endEl.value = todayStr;
+                                    // If both provided, ensure start is not after end
+                                    if (startEl.value && endEl.value) {
+                                        if (startEl.value > endEl.value) startEl.value = endEl.value;
+                                    }
+                                }
+
+                                // Prefill with last 30 days only if both inputs are empty
+                                if (startEl && endEl && !startEl.value && !endEl.value) {
+                                    startEl.value = date30Str;
+                                    endEl.value = todayStr;
+                                }
+
+                                startEl?.addEventListener('change', () => { clampDates(); archivePage = 0; renderArchiveTable(); });
+                                endEl?.addEventListener('change', () => { clampDates(); archivePage = 0; renderArchiveTable(); });
+
+                                // Initial clamp and render
+                                clampDates();
+                                archivePage = 0;
+                                renderArchiveTable();
+                            })();
+
+                            // platform filter removed
+                        </script>
                     </div>
                 </div>
                 
@@ -1615,20 +2171,61 @@
                     
                     <!-- Role Toggle Switch -->
                     <div class="p-1.5 bg-dash-secondary/50 border border-dash rounded-2xl flex items-center gap-1">
-                        <button id="toggle-creator-view" onclick="switchHowItWorksView('creator')" class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all btn-primary shadow-lg shadow-[var(--accent-primary)]/20">For Creators</button>
+                        <button id="toggle-creator-view" onclick="switchHowItWorksView('creator')" class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all btn-primary shadow-lg">For Creators</button>
                         <button id="toggle-performer-view" onclick="switchHowItWorksView('performer')" class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-dash-secondary hover:text-[var(--text-primary)]">For Performers</button>
                     </div>
+
+                    <script>
+                        (function(){
+                            // Expose a global function used by the toggle buttons
+                            window.switchHowItWorksView = function(role){
+                                const creatorBtn = document.getElementById('toggle-creator-view');
+                                const performerBtn = document.getElementById('toggle-performer-view');
+                                const creatorContent = document.getElementById('creator-how-it-works-content');
+                                const performerContent = document.getElementById('performer-how-it-works-content');
+                                if(!creatorBtn || !performerBtn || !creatorContent || !performerContent) return;
+
+                                const activate = (btn)=>{
+                                    btn.classList.add('btn-primary','shadow-lg');
+                                    btn.classList.remove('text-dash-secondary');
+                                };
+                                const deactivate = (btn)=>{
+                                    btn.classList.remove('btn-primary','shadow-lg');
+                                    if(!btn.classList.contains('text-dash-secondary')) btn.classList.add('text-dash-secondary');
+                                };
+
+                                if(role === 'performer'){
+                                    deactivate(creatorBtn);
+                                    activate(performerBtn);
+                                    creatorContent.classList.add('hidden');
+                                    performerContent.classList.remove('hidden');
+                                } else {
+                                    deactivate(performerBtn);
+                                    activate(creatorBtn);
+                                    creatorContent.classList.remove('hidden');
+                                    performerContent.classList.add('hidden');
+                                }
+                            };
+
+                            // Initialize toggle to match the DOM: if performer content is visible, select performer, else creator
+                            try{
+                                const perfContent = document.getElementById('performer-how-it-works-content');
+                                const initial = (perfContent && !perfContent.classList.contains('hidden')) ? 'performer' : 'creator';
+                                window.switchHowItWorksView(initial);
+                            }catch(e){ /* silent */ }
+                        })();
+                    </script>
                 </div>
 
                 <!-- Workflow Content Areas -->
-                <div class="relative min-h-[500px] overflow-hidden">
+                <div class="relative min-h-[500px]">
                     <!-- CREATOR WORKFLOW -->
                     <div id="creator-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300">
                         <div class="space-y-6">
                             <div class="bento-card p-8 border-l-4 border-l-[var(--accent-primary)] group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] flex items-center justify-center"><i data-feather="target" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">01. Mission Briefing</h4>
+                                    <h4 class="font-bold text-lg">01. Detail the task</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Select your platform (Instagram, Google, etc.). Define your engagement goals and the specific instructions our performers must follow to ensure brand alignment.</p>
                             </div>
@@ -1636,7 +2233,7 @@
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="search" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">02. Organic Discovery</h4>
+                                    <h4 class="font-bold text-lg">02. Performers find you organically</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">We don't use links. You provide a <b>Search Seed</b> and a <b>Visual Fingerprint</b>. This forces performers to find your content organically, signaling high quality to algorithms.</p>
                             </div>
@@ -1646,15 +2243,15 @@
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="lock" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">03. Escrow Security</h4>
+                                    <h4 class="font-bold text-lg">03. Make the payment (refundable)</h4>
                                 </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Funds are locked in Escrow upon campaign launch. You only pay for verified, high-quality human work that meets the "Rule of 10 Words" and our quality standards.</p>
+                                <p class="text-sm text-dash-secondary leading-relaxed">Funds are paid upon creating in a campaign. You're paying for verified, high-quality human engagements that meets the organic search criteria set by the algorithms of these platforms.</p>
                             </div>
 
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center"><i data-feather="bar-chart" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">04. Growth Audit</h4>
+                                    <h4 class="font-bold text-lg">04. Audit the performance</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Track interactions in real-time. Access detailed analytics showing the retention impact and algorithm breakthrough achieved by your campaign missions.</p>
                             </div>
@@ -1662,12 +2259,12 @@
                     </div>
 
                     <!-- PERFORMER WORKFLOW -->
-                    <div id="performer-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300 hidden opacity-0">
+                    <div id="performer-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300 hidden">
                         <div class="space-y-6">
                             <div class="bento-card p-8 border-l-4 border-l-blue-500 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="check-square" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">01. Acceptance</h4>
+                                    <h4 class="font-bold text-lg">01. Accept task</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Browse the board and claim a mission. Once accepted, you have <b>30 minutes</b> to complete the task and submit proof before the spot is released.</p>
                             </div>
@@ -1675,7 +2272,7 @@
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="eye" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">02. Dwell Phase</h4>
+                                    <h4 class="font-bold text-lg">02. Dwell on it</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Find the post organically using the Search Seed. You must stay on the content for at least <b>60 seconds</b> before engaging to prove genuine human attention.</p>
                             </div>
@@ -1685,7 +2282,7 @@
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="message-circle" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">03. The 10-Word Rule</h4>
+                                    <h4 class="font-bold text-lg">03. Use the '10-Word' rule</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Every comment must be at least 10 words long and contextually relevant. No "Cool!" or "Nice!". We only reward high-value human interactions.</p>
                             </div>
@@ -1693,15 +2290,13 @@
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] flex items-center justify-center"><i data-feather="zap" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">04. Verification</h4>
+                                    <h4 class="font-bold text-lg">04. Confirm you've done it</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Upload a screenshot and paste your text. Our admins verify submissions within 24 hours. Rewards are credited to your balance upon approval.</p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                
 
                 <!-- Global Footer CTA -->
                 <div class="mt-16 text-center border-t border-dash pt-12">
@@ -1711,7 +2306,7 @@
 
                 <!-- FAQ Section -->
                 <div class="mt-20">
-                    <h3 class="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h3>
+                    <h3 class="text-2xl font-bold mb-8 text-center">Frequently Asked Questions (FAQs)</h3>
                     <div class="faq-container space-y-4">
                         <details class="faq-item bento-card p-6">
                             <summary class="flex justify-between items-center font-bold text-base cursor-pointer">
@@ -1994,6 +2589,7 @@
                             <button onclick="switchSettingsView('profile')" class="settings-nav-btn active flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition whitespace-nowrap w-full text-left" data-view="profile"><i class="fa-solid fa-user-gear w-5"></i> Profile</button>
                             <button onclick="switchSettingsView('security')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="security"><i class="fa-solid fa-shield-halved w-5"></i> Login & Security</button>
                             <button onclick="switchSettingsView('notifications')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="notifications"><i class="fa-solid fa-bell w-5"></i> Notifications</button>
+                            <button onclick="switchSettingsView('bank')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="bank"><i class="fa-solid fa-university w-5"></i> Bank</button>
                             <button onclick="switchSettingsView('support')" class="settings-nav-btn flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-dash-secondary transition whitespace-nowrap w-full text-left" data-view="support"><i class="fa-solid fa-circle-question w-5"></i> Support Desk</button>
                         </nav>
                     </aside>
@@ -2329,7 +2925,7 @@
     </div>
 
     <script type="module">
-        import { client, account, databases, storage, ID, Query, APPWRITE_CONFIG } from './appwriteClient.js';
+        import { client, account, databases, storage, functions, ID, Query, APPWRITE_CONFIG } from './appwriteClient.js';
 
         // Ensure there's a dedicated viewport for SPA views to prevent stacking
     document.addEventListener('DOMContentLoaded', () => {
@@ -2661,12 +3257,24 @@
                     tasks = tasks.filter(t => !engagedIds.includes(t.$id));
                 }
 
-                // Fetch current performer's profile for stats
-                const profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id);
-                if (profile) {
-                    document.getElementById('performer-stat-earnings').innerText = `₦${(profile.balance || 0).toLocaleString()}`;
-                    document.getElementById('performer-stat-pending').innerText = profile.pending_balance || 0; 
-                    document.getElementById('performer-stat-approved').innerText = profile.completed_tasks || 0;
+                // Fetch current performer's profile and vault for stats
+                const profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(()=>null);
+                let vault = null;
+                try { const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', currentUser.id), Query.limit(1)]).catch(()=>({ documents: [] })); vault = (vres && vres.documents && vres.documents[0]) || null; } catch(e) { /* ignore */ }
+                if (vault) {
+                    document.getElementById('performer-stat-earnings').innerText = `₦${(vault.balance || 0).toLocaleString()}`;
+                    document.getElementById('performer-stat-pending').innerText = vault.pending_balance || 0;
+                    document.getElementById('performer-stat-approved').innerText = vault.completed_tasks || 0;
+                } else if (profile) {
+                    // If no vault exists yet, compute earnings from transactions as the canonical fallback
+                    const txResLocal = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', currentUser.id), Query.orderDesc('created_at'), Query.limit(500)]).catch(()=>({ documents: [] }));
+                    const allTxLocal = (txResLocal && txResLocal.documents) || [];
+                    const payouts = allTxLocal.filter(t => t.type === 'payout' && t.status === 'completed').reduce((s,t)=>s+(t.amount||0),0);
+                    const withdrawalsCompleted = allTxLocal.filter(t => t.type === 'withdrawal' && t.status === 'completed').reduce((s,t)=>s+(t.amount||0),0);
+                    const computedBal = payouts - withdrawalsCompleted;
+                    document.getElementById('performer-stat-earnings').innerText = `₦${(computedBal || 0).toLocaleString()}`;
+                    document.getElementById('performer-stat-pending').innerText = 0;
+                    document.getElementById('performer-stat-approved').innerText = 0;
                 }
 
                 if (!tasks || tasks.length === 0) {
@@ -2813,8 +3421,16 @@
             }
 
             if (profile) {
-                roles.creator.availableBalance = profile.balance || 0;
-                roles.creator.allocatedFunds = profile.allocated_funds || 0;
+                // Try to fetch vault record for canonical balances
+                try {
+                    const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', profile.$id), Query.limit(1)]).catch(()=>({ documents: [] }));
+                    const pv = (vres && vres.documents && vres.documents[0]) || null;
+                    roles.creator.availableBalance = (pv && typeof pv.balance !== 'undefined') ? pv.balance : 0;
+                    roles.creator.allocatedFunds = (pv && typeof pv.allocated_funds !== 'undefined') ? pv.allocated_funds : 0;
+                } catch(e) {
+                    roles.creator.availableBalance = 0;
+                    roles.creator.allocatedFunds = 0;
+                }
                 // Expose profile for other parts of the UI
                 window.userProfile = profile;
             }
@@ -3002,11 +3618,38 @@
 
         function getFilteredCampaigns() {
             const searchTerm = document.getElementById('campaign-search')?.value.toLowerCase() || '';
+            const startDateVal = document.getElementById('campaign-date-start')?.value || '';
+            let endDateVal = document.getElementById('campaign-date-end')?.value || '';
+
+            // If end date is empty, default to today (prevent future dates)
+            const todayStr = new Date().toISOString().slice(0,10);
+            if (!endDateVal) endDateVal = todayStr;
+
+            // Platforms filter removed — show all platforms
+
             return (roles.creator.items || []).filter(c => {
                 const matchesFilter = archiveFilter === 'all' || c.status === archiveFilter;
-                const matchesSearch = c.target_url.toLowerCase().includes(searchTerm) || 
-                                     c.platform.toLowerCase().includes(searchTerm);
-                return matchesFilter && matchesSearch;
+                const matchesSearch = c.target_url.toLowerCase().includes(searchTerm) || c.platform.toLowerCase().includes(searchTerm);
+
+                // Date range filtering (created_at expected as ISO string)
+                let matchesDate = true;
+                try {
+                    // Parse as local dates with clear start/end boundaries
+                    const createdTs = new Date(c.created_at).getTime();
+
+                    if (startDateVal) {
+                        const startTs = new Date(startDateVal + 'T00:00:00').getTime();
+                        if (createdTs < startTs) matchesDate = false;
+                    }
+
+                    if (endDateVal && matchesDate) {
+                        // endDateVal is defaulted to today when empty; clamp to end of day
+                        const endTs = new Date(endDateVal + 'T23:59:59.999').getTime();
+                        if (createdTs > endTs) matchesDate = false;
+                    }
+                } catch (e) { /* ignore parsing issues and fall back to true */ }
+
+                return matchesFilter && matchesSearch && matchesDate;
             });
         }
 
@@ -3626,12 +4269,9 @@
                 const campaign = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, engagement.campaign_id);
                 await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, engagement.campaign_id, { current_count: (campaign.current_count || 0) + 1 });
 
-                // Reward performer: update profiles balance and completed_tasks
+                // Reward performer: create transaction and update VAULTS (vault is canonical)
                 const rewardAmount = engagement.reward || 70; // fallback reward
-                const performer = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, engagement.performer_id);
-                await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, engagement.performer_id, { balance: (performer.balance || 0) + rewardAmount, completed_tasks: (performer.completed_tasks || 0) + 1 });
-
-                // Record transaction
+                // 1. Record transaction (ledger)
                 await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
                     user_id: engagement.performer_id,
                     campaign_id: engagement.campaign_id,
@@ -3641,6 +4281,18 @@
                     description: 'Payout for approved engagement',
                     created_at: new Date().toISOString()
                 });
+
+                // 2. Upsert / increment VAULTS doc for performer
+                try {
+                    const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', engagement.performer_id), Query.limit(1)]).catch(()=>({ documents: [] }));
+                    const existing = (vres && vres.documents && vres.documents[0]) || null;
+                    if (existing) {
+                        const updated = Object.assign({}, existing, { balance: (existing.balance || 0) + rewardAmount, completed_tasks: (existing.completed_tasks || 0) + 1 });
+                        await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, existing.$id, updated);
+                    } else {
+                        await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, ID.unique(), { user_id: engagement.performer_id, balance: rewardAmount, completed_tasks: 1, created_at: new Date().toISOString() });
+                    }
+                } catch (e) { console.warn('Failed to upsert vault on approval', e); }
 
                 // Mark any escrow_lock transaction for this engagement as completed
                 try {
@@ -4537,7 +5189,7 @@
             switch(view) {
                 case 'profile':
                         content = `
-                            <h2 class="text-3xl font-bold mb-2">Profile Settings</h2>
+                            <h2 class="text-3xl font-bold mb-2">Settings</h2>
                             <p class="text-dash-secondary mb-8">Manage your personal identity and contact details.</p>
                             <div class="space-y-6 max-w-xl">
                                 <div class="flex items-center gap-6 mb-6">
@@ -4571,6 +5223,20 @@
 
                                 <div class="pt-2">
                                     <button onclick="saveProfileSettings()" class="btn-fintech btn-primary px-8 py-3 shadow-lg shadow-blue-500/20">SAVE CHANGES</button>
+                                </div>
+                                
+                                <!-- Inline add bank form (hidden by default) -->
+                                <div id="add-bank-form" class="mt-6 hidden">
+                                    <h4 class="font-bold mb-2">Add Bank Account</h4>
+                                    <div class="grid grid-cols-1 gap-3">
+                                        <input type="text" id="bank-name" placeholder="Bank Name (e.g., Zenith)" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm">
+                                        <input type="text" id="bank-account-number" placeholder="Account Number" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm">
+                                        <input type="text" id="bank-account-name" placeholder="Account Holder Name" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm">
+                                        <div class="flex gap-2">
+                                            <button id="save-bank-btn" class="btn-fintech btn-primary px-4 py-2 text-sm">Save Account</button>
+                                            <button onclick="document.getElementById('add-bank-form').classList.add('hidden')" class="px-4 py-2 text-sm border border-dash rounded-xl">Cancel</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -4608,9 +5274,33 @@
                         </div>
                     `;
                     break;
+                case 'bank':
+                    content = `
+                        <h2 class="text-3xl font-bold mb-2">Bank Details</h2>
+                        <p class="text-dash-secondary mb-8">Manage the bank account we will use for your withdrawals. These fields are stored in the profile document as <code>bank_name</code>, <code>bank_account_holder</code> and <code>bank_account_number</code>.</p>
+                        <div class="space-y-6 max-w-xl">
+                            <div>
+                                <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Bank Name</label>
+                                <input type="text" id="profile-bank-name-input" placeholder="Bank Name (e.g., Zenith)" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Account Holder Name</label>
+                                <input type="text" id="profile-bank-account-holder-input" placeholder="Account Holder Full Name" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Account Number</label>
+                                <input type="text" id="profile-bank-account-number-input" placeholder="Account Number" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm">
+                            </div>
+
+                            <div class="pt-2">
+                                <button onclick="saveProfileSettings()" class="btn-fintech btn-primary px-8 py-3 shadow-lg shadow-blue-500/20">SAVE BANK</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
                 case 'notifications':
                     content = `
-                        <h2 class="text-3xl font-bold mb-2">Notifications</h2>
+                        <h2 class="text-3xl font-normal mb-2">Notifications</h2>
                         <p class="text-dash-secondary mb-8">Choose how you want to be alerted about task updates.</p>
                         <div class="space-y-6 max-w-xl">
                             <div class="flex items-center justify-between p-4 bg-dash-secondary/30 rounded-2xl border border-dash"><div><p class="font-bold">Email Alerts</p><p class="text-xs text-dash-secondary">Summary of campaigns and performance</p></div><label class="switch"><input type="checkbox" checked onchange="togglePref('email')"><span class="slider"></span></label></div>
@@ -4639,8 +5329,75 @@
             area.innerHTML = content;
             feather.replace();
 
-            // Populate any dynamic profile fields from fetched profile data
+            // Local helper to populate the bank select for the settings view (DOM is now present)
+            (function populateBankSelectLocal(){
+                try {
+                    const sel = document.getElementById('profile-bank-select');
+                    if (!sel) return;
+                    sel.innerHTML = '<option value="">Choose saved account</option>';
+                    const profile = window.userProfile || {};
+                    const accounts = profile.bank_accounts || [];
+                    accounts.forEach((a, idx) => {
+                        const label = `${a.bank_name || 'Bank'} • ${String(a.account_number || '').slice(-4)} • ${a.account_name || ''}`;
+                        const opt = document.createElement('option');
+                        opt.value = idx;
+                        opt.text = label;
+                        sel.appendChild(opt);
+                    });
+                    if (profile.selected_bank) sel.value = profile.selected_bank;
+                    const rem = document.getElementById('remove-bank-btn');
+                    if (rem) rem.classList.toggle('hidden', (accounts.length === 0));
+                } catch(e) { console.warn('populateBankSelectLocal failed', e); }
+            })();
+
+            // Wire Save Account button inside the inline add-bank-form
             try {
+                const saveBtnNew = document.getElementById('save-bank-btn');
+                if (saveBtnNew) {
+                    saveBtnNew.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        try {
+                            await saveProfileSettings();
+                            // refresh local profile and select
+                            window.userProfile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(()=>window.userProfile || null);
+                            const sel = document.getElementById('profile-bank-select');
+                            if (sel) {
+                                sel.innerHTML = '<option value="">Choose saved account</option>';
+                                const accounts = (window.userProfile && window.userProfile.bank_accounts) || [];
+                                accounts.forEach((a, idx) => { const opt = document.createElement('option'); opt.value = idx; opt.text = `${a.bank_name || 'Bank'} • ${String(a.account_number || '').slice(-4)} • ${a.account_name || ''}`; sel.appendChild(opt); });
+                            }
+                            document.getElementById('add-bank-form')?.classList.add('hidden');
+                        } catch(err) { console.warn('save bank failed', err); }
+                    });
+                }
+
+                const remBtnNew = document.getElementById('remove-bank-btn');
+                if (remBtnNew) {
+                    remBtnNew.addEventListener('click', async () => {
+                        try {
+                            const sel = document.getElementById('profile-bank-select');
+                            if (!sel || !sel.value) return;
+                            const idx = parseInt(sel.value, 10);
+                            const profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(()=>null);
+                            if (!profile) return;
+                            const accounts = profile.bank_accounts || [];
+                            if (accounts[idx]) accounts.splice(idx,1);
+                            await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id, Object.assign({}, profile, { bank_accounts: accounts }));
+                            window.userProfile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(()=>null);
+                            // repopulate select
+                            const sel2 = document.getElementById('profile-bank-select');
+                            if (sel2) {
+                                sel2.innerHTML = '<option value="">Choose saved account</option>';
+                                const accs = (window.userProfile && window.userProfile.bank_accounts) || [];
+                                accs.forEach((a, idx2) => { const opt = document.createElement('option'); opt.value = idx2; opt.text = `${a.bank_name || 'Bank'} • ${String(a.account_number || '').slice(-4)} • ${a.account_name || ''}`; sel2.appendChild(opt); });
+                                const rem = document.getElementById('remove-bank-btn'); if (rem) rem.classList.toggle('hidden', (accs.length === 0));
+                            }
+                        } catch(e) { console.warn('remove bank failed', e); }
+                    });
+                }
+            } catch (e) { console.warn('Failed to wire bank buttons', e); }
+            // Populate any dynamic profile fields from fetched profile data
+                try {
                 if (window.userProfile) {
                     const wa = document.getElementById('set-whatsapp');
                     const em = document.getElementById('set-email');
@@ -4648,6 +5405,16 @@
                     if (wa && window.userProfile.whatsapp_number) wa.value = window.userProfile.whatsapp_number;
                     if (em && window.userProfile.email) em.value = window.userProfile.email;
                     if (preview && window.userProfile.avatar) preview.src = window.userProfile.avatar;
+
+                    // Populate primary bank fields (explicit per-user fields)
+                    try {
+                        const bn = document.getElementById('profile-bank-name-input');
+                        const bh = document.getElementById('profile-bank-account-holder-input');
+                        const bnum = document.getElementById('profile-bank-account-number-input');
+                        if (bn && window.userProfile.bank_name) bn.value = window.userProfile.bank_name;
+                        if (bh && window.userProfile.bank_account_holder) bh.value = window.userProfile.bank_account_holder;
+                        if (bnum && window.userProfile.bank_account_number) bnum.value = window.userProfile.bank_account_number;
+                    } catch (e) { console.warn('Failed to populate primary bank inputs', e); }
                 } else {
                     // Fallback: set email from currentUser if available
                     const em = document.getElementById('set-email');
@@ -4793,6 +5560,8 @@
             if (btn) { btn.disabled = true; btn.innerText = 'Saving...'; }
 
             try {
+                // SECURITY: never allow client to write balance field from settings UI
+                try { delete profilePayload.balance; } catch(e) {}
                 // If there's a new avatar file, upload it to proofs bucket and store URL
                 if (avatarInput && avatarInput.files && avatarInput.files[0]) {
                     const file = avatarInput.files[0];
@@ -4809,6 +5578,35 @@
                 try {
                     // Attempt to get existing profile; if exists update, else create
                     const existing = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(() => null);
+
+                    // Merge bank accounts if present in the UI AND persist explicit bank fields if present
+                    try {
+                        // Preserve existing bank_accounts array behavior
+                        const bankAccounts = existing && existing.bank_accounts ? existing.bank_accounts.slice() : [];
+                        const bnInline = document.getElementById('bank-name')?.value?.trim();
+                        const bnumInline = document.getElementById('bank-account-number')?.value?.trim();
+                        const bholderInline = document.getElementById('bank-account-name')?.value?.trim();
+                        if (bnInline && bnumInline) {
+                            // Only store masked account in the bank_accounts array for UX
+                            const masked = '****' + String(bnumInline).slice(-4);
+                            bankAccounts.unshift({ bank_name: bnInline, account_number: masked, account_name: bholderInline || currentUser.fullName, created_at: new Date().toISOString() });
+                            try { document.getElementById('bank-name').value = ''; document.getElementById('bank-account-number').value = ''; document.getElementById('bank-account-name').value = ''; } catch(e){}
+                        }
+                        const bankSelect = document.getElementById('profile-bank-select');
+                        if (bankSelect && bankSelect.value) profilePayload.selected_bank = bankSelect.value;
+                        if (bankAccounts.length) profilePayload.bank_accounts = bankAccounts;
+
+                        // Persist exact bank fields if the Bank view inputs exist (store as written)
+                        try {
+                            const bnInput = document.getElementById('profile-bank-name-input')?.value?.trim();
+                            const bhInput = document.getElementById('profile-bank-account-holder-input')?.value?.trim();
+                            const bnumInput = document.getElementById('profile-bank-account-number-input')?.value?.trim();
+                            if (typeof bnInput !== 'undefined') profilePayload.bank_name = bnInput || '';
+                            if (typeof bhInput !== 'undefined') profilePayload.bank_account_holder = bhInput || '';
+                            if (typeof bnumInput !== 'undefined') profilePayload.bank_account_number = bnumInput || '';
+                        } catch (e) { console.warn('Failed to capture explicit bank inputs', e); }
+                    } catch(e) { console.warn('Bank capture failed', e); }
+
                     if (existing && existing.$id) {
                         await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id, Object.assign({}, existing, profilePayload));
                     } else {
@@ -4852,7 +5650,196 @@
         }
 
         function togglePref(key) {
+            try {
+                const prefs = getNotificationPrefs();
+                prefs[key] = !prefs[key];
+                saveNotificationPrefs(prefs);
+                updateNotificationTogglesUI();
+
+                // If user enabled push notifications, request permission proactively
+                if (key === 'push' && prefs.push) {
+                    requestNotificationPermission();
+                }
+            } catch (e) { console.warn('togglePref failed', e); }
         }
+
+        // --- Notification helpers ---
+        function getNotificationPrefs() {
+            try {
+                const raw = localStorage.getItem('notificationPrefs');
+                if (raw) return JSON.parse(raw);
+            } catch (e) { /* ignore */ }
+            return { email: true, push: true, sound: true, inApp: true };
+        }
+
+        function saveNotificationPrefs(p) {
+            try { localStorage.setItem('notificationPrefs', JSON.stringify(p)); } catch (e) { /* ignore */ }
+        }
+
+        function updateNotificationTogglesUI() {
+            const prefs = getNotificationPrefs();
+            // Find notification inputs that call togglePref and set their checked state
+            document.querySelectorAll('#settings-content-area input[type="checkbox"]').forEach(inp => {
+                const onchange = inp.getAttribute('onchange') || '';
+                if (/togglePref\(['"`]?(email|push|sound|inApp)['"`]?\)/i.test(onchange)) {
+                    const key = onchange.match(/togglePref\(['"`]?(email|push|sound|inApp)['"`]?\)/i)[1];
+                    inp.checked = !!prefs[key];
+                }
+            });
+        }
+
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) return;
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted') {
+                        console.info('Browser notifications granted');
+                    }
+                }).catch(e => console.warn('Notification permission request failed', e));
+            }
+        }
+
+        function playNotificationTone() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'sine';
+                o.frequency.value = 880;
+                g.gain.value = 0.0001;
+                o.connect(g); g.connect(ctx.destination);
+                o.start();
+                g.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.02);
+                setTimeout(() => {
+                    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+                    o.stop(ctx.currentTime + 0.13);
+                    try { ctx.close(); } catch (e) { /* ignore */ }
+                }, 120);
+            } catch (e) { console.warn('playNotificationTone failed', e); }
+        }
+
+        function ensureNotificationCenter() {
+            if (document.getElementById('global-notification-center')) return;
+            // Bell + dropdown
+            const container = document.createElement('div');
+            container.id = 'global-notification-center';
+            container.style = 'position:fixed;right:16px;top:16px;z-index:99999;font-family:inherit;';
+
+            const bell = document.createElement('button');
+            bell.id = 'global-notification-bell';
+            bell.title = 'Notifications';
+            bell.style = 'background:var(--bg-card);border:1px solid var(--border-dash);padding:8px;border-radius:999px;display:flex;align-items:center;gap:8px;cursor:pointer;';
+            bell.innerHTML = `<span style="display:inline-block;position:relative"><i class=\"fa-solid fa-bell\"></i><span id=\"global-notification-count\" style=\"position:absolute;top:-8px;right:-10px;background:#ef4444;color:#fff;border-radius:999px;padding:2px 6px;font-size:10px;display:none\"></span></span>`;
+
+            const panel = document.createElement('div');
+            panel.id = 'global-notification-panel';
+            panel.style = 'display:none;min-width:320px;max-width:420px;max-height:60vh;overflow:auto;margin-top:8px;border-radius:12px;background:var(--bg-card);border:1px solid var(--border-dash);box-shadow:0 8px 30px rgba(2,6,23,0.08);padding:8px;';
+            panel.innerHTML = '<div style="font-weight:700;padding:8px 12px;border-bottom:1px solid var(--border-dash);">Notifications</div><div id="global-notification-list" style="display:flex;flex-direction:column;gap:8px;padding:8px"></div>';
+
+            bell.addEventListener('click', () => {
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                // mark notifications read when opened
+                const countEl = document.getElementById('global-notification-count'); if (countEl) countEl.style.display = 'none';
+            });
+
+            container.appendChild(bell);
+            container.appendChild(panel);
+            document.body.appendChild(container);
+        }
+
+        function showInAppNotification(title, body, data) {
+            try {
+                ensureNotificationCenter();
+                const list = document.getElementById('global-notification-list');
+                if (!list) return;
+                const item = document.createElement('div');
+                item.style = 'background:transparent;border:1px solid var(--border-dash);padding:10px;border-radius:8px;display:flex;flex-direction:column;gap:6px;';
+                item.innerHTML = `<div style="font-weight:700">${escapeHtml(title)}</div><div style="font-size:13px;color:var(--text-secondary)">${escapeHtml(body)}</div>`;
+                item.addEventListener('click', () => {
+                    // bubble an event that other code can listen to
+                    window.dispatchEvent(new CustomEvent('notification-click', { detail: data || {} }));
+                });
+                list.prepend(item);
+
+                // show small ephemeral toast as well
+                const toast = document.createElement('div');
+                toast.style = 'position:fixed;right:20px;bottom:20px;background:var(--bg-card);border:1px solid var(--border-dash);padding:12px 16px;border-radius:10px;z-index:99999;box-shadow:0 8px 20px rgba(2,6,23,0.08);';
+                toast.innerHTML = `<div style="font-weight:700">${escapeHtml(title)}</div><div style="font-size:13px;color:var(--text-secondary)">${escapeHtml(body)}</div>`;
+                document.body.appendChild(toast);
+                setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 5000);
+
+                // update badge
+                const countEl = document.getElementById('global-notification-count');
+                if (countEl) {
+                    const cur = parseInt(countEl.getAttribute('data-count') || '0', 10) + 1;
+                    countEl.setAttribute('data-count', String(cur));
+                    countEl.innerText = String(cur > 99 ? '99+' : cur);
+                    countEl.style.display = 'inline-block';
+                }
+            } catch (e) { console.warn('showInAppNotification failed', e); }
+        }
+
+        function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]); }
+
+        function notifyUser({ title = 'Notification', body = '', data = null, silent = false } = {}) {
+            try {
+                const prefs = getNotificationPrefs();
+                if (prefs.push && 'Notification' in window && Notification.permission === 'granted') {
+                    try {
+                        const n = new Notification(title, { body });
+                        n.onclick = () => { window.focus(); window.dispatchEvent(new CustomEvent('notification-click', { detail: data })); n.close(); };
+                    } catch (e) { console.warn('Browser Notification failed', e); }
+                } else if (prefs.push && 'Notification' in window && Notification.permission === 'default') {
+                    // request permission lazily
+                    requestNotificationPermission();
+                }
+
+                if (prefs.inApp) showInAppNotification(title, body, data);
+                if (prefs.sound && !silent) playNotificationTone();
+
+                // Persist a short list locally for UI consistency
+                try {
+                    const existing = JSON.parse(localStorage.getItem('notifications') || '[]');
+                    existing.unshift({ title, body, data, ts: Date.now() });
+                    localStorage.setItem('notifications', JSON.stringify(existing.slice(0, 100)));
+                } catch (e) { /* ignore */ }
+            } catch (e) { console.warn('notifyUser failed', e); }
+        }
+
+        function initNotifications() {
+            try {
+                ensureNotificationCenter();
+                updateNotificationTogglesUI();
+                // Load persisted notifications
+                try {
+                    const saved = JSON.parse(localStorage.getItem('notifications') || '[]');
+                    const list = document.getElementById('global-notification-list');
+                    if (list && Array.isArray(saved)) saved.slice(0, 20).forEach(n => {
+                        const item = document.createElement('div');
+                        item.style = 'background:transparent;border:1px solid var(--border-dash);padding:10px;border-radius:8px;display:flex;flex-direction:column;gap:6px;';
+                        item.innerHTML = `<div style="font-weight:700">${escapeHtml(n.title)}</div><div style="font-size:13px;color:var(--text-secondary)">${escapeHtml(n.body)}</div>`;
+                        list.appendChild(item);
+                    });
+                } catch (e) { /* ignore */ }
+
+                // Observe settings area so toggles in notifications view are initialized when view is rendered
+                const settingsArea = document.getElementById('settings-content-area');
+                if (settingsArea) {
+                    const mo = new MutationObserver(() => { updateNotificationTogglesUI(); });
+                    mo.observe(settingsArea, { childList: true, subtree: true });
+                }
+            } catch (e) { console.warn('initNotifications failed', e); }
+        }
+
+        // Expose API globally
+        window.notifyUser = notifyUser;
+        window.requestNotificationPermission = requestNotificationPermission;
+        window.initNotifications = initNotifications;
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => { try { initNotifications(); } catch (e) { /* ignore */ } });
 
         window.triggerConfetti = function() {
             const colors = ['#059669', '#10b981', '#334155', '#0ea5e9'];
@@ -5236,7 +6223,7 @@
                 <i class="fa-solid fa-user-group w-4 text-center"></i> Referrals
             </a>
             <a href="#" onclick="openSettings('profile'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
+                <i class="fa-solid fa-user-gear w-4 text-center"></i> Settings
             </a>
             <div class="my-4 border-t border-dash"></div>
             <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Support</p>
