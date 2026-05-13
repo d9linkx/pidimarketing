@@ -544,17 +544,13 @@
                 </div>
                 <div class="my-4 border-t border-dash"></div>
                 <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Tools</p>
+                <a href="#" onclick="switchSPAView('how-it-works')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i class="fa-solid fa-circle-info w-4 text-center"></i> How it Works
+                </a>
                 <a href="#" onclick="switchSPAView('referrals')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i class="fa-solid fa-user-group w-4 text-center"></i> Referrals
                 </a>
 
-                <div class="admin-only hidden">
-                    <div class="my-4 border-t border-dash"></div>
-                    <p class="text-[9px] font-bold text-red-500 uppercase tracking-widest px-2 mb-2">Internal</p>
-                    <a href="#" onclick="switchSPAView('admin')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-red-500 hover:bg-red-500/10 transition font-bold">
-                        <i class="fa-solid fa-screwdriver-wrench w-4 text-center"></i> Admin Panel
-                    </a>
-                </div>
                 <a href="#" onclick="openSettings('profile')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i class="fa-solid fa-user-gear w-4 text-center"></i> Profile Settings
                 </a>
@@ -1382,7 +1378,7 @@
             <!-- SPA CONTAINER: Campaigns View -->
             <div id="campaigns-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                    <div class="bento-card border-none md:!bg-transparent p-0 shadow-none hover:shadow-none group relative before:hidden md:ml-0">
+                    <div class="bento-card border-none !bg-none !bg-transparent p-0 shadow-none hover:shadow-none group relative before:hidden md:ml-0">
 
                         <div class="flex items-center gap-2">
                             
@@ -1398,19 +1394,16 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap md:flex-nowrap items-center gap-3 w-full md:w-auto">
-                        <div class="relative flex-1 md:flex-initial">
-                            <input type="text" id="campaign-search" placeholder="Search URL..." 
-                                class="w-full md:w-64 bg-dash-secondary border border-dash rounded-xl p-2.5 pl-10 text-xs focus:outline-none focus:border-[var(--accent-primary)] transition-all">
-                            <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-dash-secondary w-4 h-4"></i>
-                        </div>
                         <div class="flex p-1 bg-dash-secondary rounded-xl border border-dash" id="campaign-tabs">
                             <button onclick="filterCampaignArchive('all')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-all">All</button>
                             <button onclick="filterCampaignArchive('active')" class="px-4 py-2 rounded-lg text-xs font-bold transition active-btn" id="tab-active">Active</button>
                             <button onclick="filterCampaignArchive('pending_verification')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-verifying">Verifying</button>
                             <button onclick="filterCampaignArchive('completed')" class="px-4 py-2 rounded-lg text-xs font-bold transition text-dash-secondary" id="tab-completed">Completed</button>
                         </div>
-                        <button onclick="openCampaignWizard()" class="btn-fintech btn-primary">
-                            <i data-feather="plus" class="w-4 h-4 mr-2"></i> CREATE
+                        <button id="main-cta-btn" onclick="openCampaignWizard()" 
+                            class="btn-fintech btn-primary flex items-center justify-center w-full md:w-auto py-4 px-6 md:px-8 text-sm whitespace-nowrap">
+                            <i data-feather="plus" class="w-4 h-4 mr-2"></i> 
+                            <span id="main-cta" class="font-bold uppercase tracking-wider">Create Campaign</span>
                         </button>
                     </div>
                 </div>
@@ -1540,8 +1533,10 @@
                             A financial overview of your marketing spend
                         </p>
                     </div>
-                    <button onclick="openCampaignWizard()" class="btn-fintech btn-primary shadow-lg">
-                        <i data-feather="plus" class="w-4 h-4 mr-2"></i> FUND NEW CAMPAIGN
+                    <button id="main-cta-btn" onclick="openCampaignWizard()" 
+                        class="btn-fintech btn-primary flex items-center justify-center w-full md:w-auto py-4 px-6 md:px-8 text-sm whitespace-nowrap">
+                        <i data-feather="plus" class="w-4 h-4 mr-2"></i> 
+                        <span id="main-cta" class="font-bold uppercase tracking-wider">Fund New Campaign</span>
                     </button>
                 </div>
 
@@ -2610,9 +2605,6 @@
                     <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Workspace</p>
                     <a href="#" onclick="switchSPAView('dashboard-home')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                         <i data-feather="grid" class="w-4 text-center"></i> Dashboard
-                    </a>
-                    <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                        <i data-feather="bar-chart-2" class="w-4 text-center"></i> Analytics
                     </a>
                     <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                         <i data-feather="layers" class="w-4 text-center"></i> Campaigns
@@ -4949,9 +4941,7 @@
                 <a href="#" onclick="switchSPAView('dashboard-home')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i data-feather="grid" class="w-4 text-center"></i> Dashboard
                 </a>
-                <a href="#" onclick="switchSPAView('analytics')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
-                    <i data-feather="bar-chart-2" class="w-4 text-center"></i> Analytics
-                </a>
+
                 <a href="#" onclick="switchSPAView('campaigns')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i data-feather="layers" class="w-4 text-center"></i> Campaigns
                 </a>
@@ -4963,6 +4953,9 @@
             <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Tools</p>
             <a href="academy.html" onclick="toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i class="fa-solid fa-graduation-cap w-4 text-center"></i> PIDIlearn
+            </a>
+            <a href="#" onclick="switchSPAView('how-it-works'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i class="fa-solid fa-circle-info w-4 text-center"></i> How it Works
             </a>
             <a href="#" onclick="switchSPAView('referrals')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i class="fa-solid fa-user-group w-4 text-center"></i> Referrals
