@@ -740,17 +740,13 @@
                                 </p>
                             </div>
 
-                            <div class="w-full md:w-auto">
-                                <div class="mt-6">
-                                    <button id="main-cta-btn" onclick="openCampaignWizard()" class="w-full btn-fintech btn-primary justify-center py-4 text-sm">
-                                        <i data-feather="plus" class="mr-2"></i> <span id="main-cta">CREATE CAMPAIGN</span>
-                                    </button>
-                                </div>
-                                <div class="mt-6">
-                                    <button id="main-cta-btn" onclick="openCampaignWizard()" class="w-full btn-fintech btn-primary justify-center py-4 text-sm">
-                                        <i data-feather="plus" class="mr-2"></i> <span id="main-cta">CREATE CAMPAIGN</span>
-                                    </button>
-                                </div>
+                            <div class="w-full md:w-auto flex flex-col gap-3 mt-6">
+                                <button id="main-cta-btn" class="w-full btn-fintech btn-primary justify-center py-4 text-sm">
+                                    <i data-feather="plus" class="mr-2"></i> <span id="main-cta">CREATE CAMPAIGN</span>
+                                </button>
+                                <button id="secondary-cta-btn" class="w-full btn-fintech bg-white/10 hover:bg-white/20 text-white border border-white/20 justify-center py-4 text-sm">
+                                    <span id="secondary-cta">SEE CAMPAIGNS</span> <i data-feather="arrow-up-right" class="ml-2"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -797,7 +793,7 @@
                     <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
                     <div class="card-explanation">
                         <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--azure-vibrant)]">Create Campaign</h4>
+                        <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--azure-vibrant)]">CRETE CAMPAIGN</h4>
                         <p class="text-[11px] text-dash-secondary leading-relaxed">Launch a new campaign to boost your presence. Set targets for Likes, Comments, or Followers across major platforms.</p>
                     </div>
                     <div class="icon-box bg-[var(--azure-pale)] text-[var(--azure-vibrant)]">
@@ -1921,7 +1917,7 @@
                             <div>
                                 <button id="main-cta-btn" onclick="openCampaignWizard()" class="hidden md:inline-flex btn-fintech btn-primary items-center justify-center py-4 px-6 text-sm whitespace-nowrap">
                                     <i data-feather="plus" class="w-4 h-4 mr-2"></i>
-                                    <span id="main-cta" class="font-bold uppercase tracking-wider">Create Campaign</span>
+                                    <span id="main-cta" class="font-bold uppercase tracking-wider">CREATE CAMPAIGN</span>
                                 </button>
                             </div>
                         </div>
@@ -1961,7 +1957,7 @@
                             <div class="ml-auto md:hidden">
                                 <button id="main-cta-btn-mobile" onclick="openCampaignWizard()" class="btn-fintech btn-primary flex items-center justify-center py-3 px-4 text-sm">
                                     <i data-feather="plus" class="w-4 h-4 mr-2"></i>
-                                    <span class="font-bold uppercase tracking-wider">Create Campaign</span>
+                                    <span class="font-bold uppercase tracking-wider">CREATE CAMPAIGN</span>
                                 </button>
                             </div>
                         </div>
@@ -4127,12 +4123,28 @@
                         const c = config[role] || config.creator;
                         
                         const ctaText = viewport.querySelector('#main-cta');
-                        if (ctaText) ctaText.innerText = c.cta;
+                        if (ctaText) ctaText.innerText = c.cta.toUpperCase();
                         const ctaBtn = viewport.querySelector('#main-cta-btn');
                         if (ctaBtn) {
                             if (role === 'creator') ctaBtn.onclick = () => openCampaignWizard();
                             else if (role === 'performer') ctaBtn.onclick = () => switchSPAView('performer-gigs');
                             else ctaBtn.onclick = () => switchSPAView('admin');
+                        }
+
+                        const secBtn = viewport.querySelector('#secondary-cta-btn');
+                        const secText = viewport.querySelector('#secondary-cta');
+                        if (secBtn && secText) {
+                            if (role === 'creator') {
+                                secText.innerText = 'SEE CAMPAIGNS';
+                                secBtn.onclick = () => switchSPAView('campaigns');
+                                secBtn.classList.remove('hidden');
+                            } else if (role === 'performer') {
+                                secText.innerText = 'ONGOING TASKS';
+                                secBtn.onclick = () => switchSPAView('performer-earnings');
+                                secBtn.classList.remove('hidden');
+                            } else {
+                                secBtn.classList.add('hidden');
+                            }
                         }
 
                         viewport.querySelector('#creator-dashboard-content')?.classList.toggle('hidden', role !== 'creator');
