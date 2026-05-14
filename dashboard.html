@@ -735,7 +735,7 @@
                                 <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white !leading-tight">
                                     Welcome back, <span class="user-name-display text-[#45b96e]"></span>
                                 </h2>
-                                <p class="text-sm md:text-lg text-gray-400 font-medium max-w-lg leading-relaxed">
+                                <p id="hero-subtitle" class="text-sm md:text-lg text-gray-400 font-medium max-w-lg leading-relaxed">
                                     Your growth engine is primed. Review your performance analytics and scale your reach.
                                 </p>
                             </div>
@@ -3476,9 +3476,9 @@
             // Toggle the two main dashboard sections
             // Update Switcher UI Config
             const config = {
-                creator: { label: 'Creator Dashboard', icon: 'plus-square', color: 'var(--accent-primary)', cta: 'Create Campaign' },
-                performer: { label: 'Performer Dashboard', icon: 'zap', color: '#var(--accent-primary)', cta: 'Find New Task' },
-                admin: { label: 'Admin Console', icon: 'shield', color: '#ef4444', cta: 'Manage System' }
+                creator: { label: 'Creator Dashboard', icon: 'plus-square', color: 'var(--accent-primary)', cta: 'Create Campaign', subtitle: 'Create a task (campaign) and get real human high-quality engagements on your posts that the algorithm will love.' },
+                performer: { label: 'Performer Dashboard', icon: 'zap', color: '#var(--accent-primary)', cta: 'Find New Task', subtitle: 'Earn as you engage on posts made by brands and businesses and get paid straight to your local bank account.' },
+                admin: { label: 'Admin Console', icon: 'shield', color: '#ef4444', cta: 'Manage System', subtitle: 'Global health monitor for PIDI network.' }
             };
             const c = config[role];
 
@@ -4071,12 +4071,23 @@
                     if (viewId === 'dashboard-home' || viewId === 'dashboard-home-view') {
                         const role = currentRole;
                         const config = {
-                            creator: { cta: 'Create Campaign' },
-                            performer: { cta: 'Find New Task' },
-                            admin: { cta: 'Manage System' }
+                            creator: { 
+                                cta: 'Create Campaign',
+                                subtitle: 'Create a task (campaign) and get real human high-quality engagements on your posts that the algorithm will love.'
+                            },
+                            performer: { 
+                                cta: 'Find New Task',
+                                subtitle: 'Earn as you engage on posts made by brands and businesses and get paid straight to your local bank account.'
+                            },
+                            admin: { 
+                                cta: 'Manage System',
+                                subtitle: 'Global health monitor for PIDI network.'
+                            }
                         };
                         const c = config[role] || config.creator;
                         
+                        const subtitleEl = viewport.querySelector('#hero-subtitle');
+                        if (subtitleEl) subtitleEl.innerText = c.subtitle;
                         const ctaText = viewport.querySelector('#main-cta');
                         if (ctaText) ctaText.innerText = c.cta.toUpperCase();
                         const ctaBtn = viewport.querySelector('#main-cta-btn');
