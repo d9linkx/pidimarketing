@@ -753,72 +753,72 @@
                 </div>
                 <!-- End Premium Hero Card -->
 
-                <!-- Row 2: Insight Stats Strip -->
-                <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 p-4 md:p-4 mb-0 mt-[-1rem] relative overflow-hidden gap-4">
-                    <!-- Card 1: Total Campaigns -->
-                    <div class="bento-card p-4 card-azure flex items-center gap-4">
-                        <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                        <div class="card-explanation">
-                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--azure-vibrant)]">All Campaigns</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Total number of campaigns you've launched on the platform.</p>
-                        </div>
-                        <div class="icon-box bg-[var(--azure-pale)] text-[var(--azure-vibrant)] mb-0 w-10 h-10"><i data-feather="eye" class="w-5"></i></div>
-                    <div><p class="text-dash-secondary text-[8px] uppercase font-bold">All Campaigns</p><h4 id="total-reach-val" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Campaigns launched</p></div>
-                    </div>
-
-                    <!-- Card 2: Total Spent (Finance) -->
-                    <div class="bento-card p-4 card-emerald flex items-center gap-4">
-                        <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                        <div class="card-explanation">
-                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">Total Spent</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Total amount spent across all campaigns (displayed in your chosen currency).</p>
-                        </div>
-                        <div class="icon-box bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] mb-0 w-10 h-10"><i data-feather="shield" class="w-5"></i></div>
-                    <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Spent</p><h4 id="accuracy-score-val" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Total spent</p></div>
-                    </div>
-
-                    <!-- Card 3: Total Engagements -->
-                    <div class="bento-card p-4 card-indigo flex items-center gap-4">
-                        <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                        <div class="card-explanation">
-                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--indigo-vibrant)]">Engagements</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Total verified engagements across all campaigns (likes, comments, shares).</p>
-                        </div>
-                        <div class="icon-box bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)] mb-0 w-10 h-10"><i data-feather="target" class="w-5"></i></div>
-                    <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Engagements</p><h4 id="avg-cpe-val" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Verified interactions</p></div>
-                    </div>
-
-                    <!-- Card 4: Average CPE -->
-                    <div class="bento-card p-4 card-amber flex items-center gap-4">
-                        <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
-                        <div class="card-explanation">
-                            <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--amber-vibrant)]">Average CPE</h4>
-                            <p class="text-[11px] text-dash-secondary leading-relaxed">Average cost per verified engagement compared to ads on social media and search (e.g., Google).</p>
-                        </div>
-                        <div class="icon-box bg-[var(--amber-pale)] text-[var(--amber-vibrant)] mb-0 w-10 h-10"><i data-feather="users" class="w-5"></i></div>
-                        <div>
-                            <p class="text-dash-secondary text-[8px] uppercase font-bold">Average CPE</p>
-                             <h4 id="live-workforce-val" class="text-lg font-bold">₦0</h4>
-                            <p class="text-[7px] text-dash-secondary font-bold uppercase">Compared to ads</p>
-                        </div>
-                        
-                        <!-- Hidden Wallet IDs to maintain JS compatibility -->
-                        <div class="hidden">
-                            <span id="pending-balance"></span>
-                            <span id="pending-balance-label"></span>
-                            <h4 id="total-balance"></h4>
-                            <button id="wallet-action-btn"></button>
-                            <p id="trust-indicator"></p>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Creator Dashboard Layout -->
                 <div id="creator-dashboard-content" class="bento-grid p-4 mt-[-1rem] hidden gap-3 lg:gap-4">
+                    <!-- Row 2: Insight Stats Strip -->
+                    <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 p-0 mb-0 mt-0 relative overflow-hidden gap-4">
+                        <!-- Card 1: Total Campaigns -->
+                        <div class="bento-card p-4 card-azure flex items-center gap-4">
+                            <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
+                            <div class="card-explanation">
+                                <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
+                                <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--azure-vibrant)]">All Campaigns</h4>
+                                <p class="text-[11px] text-dash-secondary leading-relaxed">Total number of campaigns you've launched on the platform.</p>
+                            </div>
+                            <div class="icon-box bg-[var(--azure-pale)] text-[var(--azure-vibrant)] mb-0 w-10 h-10"><i data-feather="eye" class="w-5"></i></div>
+                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">All Campaigns</p><h4 id="total-reach-val" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Campaigns launched</p></div>
+                        </div>
+
+                        <!-- Card 2: Total Spent (Finance) -->
+                        <div class="bento-card p-4 card-emerald flex items-center gap-4">
+                            <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
+                            <div class="card-explanation">
+                                <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
+                                <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">Total Spent</h4>
+                                <p class="text-[11px] text-dash-secondary leading-relaxed">Total amount spent across all campaigns (displayed in your chosen currency).</p>
+                            </div>
+                            <div class="icon-box bg-[var(--emerald-pale)] text-[var(--emerald-vibrant)] mb-0 w-10 h-10"><i data-feather="shield" class="w-5"></i></div>
+                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Total Spent</p><h4 id="accuracy-score-val" class="text-lg font-bold">₦0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Total spent</p></div>
+                        </div>
+
+                        <!-- Card 3: Total Engagements -->
+                        <div class="bento-card p-4 card-indigo flex items-center gap-4">
+                            <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
+                            <div class="card-explanation">
+                                <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
+                                <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--indigo-vibrant)]">Engagements</h4>
+                                <p class="text-[11px] text-dash-secondary leading-relaxed">Total verified engagements across all campaigns (likes, comments, shares).</p>
+                            </div>
+                            <div class="icon-box bg-[var(--indigo-pale)] text-[var(--indigo-vibrant)] mb-0 w-10 h-10"><i data-feather="target" class="w-5"></i></div>
+                        <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Engagements</p><h4 id="avg-cpe-val" class="text-lg font-bold">0</h4><p class="text-[7px] text-dash-secondary font-bold uppercase">Verified interactions</p></div>
+                        </div>
+
+                        <!-- Card 4: Average CPE -->
+                        <div class="bento-card p-4 card-amber flex items-center gap-4">
+                            <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
+                            <div class="card-explanation">
+                                <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
+                                <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--amber-vibrant)]">Average CPE</h4>
+                                <p class="text-[11px] text-dash-secondary leading-relaxed">Average cost per verified engagement compared to ads on social media and search (e.g., Google).</p>
+                            </div>
+                            <div class="icon-box bg-[var(--amber-pale)] text-[var(--amber-vibrant)] mb-0 w-10 h-10"><i data-feather="users" class="w-5"></i></div>
+                            <div>
+                                <p class="text-dash-secondary text-[8px] uppercase font-bold">Average CPE</p>
+                                 <h4 id="live-workforce-val" class="text-lg font-bold">₦0</h4>
+                                <p class="text-[7px] text-dash-secondary font-bold uppercase">Compared to ads</p>
+                            </div>
+                            
+                            <!-- Hidden Wallet IDs to maintain JS compatibility -->
+                            <div class="hidden">
+                                <span id="pending-balance"></span>
+                                <span id="pending-balance-label"></span>
+                                <h4 id="total-balance"></h4>
+                                <button id="wallet-action-btn"></button>
+                                <p id="trust-indicator"></p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Row 1: Active Campaigns & Create Campaign -->
                     <div class="bento-card col-span-2 md:order-second flex flex-col bg-[var(--bg-card)] border border-dash rounded-3xl overflow-hidden relative group">
                         <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
@@ -853,7 +853,7 @@
                     </div>
 
                 <!-- Changed 'col-span-1' to 'col-span-2 md:col-span-1' -->
-                <div class="bento-card col-span-2 md:col-span-1 md:order-first card-azure flex flex-col justify-between relative group">
+                <div class="bento-card col-span-2 md:col-span-1 md:order-second card-azure flex flex-col justify-between relative group">
                     <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
                     <div class="card-explanation">
                         <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
