@@ -2833,10 +2833,21 @@
                 </div>
             `).join('');
 
-            const engsHtml = pendingEngs.map(e => `
+            const engsHtml = pendingEngs.map(e => {
+                let proofs = [];
+                try {
+                    const meta = JSON.parse(e.metadata || '{}');
+                    proofs = meta.additional_proofs || (e.proof_url ? [e.proof_url] : []);
+                } catch(err) { proofs = e.proof_url ? [e.proof_url] : []; }
+
+                return `
                 <div class="bento-card flex flex-col md:flex-row gap-6 items-center">
-                    <div class="w-full md:w-32 h-32 bg-dash-secondary rounded-2xl overflow-hidden border border-dash">
-                        ${e.proof_url ? `<img src="${e.proof_url}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${e.proof_url}')">` : `<div class="flex items-center justify-center h-full text-xs">No Proof</div>`}
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar w-full md:w-auto pb-2">
+                        ${proofs.map(url => `
+                            <div class="w-24 h-32 md:w-32 md:h-32 bg-dash-secondary rounded-2xl overflow-hidden border border-dash flex-shrink-0 shadow-sm">
+                                <img src="${url}" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform" onclick="window.open('${url}')">
+                            </div>
+                        `).join('') || `<div class="w-32 h-32 bg-dash-secondary rounded-2xl flex items-center justify-center text-xs text-dash-secondary">No Proof</div>`}
                     </div>
                     <div class="flex-1 space-y-1 text-center md:text-left">
                         <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest">Performer: ${e.performer_name || e.performer_id}</p>
@@ -2848,7 +2859,7 @@
                         <button onclick="adminVerifyEngagement('${e.$id}', 'rejected')" class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-xs hover:bg-red-600 transition">Reject</button>` : `<span class="text-xs text-dash-secondary">View only</span>`}
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
 
             container.innerHTML = campsHtml + engsHtml;
             // Also refresh the hubState datasets so filters operate on full data
