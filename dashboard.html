@@ -944,7 +944,7 @@
                         </div>
                         <div class="bento-card p-4 card-indigo flex items-center gap-4">
                             <div class="icon-box bg-indigo-500/10 text-indigo-500 mb-0 w-10 h-10"><i data-feather="award" class="w-5"></i></div>
-                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Rep Score</p><h4 id="performer-stat-rep" class="text-lg font-bold">98%</h4></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Ratings</p><h4 id="performer-stat-rep" class="text-lg font-bold">98%</h4></div>
                         </div>
                     </div>
 
@@ -981,7 +981,7 @@
                     </div>
 
                     <div id="performer-pending-section" class="bento-card col-span-full hidden order-last">
-                        <h2 class="text-xl font-bold mb-4">Your Pending Submissions</h2>
+                        <h2 class="text-xl font-bold mb-4">Pending Submissions</h2>
                         <div id="performer-pending-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                     </div>
                 </div> <!-- End performer-dashboard-content -->
@@ -992,7 +992,7 @@
                     <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="bento-card p-4 card-slate flex items-center gap-4">
                             <div class="icon-box bg-slate-100 text-slate-600 mb-0 w-10 h-10"><i data-feather="database" class="w-5"></i></div>
-                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Locked Escrow</p><h4 id="admin-stat-tvl" class="text-lg font-bold">₦0</h4></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Paid & Active</p><h4 id="admin-stat-tvl" class="text-lg font-bold">₦0</h4></div>
                         </div>
                         <div class="bento-card p-4 card-slate flex items-center gap-4">
                             <div class="icon-box bg-slate-100 text-slate-600 mb-0 w-10 h-10"><i data-feather="activity" class="w-5"></i></div>
@@ -1038,8 +1038,8 @@
             <div id="performer-gigs-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                     <div>
-                        <h2 class="text-3xl font-bold tracking-tight">My Gigs (Performer)</h2>
-                        <p class="text-dash-secondary text-sm mt-1">Live list of tasks pulled from the campaigns table.</p>
+                        <h2 class="text-3xl font-bold tracking-tight">Tasks for me</h2>
+                        <p class="text-dash-secondary text-sm mt-1">Live list of tasks you can perform and get paid for.</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <button id="refresh-gigs-btn" class="btn-fintech btn-secondary px-4 py-2 text-xs font-bold rounded-xl" title="Refresh gigs">Refresh</button>
@@ -1065,7 +1065,7 @@
                                 </tr>
                             </thead>
                             <tbody id="performer-gigs-list" class="divide-y divide-dash">
-                                <tr><td colspan="6" class="py-8 text-center text-dash-secondary">Loading gigs…</td></tr>
+                                <tr><td colspan="6" class="py-8 text-center text-dash-secondary">Loading tasks…</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1267,7 +1267,7 @@
             <div id="performer-earnings-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
                 <div class="flex items-start justify-between mb-6">
                     <div>
-                        <h2 class="text-3xl font-bold tracking-tight">My Earnings (Performer)</h2>
+                        <h2 class="text-3xl font-bold tracking-tight">Earnings</h2>
                         <p class="text-dash-secondary text-sm mt-1">Net balance, pending verifications, and performance analytics.</p>
                     </div>
                     <div class="text-sm text-dash-secondary">Last updated: <span id="earnings-last-updated">Never</span></div>
@@ -1288,7 +1288,7 @@
                         <div>
                             <p class="text-[9px] font-bold text-dash-secondary uppercase">Pending Verification</p>
                             <h3 id="performer-pending-verification" class="text-2xl font-black">₦0</h3>
-                            <p class="text-[11px] text-dash-secondary mt-1">Locked in escrow (under review)</p>
+                            <p class="text-[11px] text-dash-secondary mt-1">Earnings in review</p>
                         </div>
                         <div class="icon-box bg-amber-500/10 text-amber-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="clock" class="w-5"></i></div>
                     </div>
@@ -1306,8 +1306,8 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                     <div class="bento-card p-4 lg:col-span-2">
                         <div class="flex items-center justify-between mb-4">
-                            <h4 class="font-bold text-sm">Performance Analytics</h4>
-                            <div class="text-xs text-dash-secondary">Velocity • Success • Earnings Trend</div>
+                            <h4 class="font-bold text-sm">Earning Statistics</h4>
+                            <div class="text-xs text-dash-secondary">Earnings Trend</div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1332,12 +1332,12 @@
                     </div>
 
                     <div class="bento-card p-4">
-                        <h4 class="font-bold text-sm mb-3">Withdrawal Protocol</h4>
+                        <h4 class="font-bold text-sm mb-3">Withdrawals</h4>
                         <p class="text-[11px] text-dash-secondary mb-4">Withdraw your Available Balance to your linked bank. USD/NGN conversions handled server-side.</p>
 
                         <div class="space-y-3">
                             <div>
-                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Amount to withdraw</label>
+                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Amount</label>
                                 <input id="withdraw-amount" type="number" min="100" placeholder="₦0" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none" />
                             </div>
 
@@ -1983,7 +1983,7 @@
                         </div>
                         <div class="card-explanation">
                             <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
-                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">Campaign Archive</h4>
+                            <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--accent-primary)]">All Campaigns</h4>
                             <p class="text-[11px] text-dash-secondary leading-relaxed">Track and manage every engagement mission you've launched. This view allows you to filter active deployments, review verifying receipts, and access detailed performance reports for completed tasks.</p>
                         </div>
                     </div>
@@ -2261,8 +2261,8 @@
             <div id="how-it-works-view" class="spa-view hidden p-4 lg:p-8 max-w-5xl mx-auto min-h-[80vh]">
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                     <div class="space-y-1">
-                        <h2 class="text-4xl font-normal leading-tight tracking-tight">How PIDItasks works</h2>
-                        <p class="text-dash-secondary text-sm opacity-80">Bridging the gap between brands and human attention.</p>
+                        <h2 class="text-4xl font-normal leading-tight tracking-tight">How it works</h2>
+                        <p class="text-dash-secondary text-sm opacity-80">We help you get seen by the algorithm, so you can reach a wider audience faster.</p>
                     </div>
                     
                     <!-- Role Toggle Switch -->
@@ -2331,7 +2331,7 @@
                                     <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="search" class="w-5"></i></div>
                                     <h4 class="font-bold text-lg">02. Performers find you organically</h4>
                                 </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">We don't use links. You provide a <b>Search Seed</b> and a <b>Visual Fingerprint</b>. This forces performers to find your content organically, signaling high quality to algorithms.</p>
+                                <p class="text-sm text-dash-secondary leading-relaxed">We don't use links. You provide <b>search words</b> and <b>visuals you can recognize</b> e.g flyer, screenshot of the post, thumbnail, etc. This helps performers to find your content organically, signaling high quality to algorithms of these platforms.</p>
                             </div>
                         </div>
 
@@ -2347,7 +2347,7 @@
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center"><i data-feather="bar-chart" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">04. Audit the performance</h4>
+                                    <h4 class="font-bold text-lg">04. Review what was done</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Track interactions in real-time. Access detailed analytics showing the retention impact and algorithm breakthrough achieved by your campaign missions.</p>
                             </div>
@@ -2362,15 +2362,15 @@
                                     <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="check-square" class="w-5"></i></div>
                                     <h4 class="font-bold text-lg">01. Accept task</h4>
                                 </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Browse the board and claim a mission. Once accepted, you have <b>30 minutes</b> to complete the task and submit proof before the spot is released.</p>
+                                <p class="text-sm text-dash-secondary leading-relaxed">Browse the board and claim a mission before the pool fills up. Once accepted, you have <b>30 minutes</b> to complete the task and submit proof before the spot is released. Failure to complete the task within the timeframe releases the task for someone else to claim and complete.</p>
                             </div>
 
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="eye" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">02. Dwell on it</h4>
+                                    <h4 class="font-bold text-lg">02. Start the task</h4>
                                 </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Find the post organically using the Search Seed. You must stay on the content for at least <b>60 seconds</b> before engaging to prove genuine human attention.</p>
+                                <p class="text-sm text-dash-secondary leading-relaxed">Find the post organically using the Search words and visuals in the task description. You must stay on the content for at least <b>60 seconds</b> before engaging to prove genuine human attention.</p>
                             </div>
                         </div>
 
@@ -2378,7 +2378,7 @@
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="message-circle" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">03. Use the '10-Word' rule</h4>
+                                    <h4 class="font-bold text-lg">03. Use the '10-Word' rule (for comments)</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Every comment must be at least 10 words long and contextually relevant. No "Cool!" or "Nice!". We only reward high-value human interactions.</p>
                             </div>
