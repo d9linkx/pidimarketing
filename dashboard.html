@@ -763,6 +763,37 @@
                     <!-- Row 2: Insight Stats Strip -->
                     <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 p-0 mb-0 mt-0 relative overflow-hidden gap-4">
                         <!-- Card 1: Total Campaigns -->
+
+                        <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                        <div class="bento-card p-4 card-azure flex items-center gap-4">
+                            <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
+                            <div class="card-explanation">
+                                <button onclick="toggleCardInfo(event)" class="close-info"><i data-feather="x" class="w-4 h-4"></i></button>
+                                <h4 class="text-xs font-bold mb-2 uppercase tracking-wider text-[var(--azure-vibrant)]">All Campaigns</h4>
+                                <p class="text-[11px] text-dash-secondary leading-relaxed">Total number of campaigns you've launched on the platform.</p>
+                            </div>
+                            <div class="icon-box bg-blue-500/10 text-blue-500 mb-0 w-10 h-10"><i data-feather="dollar-sign" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">All Campaigns</p><h4 id="total-reach-val" class="text-lg font-bold">₦0</h4></div>
+                        </div>
+                        <div class="bento-card p-4 card-emerald flex items-center gap-4">
+                            <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="check-circle" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Completed</p><h4 id="performer-stat-approved" class="text-lg font-bold">0</h4></div>
+                        </div>
+                        <div class="bento-card p-4 card-amber flex items-center gap-4">
+                            <div class="icon-box bg-amber-500/10 text-amber-500 mb-0 w-10 h-10"><i data-feather="clock" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">In Review</p><h4 id="performer-stat-pending" class="text-lg font-bold">0</h4></div>
+                        </div>
+                        <div class="bento-card p-4 card-indigo flex items-center gap-4">
+                            <div class="icon-box bg-indigo-500/10 text-indigo-500 mb-0 w-10 h-10"><i data-feather="award" class="w-5"></i></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Ratings</p><h4 id="performer-stat-rep" class="text-lg font-bold">98%</h4></div>
+                        </div>
+                        </div>
+
+
+
+
+                        
                         <div class="bento-card p-4 card-azure flex items-center gap-4">
                             <button onclick="toggleCardInfo(event)" class="info-trigger"><i data-feather="info" class="w-3.5 h-3.5"></i></button>
                             <div class="card-explanation">
