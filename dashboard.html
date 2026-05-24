@@ -2325,24 +2325,27 @@
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Select your platform (Instagram, Google, etc.). Define your engagement goals and the specific instructions our performers must follow to ensure brand alignment.</p>
                             </div>
+                            <div class="bento-card p-8 border-1-4 border-1-[var(--accent-primary)] group">
 
-                            <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="search" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">02. Performers find you organically</h4>
+                                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="lock" class="w-5"></i></div>
+                                    <h4 class="font-bold text-lg">02. Make the payment (refundable)</h4>
                                 </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">We don't use links. You provide <b>search words</b> and <b>visuals you can recognize</b> e.g flyer, screenshot of the post, thumbnail, etc. This helps performers to find your content organically, signaling high quality to algorithms of these platforms.</p>
+                                <p class="text-sm text-dash-secondary leading-relaxed">Funds are paid upon creating in a campaign. You're paying for verified, high-quality human engagements that meets the organic search criteria set by the algorithms of these platforms.</p>
                             </div>
                         </div>
 
                         <div class="space-y-6">
+
+
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="lock" class="w-5"></i></div>
-                                    <h4 class="font-bold text-lg">03. Make the payment (refundable)</h4>
+                                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="search" class="w-5"></i></div>
+                                    <h4 class="font-bold text-lg">03. Performers find you organically</h4>
                                 </div>
-                                <p class="text-sm text-dash-secondary leading-relaxed">Funds are paid upon creating in a campaign. You're paying for verified, high-quality human engagements that meets the organic search criteria set by the algorithms of these platforms.</p>
+                                <p class="text-sm text-dash-secondary leading-relaxed">We don't use links. You provide <b>search words</b> and <b>visuals you can recognize</b> e.g flyer, screenshot of the post, thumbnail, etc. This helps performers to find your content organically, signaling high quality to algorithms of these platforms.</p>
                             </div>
+   
 
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
@@ -2394,11 +2397,6 @@
                     </div>
                 </div>
 
-                <!-- Global Footer CTA -->
-                <div class="mt-16 text-center border-t border-dash pt-12">
-                    <h4 class="text-lg font-bold mb-6">Ready to get started?</h4>
-                    <button onclick="switchRole(currentRole)" class="btn-fintech btn-primary px-12 py-4">LAUNCH WORKSPACE</button>
-                </div>
 
                 <!-- FAQ Section -->
                 <div class="mt-20">
@@ -2768,21 +2766,21 @@
                                 <!-- SEO Platforms Discovery (Google/YouTube) -->
                                 <div id="seo-discovery-fields" class="hidden space-y-4">
                                     <div>
-                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Search Seed (Keywords)</label>
+                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Search keywords</label>
                                         <input type="text" id="search-seed" placeholder="e.g. Best performance marketing 2026" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Breadcrumb (Navigation Instruction)</label>
-                                        <input type="text" id="breadcrumb" placeholder="e.g. Sort by Latest, look for black flyer" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                        <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">How to find the post</label>
+                                        <input type="text" id="breadcrumb" placeholder="e.g. Look for our latest post, look for this black flyer, etc." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Master URL (Hidden from Performers)</label>
+                                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Post URL (Hidden from Performers)</label>
                                     <input type="url" id="target-url" placeholder="https://..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
                                     <p class="text-[9px] text-dash-secondary mt-2 flex items-start gap-2 italic">
                                         <i data-feather="lock" class="w-3 h-3 mt-0.5 flex-shrink-0"></i>
-                                        <span>Encrypted Ground Truth: Used by PIDI admins to verify campaign success. Performers only see discovery guides.</span>
+                                        <span>Your post URL is used by PIDI admins to verify visibility of the post before pushing it out to performers. Performers only use discovery guides to find the your post, organically.</span>
                                     </p>
                                 </div>
                             </div>
@@ -2812,7 +2810,7 @@
                             <textarea id="task-instructions" rows="4" placeholder="Here, you tell the performer things like ''Please ask about international shipping. Use at least 10 words. Mention 'quality'..." class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-[var(--accent-primary)]"></textarea>
                         </div>
                         <div class="flex gap-2">
-                            <span class="bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-3 py-1 rounded-lg text-[10px] font-bold">RULE OF 10 WORDS</span>
+                            <span class="bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-3 py-1 rounded-lg text-[10px] font-bold">ORGANIC SEARCH</span>
                             <span class="bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-3 py-1 rounded-lg text-[10px] font-bold">HUMAN VERIFIED</span>
                         </div>
                     </div>
@@ -2902,7 +2900,7 @@
                         </div>
                         <div class="space-y-2">
                             <h2 class="text-3xl font-bold">Great Success!</h2>
-                            <p class="text-dash-secondary max-w-xs mx-auto">Your campaign has been queued. We're verifying your payment in the background right now.</p>
+                            <p class="text-dash-secondary max-w-xs mx-auto">Your campaign has been queued. We're verifying your payment and post URL in the background right now. Refresh your dashboard to see when your campaign is live.</p>
                         </div>
                         <div class="flex flex-col gap-3 max-w-xs mx-auto pt-4">
                             <button onclick="closeCampaignWizard(); switchSPAView('campaigns')" class="w-full btn-fintech btn-primary justify-center py-4">GO TO CAMPAIGNS</button>
