@@ -542,7 +542,7 @@ ul { list-style: none; }
 /* --- HERO SECTION --- */
 .hero-section {
     padding: 250px 0 100px;
-    background: var(--light-gray);
+    background: var(--white);
     text-align: center;
     position: relative;
     overflow: hidden;
