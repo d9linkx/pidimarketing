@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Congratulations!</title>
+    <style>
+        :root {
+            --primary: #22c55e;
+            --primary-hover: #16a34a;
+            --whatsapp: #25D366;
+            --whatsapp-hover: #128C7E;
+            --text-dark: #1f2937;
+            --text-muted: #4b5563;
+            --bg-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-card {
+            background: #ffffff;
+            max-width: 550px;
+            width: 100%;
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Success Checkmark Animation */
+        .icon-container {
+            width: 80px;
+            height: 80px;
+            background: #f0fdf4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .checkmark {
+            width: 40px;
+            height: 40px;
+            stroke-width: 3;
+            stroke: var(--primary);
+            stroke-miterlimit: 10;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 0;
+            animation: dash 0.9s ease-in-out;
+        }
+
+        h1 {
+            color: var(--text-dark);
+            font-size: 28px;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .highlight {
+            color: var(--text-dark);
+            font-weight: 600;
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        /* Action Buttons */
+        .cta-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-calendly {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+        }
+
+        .btn-calendly:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-whatsapp {
+            background-color: transparent;
+            color: var(--whatsapp);
+            border: 2px solid var(--whatsapp);
+        }
+
+        .btn-whatsapp:hover {
+            background-color: var(--whatsapp);
+            color: white;
+        }
+
+        /* Footer Navigation Links */
+        .footer-nav {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            font-size: 14px;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--text-dark);
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes dash {
+            0% { stroke-dashoffset: 100; }
+            100% { stroke-dashoffset: 0; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+</head>
+<body>
+
+    <div class="success-card">
+        <div class="icon-container">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+        </div>
+
+        <h1>Payment Successful!</h1>
+        <p>
+            Congratulations, you are officially locked in! Your classes are scheduled to begin in <span class="highlight">7 days</span>. 
+            Please select the specific start date and time block that works best for your schedule.
+        </p>
+
+        <div class="cta-container">
+            <a href="https://calendly.com/your-calendly-link" class="btn btn-calendly" id="calendlyLink" target="_blank">
+                <i class="fa-regular fa-calendar-days"></i> Choose Your Schedule
+            </a>
+            
+            <a href="https://wa.me/+2347070989034" class="btn btn-whatsapp" target="_blank">
+                <i class="fa-brands fa-whatsapp"></i> Chat with Us on WhatsApp
+            </a>
+        </div>
+
+        <div class="footer-nav">
+            <a href="https://pidimarketing.vercel.app/index.html" class="nav-link">Home</a>
+            <a href="https://pidimarketing.vercel.app/contact" class="nav-link" target="_blank">Contact Support</a>
+        </div>
+    </div>
+
+    <script>
+        // Optional JavaScript functionality 
+        document.addEventListener('DOMContentLoaded', () => {
+            const calendlyBtn = document.getElementById('calendlyLink');
+
+            // Quick reminder alert if they try to leave without clicking Calendly
+            calendlyBtn.addEventListener('click', () => {
+                console.log('User heading to Calendly to book schedule.');
+            });
+        });
+    </script>
+</body>
+</html>
+              
