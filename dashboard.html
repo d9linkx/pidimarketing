@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -97,7 +97,7 @@
                 const accounts = profile.bank_accounts || [];
                 accounts.forEach((a, idx) => {
                     const val = a.account_number || `${a.bank_name}-${idx}`;
-                    const label = `${a.bank_name || 'Bank'} • ${String(a.account_number).slice(-4)} • ${a.account_name || ''}`;
+                    const label = `${a.bank_name || 'Bank'} â€¢ ${String(a.account_number).slice(-4)} â€¢ ${a.account_name || ''}`;
                     const opt = document.createElement('option');
                     opt.value = idx; // index in array
                     opt.text = label;
@@ -789,7 +789,7 @@
         <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="shield" class="w-5"></i></div>
         <div>
             <p class="text-dash-secondary text-[8px] uppercase font-bold">Total Spent</p>
-            <h4 id="accuracy-score-val" class="text-lg font-bold">₦0</h4>
+            <h4 id="accuracy-score-val" class="text-lg font-bold">â‚¦0</h4>
         </div>
     </div>
 
@@ -819,7 +819,7 @@
         <div class="icon-box bg-amber-500/10 text-amber-500 mb-0 w-10 h-10"><i data-feather="users" class="w-5"></i></div>
         <div>
             <p class="text-dash-secondary text-[8px] uppercase font-bold">Average CPE</p>
-            <h4 id="live-workforce-val" class="text-lg font-bold">₦0</h4>
+            <h4 id="live-workforce-val" class="text-lg font-bold">â‚¦0</h4>
         </div>
         
         <!-- Hidden Wallet IDs to maintain JS compatibility -->
@@ -921,9 +921,9 @@
                             const elAvgCPE = document.getElementById('live-workforce-val');
 
                             if(elTotalCampaigns) elTotalCampaigns.innerText = totalCampaigns.toLocaleString();
-                            if(elTotalSpent) elTotalSpent.innerText = `₦${totalSpent.toLocaleString()}`;
+                            if(elTotalSpent) elTotalSpent.innerText = `â‚¦${totalSpent.toLocaleString()}`;
                             if(elTotalEngagements) elTotalEngagements.innerText = totalEngagements.toLocaleString();
-                            if(elAvgCPE) elAvgCPE.innerText = `₦${avgCPE.toLocaleString()}`;
+                            if(elAvgCPE) elAvgCPE.innerText = `â‚¦${avgCPE.toLocaleString()}`;
                         }catch(err){
                             console.warn('Failed to update insight cards:', err);
                         }
@@ -945,7 +945,7 @@
                     <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="bento-card p-4 card-azure flex items-center gap-4">
                             <div class="icon-box bg-blue-500/10 text-blue-500 mb-0 w-10 h-10"><i data-feather="dollar-sign" class="w-5"></i></div>
-                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Lifetime Earnings</p><h4 id="performer-stat-earnings" class="text-lg font-bold">₦0</h4></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Lifetime Earnings</p><h4 id="performer-stat-earnings" class="text-lg font-bold">â‚¦0</h4></div>
                         </div>
                         <div class="bento-card p-4 card-emerald flex items-center gap-4">
                             <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="check-circle" class="w-5"></i></div>
@@ -981,7 +981,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="performer-available-gigs-list" class="divide-y divide-dash">
-                                            <tr><td colspan="6" class="py-6 text-center text-dash-secondary">Loading…</td></tr>
+                                            <tr><td colspan="6" class="py-6 text-center text-dash-secondary">Loadingâ€¦</td></tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -1005,7 +1005,7 @@
                     <div class="col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="bento-card p-4 card-slate flex items-center gap-4">
                             <div class="icon-box bg-slate-100 text-slate-600 mb-0 w-10 h-10"><i data-feather="database" class="w-5"></i></div>
-                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Paid & Active</p><h4 id="admin-stat-tvl" class="text-lg font-bold">₦0</h4></div>
+                            <div><p class="text-dash-secondary text-[8px] uppercase font-bold">Paid & Active</p><h4 id="admin-stat-tvl" class="text-lg font-bold">â‚¦0</h4></div>
                         </div>
                         <div class="bento-card p-4 card-slate flex items-center gap-4">
                             <div class="icon-box bg-slate-100 text-slate-600 mb-0 w-10 h-10"><i data-feather="activity" class="w-5"></i></div>
@@ -1078,7 +1078,7 @@
                                 </tr>
                             </thead>
                             <tbody id="performer-gigs-list" class="divide-y divide-dash">
-                                <tr><td colspan="6" class="py-8 text-center text-dash-secondary">Loading tasks…</td></tr>
+                                <tr><td colspan="6" class="py-8 text-center text-dash-secondary">Loading tasksâ€¦</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1094,6 +1094,97 @@
 
                     const shortListEl = document.getElementById('performer-available-gigs-list');
 
+                    window.getPerformerTaskActionConfig = function(c) {
+                        const status = (c && c.status ? String(c.status).toLowerCase() : 'pending');
+
+                        if (status === 'active') {
+                            return {
+                                label: 'Start',
+                                onclick: `startTaskFlow('${c.$id}')`,
+                                className: 'px-3 py-1 rounded-lg text-xs font-bold bg-[var(--accent-primary)] text-white hover:opacity-90',
+                                disabled: false,
+                                title: 'Start this task'
+                            };
+                        }
+
+                        if (status === 'completed') {
+                            return {
+                                label: 'View',
+                                onclick: `viewCompletedTaskDetails('${c.$id}')`,
+                                className: 'px-3 py-1 rounded-lg text-xs font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20 hover:bg-blue-500/20',
+                                disabled: false,
+                                title: 'Review what this task was about and what you submitted'
+                            };
+                        }
+
+                        return {
+                            label: status === 'pending_verification' ? 'Pending' : 'Unavailable',
+                            onclick: '',
+                            className: 'px-3 py-1 rounded-lg text-xs font-bold bg-dash-secondary text-dash-secondary cursor-not-allowed opacity-80',
+                            disabled: true,
+                            title: 'This task is not open for action yet'
+                        };
+                    };
+
+                    window.getPerformerRewardForTask = function(task) {
+                        if (!task) return 70;
+
+                        const goalCount = Number(task.goal_count) || 1;
+                        const totalCost = Number(task.total_cost);
+                        const fallbackBase = Number(task.reward ?? task.price ?? 0);
+                        const basePerPerformer = Number.isFinite(totalCost) && totalCost > 0
+                            ? totalCost / goalCount
+                            : (Number.isFinite(fallbackBase) && fallbackBase > 0 ? fallbackBase : 70);
+
+                        return Math.round(basePerPerformer * 0.4);
+                    };
+
+                    window.viewCompletedTaskDetails = async function(taskId) {
+                        try {
+                            if (!window.currentUser || !window.currentUser.id) {
+                                showToast('Please wait for your profile to finish loading before reviewing tasks.', 'error');
+                                return;
+                            }
+
+                            const task = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, taskId);
+                            const engagementRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [
+                                Query.equal('campaign_id', taskId),
+                                Query.equal('performer_id', window.currentUser.id),
+                                Query.orderDesc('created_at'),
+                                Query.limit(1)
+                            ]);
+                            const engagement = (engagementRes.documents && engagementRes.documents[0]) || null;
+                            const metadata = engagement && engagement.metadata ? (() => {
+                                try {
+                                    return JSON.parse(engagement.metadata);
+                                } catch (e) {
+                                    return {};
+                                }
+                            })() : {};
+
+                            const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                            const summary = [
+                                `Task: ${escapeHtml(task.target_url || task.title || 'Untitled Task')}`,
+                                `Platform: ${escapeHtml(task.platform || 'Unknown')}`,
+                                `What this task was about: ${escapeHtml(task.instructions || 'No instructions provided.')}`,
+                                `What you submitted: ${escapeHtml(metadata.comment_text || 'No submission text was recorded.')}`
+                            ];
+
+                            if (metadata.comment_link) {
+                                summary.push(`Submission link: ${escapeHtml(metadata.comment_link)}`);
+                            }
+
+                            if (engagement && engagement.proof_url) {
+                                window.open(engagement.proof_url, '_blank', 'noopener');
+                            }
+
+                            showToast(summary.join('<br>'), 'info');
+                        } catch (err) {
+                            console.error('Failed to load completed task details', err);
+                            showToast('Unable to load this completed task right now.', 'error');
+                        }
+                    };
+
                     function renderShortRows(items) {
                         if (!shortListEl) return;
                         if (!items || items.length === 0) {
@@ -1104,6 +1195,8 @@
                         shortListEl.innerHTML = items.map(c => {
                             const progress = Math.round(((c.current_count || 0) / (c.goal_count || 1)) * 100) || 0;
                             const statusLabel = c.status === 'pending_verification' ? 'Verifying' : (c.status || 'active');
+                            const action = window.getPerformerTaskActionConfig(c);
+                            const reward = window.getPerformerRewardForTask(c);
                             return `
                                 <tr class="hover:bg-dash-secondary/10 transition-colors">
                                     <td class="p-3 align-top">
@@ -1113,9 +1206,9 @@
                                     <td class="p-3 align-top"><span class="text-xs font-bold uppercase">${c.platform || ''}</span></td>
                                     <td class="p-3 align-top"><span class="px-3 py-1 rounded-full text-[10px] font-black ${c.status === 'completed' ? 'bg-green-500/10 text-green-500' : (c.status === 'rejected' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500')}">${statusLabel}</span></td>
                                     <td class="p-3 align-top"><div class="w-full bg-dash-secondary h-2 rounded-full overflow-hidden"><div style="width:${progress}%" class="h-2 bg-[var(--accent-primary)]"></div></div></td>
-                                    <td class="p-3 align-top font-bold">₦${(c.total_cost ? (c.total_cost / (c.goal_count || 1)).toFixed(0) : 70)}</td>
+                                    <td class="p-3 align-top font-bold">â‚¦${reward.toLocaleString()}</td>
                                     <td class="p-3 text-right align-top">
-                                        <button onclick="startTaskFlow('${c.$id}')" class="px-3 py-1 rounded-lg text-xs font-bold bg-[var(--accent-primary)] text-white hover:opacity-90">Start</button>
+                                        <button type="button" ${action.disabled ? 'disabled aria-disabled="true"' : `onclick="${action.onclick}"`} title="${action.title || ''}" class="${action.className}">${action.label}</button>
                                     </td>
                                 </tr>
                             `;
@@ -1193,6 +1286,8 @@
                         listEl.innerHTML = items.map(c => {
                             const progress = Math.round(((c.current_count || 0) / (c.goal_count || 1)) * 100) || 0;
                             const statusLabel = c.status === 'pending_verification' ? 'Verifying' : (c.status || 'active');
+                            const action = window.getPerformerTaskActionConfig(c);
+                            const reward = window.getPerformerRewardForTask(c);
                             return `
                                         <tr class="hover:bg-dash-secondary/10 transition-colors">
                                     <td class="p-4 align-top">
@@ -1201,10 +1296,10 @@
                                     </td>
                                     <td class="p-4 align-top"><span class="text-xs font-bold uppercase">${c.platform || ''}</span></td>
                                     <td class="p-4 align-top"><span class="px-3 py-1 rounded-full text-[10px] font-black ${c.status === 'completed' ? 'bg-green-500/10 text-green-500' : (c.status === 'rejected' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500')}">${statusLabel}</span></td>
-                                    <td class="p-4 align-top"><div class="w-full bg-dash-secondary h-2 rounded-full overflow-hidden"><div style="width:${progress}%" class="h-2 bg-[var(--accent-primary)]"></div></div><div class="text-[10px] text-dash-secondary mt-1">${progress}% • ${c.current_count || 0}/${c.goal_count || 0}</div></td>
-                                    <td class="p-4 align-top font-bold">₦${(c.total_cost ? (c.total_cost / (c.goal_count || 1)).toFixed(0) : 70)}</td>
+                                    <td class="p-4 align-top"><div class="w-full bg-dash-secondary h-2 rounded-full overflow-hidden"><div style="width:${progress}%" class="h-2 bg-[var(--accent-primary)]"></div></div><div class="text-[10px] text-dash-secondary mt-1">${progress}% â€¢ ${c.current_count || 0}/${c.goal_count || 0}</div></td>
+                                    <td class="p-4 align-top font-bold">â‚¦${reward.toLocaleString()}</td>
                                     <td class="p-4 text-right align-top">
-                                        <button onclick="startTaskFlow('${c.$id}')" class="px-4 py-2 rounded-lg text-xs font-bold bg-[var(--accent-primary)] text-white hover:opacity-90">Start</button>
+                                        <button type="button" ${action.disabled ? 'disabled aria-disabled="true"' : `onclick="${action.onclick}"`} title="${action.title || ''}" class="${action.className}">${action.label}</button>
                                     </td>
                                 </tr>
                             `;
@@ -1215,21 +1310,23 @@
                         if (!cardsEl) return;
                         cardsEl.innerHTML = items.map(c => {
                             const progress = Math.round(((c.current_count || 0) / (c.goal_count || 1)) * 100) || 0;
+                            const action = window.getPerformerTaskActionConfig(c);
+                            const reward = window.getPerformerRewardForTask(c);
                             return `
                                 <div class="bento-card p-4">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <div class="font-bold">${(c.target_url || c.title || 'Untitled Mission')}</div>
-                                            <div class="text-[10px] text-dash-secondary mt-1">${c.platform || ''} • ${c.full_name || 'Unknown'}</div>
+                                            <div class="text-[10px] text-dash-secondary mt-1">${c.platform || ''} â€¢ ${c.full_name || 'Unknown'}</div>
                                         </div>
                                         <div class="text-right">
-                                            <div class="text-sm font-black">₦${(c.total_cost ? (c.total_cost / (c.goal_count || 1)).toFixed(0) : 70)}</div>
+                                            <div class="text-sm font-black">â‚¦${reward.toLocaleString()}</div>
                                             <div class="text-[10px] text-dash-secondary">${progress}%</div>
                                         </div>
                                     </div>
                                     <div class="mt-3 text-[10px] text-dash-secondary">${(c.instructions || '').slice(0, 120)}</div>
                                     <div class="mt-4 text-right">
-                                        <button onclick="startTaskFlow('${c.$id}')" class="px-3 py-2 rounded-lg text-xs font-bold bg-[var(--accent-primary)] text-white hover:opacity-90">Start</button>
+                                        <button type="button" ${action.disabled ? 'disabled aria-disabled="true"' : `onclick="${action.onclick}"`} title="${action.title || ''}" class="${action.className}">${action.label}</button>
                                     </div>
                                 </div>
                             `;
@@ -1278,7 +1375,7 @@
 
             <!-- SPA CONTAINER: Performer Earnings View -->
             <div id="performer-earnings-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
-                <div class="flex items-start justify-between mb-6">
+                <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between mb-6">
                     <div>
                         <h2 class="text-3xl font-bold tracking-tight">Earnings</h2>
                         <p class="text-dash-secondary text-sm mt-1">Net balance, pending verifications, and performance analytics.</p>
@@ -1287,43 +1384,45 @@
                 </div>
 
                 <!-- Top stats -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="bento-card p-4 flex items-center justify-between">
-                        <div>
-                            <p class="text-[9px] font-bold text-dash-secondary uppercase">Net Balance (Available)</p>
-                            <h3 id="performer-net-balance" class="text-2xl font-black">₦0</h3>
-                            <p class="text-[11px] text-dash-secondary mt-1">Cash you can withdraw now</p>
+                <div class="grid grid-cols-1 gap-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bento-card p-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-[9px] font-bold text-dash-secondary uppercase">Net Balance (Available)</p>
+                                <h3 id="performer-net-balance" class="text-2xl font-black">â‚¦0</h3>
+                                <p class="text-[11px] text-dash-secondary mt-1">Cash you can withdraw now</p>
+                            </div>
+                            <div class="icon-box bg-blue-500/10 text-blue-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="wallet" class="w-5"></i></div>
                         </div>
-                        <div class="icon-box bg-blue-500/10 text-blue-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="wallet" class="w-5"></i></div>
-                    </div>
 
-                    <div class="bento-card p-4 flex items-center justify-between">
-                        <div>
-                            <p class="text-[9px] font-bold text-dash-secondary uppercase">Pending Verification</p>
-                            <h3 id="performer-pending-verification" class="text-2xl font-black">₦0</h3>
-                            <p class="text-[11px] text-dash-secondary mt-1">Earnings in review</p>
+                        <div class="bento-card p-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-[9px] font-bold text-dash-secondary uppercase">Pending Verification</p>
+                                <h3 id="performer-pending-verification" class="text-2xl font-black">â‚¦0</h3>
+                                <p class="text-[11px] text-dash-secondary mt-1">Earnings in review</p>
+                            </div>
+                            <div class="icon-box bg-amber-500/10 text-amber-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="clock" class="w-5"></i></div>
                         </div>
-                        <div class="icon-box bg-amber-500/10 text-amber-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="clock" class="w-5"></i></div>
-                    </div>
 
-                    <div class="bento-card p-4 flex items-center justify-between">
-                        <div>
-                            <p class="text-[9px] font-bold text-dash-secondary uppercase">All-Time Earnings</p>
-                            <h3 id="performer-all-time" class="text-2xl font-black">₦0</h3>
-                            <p class="text-[11px] text-dash-secondary mt-1">Total received since joining</p>
+                        <div class="bento-card p-4 flex items-center justify-between">
+                            <div>
+                                <p class="text-[9px] font-bold text-dash-secondary uppercase">All-Time Earnings</p>
+                                <h3 id="performer-all-time" class="text-2xl font-black">â‚¦0</h3>
+                                <p class="text-[11px] text-dash-secondary mt-1">Total received since joining</p>
+                            </div>
+                            <div class="icon-box bg-emerald-500/10 text-emerald-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="award" class="w-5"></i></div>
                         </div>
-                        <div class="icon-box bg-emerald-500/10 text-emerald-500 w-12 h-12 flex items-center justify-center rounded-xl"><i data-feather="award" class="w-5"></i></div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-                    <div class="bento-card p-4 lg:col-span-2">
-                        <div class="flex items-center justify-between mb-4">
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] mb-6">
+                    <div class="bento-card p-4">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <h4 class="font-bold text-sm">Earning Statistics</h4>
                             <div class="text-xs text-dash-secondary">Earnings Trend</div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div class="p-4 bg-white border border-dash rounded-2xl text-center">
                                 <p class="text-[10px] text-dash-secondary uppercase font-bold">Velocity Score</p>
                                 <canvas id="velocityGauge" width="120" height="100"></canvas>
@@ -1339,7 +1438,7 @@
 
                             <div class="p-4 bg-white border border-dash rounded-2xl md:col-span-3">
                                 <p class="text-[10px] text-dash-secondary uppercase font-bold mb-2">Earnings Trend (Last 7 days)</p>
-                                <div class="h-40"><canvas id="earningsTrendChart"></canvas></div>
+                                <div class="h-48 md:h-40"><canvas id="earningsTrendChart"></canvas></div>
                             </div>
                         </div>
                     </div>
@@ -1351,24 +1450,24 @@
                         <div class="space-y-3">
                             <div>
                                 <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Amount</label>
-                                <input id="withdraw-amount" type="number" min="100" placeholder="₦0" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none" />
+                                <input id="withdraw-amount" type="number" min="100" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="â‚¦0" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none" />
                             </div>
+
 
                             <div>
-                                <label class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Saved Bank</label>
-                                <div id="saved-bank-details" class="p-3 bg-white border border-dash rounded-xl text-sm">No bank details saved</div>
+                                <button id="withdraw-btn" type="button" class="w-full btn-fintech btn-primary py-3 font-black min-h-[48px] touch-manipulation">Request Withdrawal</button>
                             </div>
 
-                            <div>
-                                <button id="withdraw-btn" class="w-full btn-fintech btn-primary py-3 font-black">Request Withdrawal</button>
-                            </div>
-
-                            <div id="withdraw-progress" class="mt-4 hidden">
-                                <p class="text-[10px] text-dash-secondary mb-2">Withdrawal Progress</p>
+                            <div id="withdraw-progress" class="mt-4 hidden rounded-2xl border border-dash bg-white p-3" aria-live="polite">
+                                <div class="flex items-center justify-between gap-3 mb-2">
+                                    <p id="withdraw-progress-title" class="text-[10px] font-black text-dash-secondary uppercase">Withdrawal Progress</p>
+                                    <span id="withdraw-progress-status" class="text-[10px] font-black uppercase bg-amber-500/10 text-amber-500 px-2 py-1 rounded-full">Ready</span>
+                                </div>
                                 <div class="w-full bg-dash-secondary rounded-full h-3 overflow-hidden border border-dash">
                                     <div id="withdraw-progress-bar" style="width:0%" class="h-3 bg-[var(--accent-primary)] transition-all"></div>
                                 </div>
                                 <div id="withdraw-progress-text" class="text-[11px] text-dash-secondary mt-2">Request Received</div>
+                                <p class="text-[10px] text-dash-secondary mt-2">You can keep using the page while the withdrawal is processing.</p>
                             </div>
                         </div>
                     </div>
@@ -1391,17 +1490,95 @@
                                 </tr>
                             </thead>
                             <tbody id="performer-transactions-list" class="divide-y divide-dash">
-                                <tr><td colspan="4" class="py-6 text-center text-dash-secondary">Loading…</td></tr>
+                                <tr><td colspan="4" class="py-6 text-center text-dash-secondary">Loadingâ€¦</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
                 <script type="module">
-                    import { databases, Query, APPWRITE_CONFIG } from './appwriteClient.js';
+                    import { databases, Query, APPWRITE_CONFIG, ID } from './appwriteClient.js';
 
                     let _earningsChart = null;
                     let _velocityChart = null;
+                    let isWithdrawalProcessing = false;
+                    let withdrawalPollTimer = null;
+
+                    function getSavedBankDetails(profile) {
+                        if (!profile) return null;
+                        const bankName = (profile.bank_name || '').trim();
+                        const holder = (profile.bank_account_holder || '').trim();
+                        const accountNumber = profile.bank_account_number ? String(profile.bank_account_number).trim() : '';
+                        if (!bankName && !holder && !accountNumber) return null;
+                        return {
+                            bank_name: bankName || 'Bank',
+                            bank_account_holder: holder,
+                            bank_account_number: accountNumber
+                        };
+                    }
+
+                    function hasCompleteSavedBankDetails(profile) {
+                        const bank = getSavedBankDetails(profile);
+                        return !!(bank && bank.bank_name && bank.bank_account_holder && bank.bank_account_number);
+                    }
+
+                    function formatSavedBankDetails(profile) {
+                        const bank = getSavedBankDetails(profile);
+                        if (!bank) return 'No bank details saved';
+                        if (!hasCompleteSavedBankDetails(profile)) {
+                            return 'Incomplete bank details. Complete bank name, account holder, and account number in Settings â†’ Bank.';
+                        }
+                        const masked = bank.bank_account_number
+                            ? (bank.bank_account_number.length > 4 ? '****' + bank.bank_account_number.slice(-4) : '****' + bank.bank_account_number)
+                            : 'No account number';
+                        const holder = bank.bank_account_holder ? ` â€¢ ${bank.bank_account_holder}` : '';
+                        return `${bank.bank_name || 'Bank'} â€¢ ${masked}${holder}`;
+                    }
+
+                    function syncWithdrawalControls(profile) {
+                        const bankEl = document.getElementById('saved-bank-details');
+                        const btn = document.getElementById('withdraw-btn');
+                        const bank = getSavedBankDetails(profile);
+                        const hasBankDetails = !!bank;
+                        const hasCompleteBankDetails = hasCompleteSavedBankDetails(profile);
+
+                        if (bankEl) {
+                            bankEl.innerText = hasBankDetails
+                                ? formatSavedBankDetails(profile)
+                                : 'No bank details saved. Add your bank in Settings â†’ Bank.';
+                        }
+
+                        if (btn) {
+                            btn.disabled = isWithdrawalProcessing || !hasCompleteBankDetails;
+                            btn.classList.toggle('opacity-60', isWithdrawalProcessing || !hasCompleteBankDetails);
+                            btn.classList.toggle('cursor-not-allowed', isWithdrawalProcessing || !hasCompleteBankDetails);
+                            btn.innerText = isWithdrawalProcessing
+                                ? 'Withdrawal Pending...'
+                                : (hasCompleteBankDetails ? 'Request Withdrawal' : 'Complete Bank Details');
+                        }
+                    }
+
+                    function setWithdrawalProgressUI(state, message, percent = 0) {
+                        const progress = document.getElementById('withdraw-progress');
+                        const bar = document.getElementById('withdraw-progress-bar');
+                        const txt = document.getElementById('withdraw-progress-text');
+                        const title = document.getElementById('withdraw-progress-title');
+                        const status = document.getElementById('withdraw-progress-status');
+
+                        if (progress) progress.classList.toggle('hidden', state === 'idle');
+                        if (bar) bar.style.width = `${percent}%`;
+                        if (txt) txt.innerText = message;
+                        if (title) title.innerText = state === 'idle' ? 'Withdrawal Progress' : 'Withdrawal in progress';
+                        if (status) {
+                            status.innerText = state === 'idle'
+                                ? 'Ready'
+                                : state === 'processing'
+                                    ? 'In progress'
+                                    : state === 'completed'
+                                        ? 'Completed'
+                                        : 'Needs attention';
+                        }
+                    }
 
                     async function fetchPerformerEarningsData() {
                         try {
@@ -1410,7 +1587,15 @@
 
                             // Profile (may contain balance & saved bank details)
                             let profile = window.userProfile || null;
-                            try { profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, uid).catch(()=>profile); } catch(e) { /* ignore */ }
+                            try {
+                                const profileRes = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, uid).catch(()=>null);
+                                if (profileRes) {
+                                    profile = profileRes;
+                                    window.userProfile = profileRes;
+                                }
+                            } catch(e) { /* ignore */ }
+
+                            syncWithdrawalControls(profile);
 
                             // Transactions for user
                             const txRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', uid), Query.orderDesc('created_at'), Query.limit(100)]);
@@ -1440,24 +1625,9 @@
                                 net = allTime - withdrawals;
                             }
 
-                            document.getElementById('performer-net-balance').innerText = `₦${Math.round(net||0).toLocaleString()}`;
-                            document.getElementById('performer-pending-verification').innerText = `₦${Math.round(pendingSum||0).toLocaleString()}`;
-                            document.getElementById('performer-all-time').innerText = `₦${Math.round(allTime||0).toLocaleString()}`;
-
-                            // Saved bank: prefer explicit primary bank fields on profile and mask the account number
-                            const bankEl = document.getElementById('saved-bank-details');
-                            try {
-                                if (profile && (profile.bank_name || profile.bank_account_number || profile.bank_account_holder)) {
-                                    const bn = profile.bank_name || 'Bank';
-                                    const holder = profile.bank_account_holder || '';
-                                    const acct = profile.bank_account_number ? String(profile.bank_account_number) : '';
-                                    const masked = acct ? (acct.length > 4 ? '****' + acct.slice(-4) : '****' + acct) : '';
-                                    bankEl.innerText = `${bn} • ${masked}${holder ? ' • ' + holder : ''}`;
-                                } else {
-                                    const bankInfo = (profile && (profile.bank_details || profile.bank)) || null;
-                                    bankEl.innerText = bankInfo ? (typeof bankInfo === 'string' ? bankInfo : JSON.stringify(bankInfo)) : 'No bank details saved';
-                                }
-                            } catch(e) { if (bankEl) bankEl.innerText = 'No bank details saved'; }
+                            document.getElementById('performer-net-balance').innerText = `â‚¦${Math.round(net||0).toLocaleString()}`;
+                            document.getElementById('performer-pending-verification').innerText = `â‚¦${Math.round(pendingSum||0).toLocaleString()}`;
+                            document.getElementById('performer-all-time').innerText = `â‚¦${Math.round(allTime||0).toLocaleString()}`;
 
                             renderTransactionList(tx.slice(0,50));
                             renderEarningsTrend(tx);
@@ -1480,7 +1650,7 @@
                             <tr class="hover:bg-dash-secondary/10 transition-colors">
                                 <td class="p-3">${new Date(t.created_at).toLocaleString()}</td>
                                 <td class="p-3 font-bold">${(t.type || '').replace('_',' ').toUpperCase()}</td>
-                                <td class="p-3 font-bold">₦${(t.amount||0).toLocaleString()}</td>
+                                <td class="p-3 font-bold">â‚¦${(t.amount||0).toLocaleString()}</td>
                                 <td class="p-3"><span class="px-2 py-1 rounded-lg text-[10px] font-black uppercase ${t.status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}">${t.status}</span></td>
                             </tr>
                         `).join('');
@@ -1556,8 +1726,8 @@
                             if (_earningsChart) { try { _earningsChart.destroy(); } catch(e){} _earningsChart = null; }
                             _earningsChart = new Chart(ctx, {
                                 type: 'line',
-                                data: { labels, datasets: [{ label: '₦', data: sums, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.08)', tension: 0.25, fill: true }] },
-                                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => v ? '₦' + v : '₦0' } } } }
+                                data: { labels, datasets: [{ label: 'â‚¦', data: sums, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.08)', tension: 0.25, fill: true }] },
+                                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => v ? 'â‚¦' + v : 'â‚¦0' } } } }
                             });
                         } catch (e) { console.warn('renderEarningsTrend failed', e); }
                     }
@@ -1569,19 +1739,30 @@
 
                     async function submitWithdrawal() {
                         try {
-                            if (!currentUser || !currentUser.id) return alert('User not loaded.');
-                            const amt = Math.round(Number(document.getElementById('withdraw-amount').value || 0));
-                            if (!amt || amt <= 0) return alert('Enter a valid withdrawal amount.');
+                            if (!currentUser || !currentUser.id) return dashboardAlert('User not loaded.');
+                            const btn = document.getElementById('withdraw-btn');
+                            if (btn && btn.disabled) {
+                                dashboardAlert('Complete your bank details in Settings â†’ Bank before requesting a withdrawal.');
+                                return;
+                            }
 
-                            // Fetch profile for bank details and fetch vault for canonical balance
+                            const amt = Math.round(Number(document.getElementById('withdraw-amount').value || 0));
+                            if (!amt || amt <= 0) return dashboardAlert('Enter a valid withdrawal amount.');
+
                             const profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, currentUser.id).catch(()=>null);
+                            const bankDetails = getSavedBankDetails(profile);
+                            if (!hasCompleteSavedBankDetails(profile) || !bankDetails || !bankDetails.bank_name || !bankDetails.bank_account_holder || !bankDetails.bank_account_number) {
+                                dashboardAlert('Please complete and save your bank details in Settings â†’ Bank before requesting a withdrawal.');
+                                syncWithdrawalControls(profile);
+                                return;
+                            }
+
                             let vaultForWithdrawal = null;
                             try { const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', currentUser.id), Query.limit(1)]).catch(()=>({ documents: [] })); vaultForWithdrawal = (vres && vres.documents && vres.documents[0]) || null; } catch(e) { /* ignore */ }
                             let balance = 0;
                             if (vaultForWithdrawal && typeof vaultForWithdrawal.balance !== 'undefined') {
                                 balance = vaultForWithdrawal.balance;
                             } else {
-                                // compute from transactions as a fallback (no profile fallback)
                                 try {
                                     const txRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', currentUser.id), Query.orderDesc('created_at'), Query.limit(500)]).catch(()=>({ documents: [] }));
                                     const allTx = (txRes && txRes.documents) || [];
@@ -1590,55 +1771,70 @@
                                     balance = payouts - withdrawalsCompleted;
                                 } catch(e) { balance = 0; }
                             }
-                            if (amt > balance) return alert('Insufficient balance.');
+                            if (amt > balance) return dashboardAlert('Insufficient balance.');
 
-                            // Create a withdrawal transaction (status: pending)
+                            isWithdrawalProcessing = true;
+                            window.userProfile = profile;
+                            syncWithdrawalControls(profile);
+                            setWithdrawalProgressUI('processing', 'Your withdrawal request has been sent and is now being processed.', 10);
+
                             const tx = await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
                                 user_id: currentUser.id,
                                 amount: amt,
                                 type: 'withdrawal',
                                 status: 'pending',
-                                bank_details: profile && (profile.bank_details || profile.bank_name || profile.bank) || null,
+                                bank_details: bankDetails,
                                 description: 'Performer withdrawal request',
                                 created_at: new Date().toISOString()
                             });
 
-                            // Optimistic: update UI and start progress
-                            document.getElementById('withdraw-progress').classList.remove('hidden');
-                            updateWithdrawProgress(10, 'Request Received');
-
-                            // Reduce displayed balance optimistically
                             const netEl = document.getElementById('performer-net-balance');
-                            const currentNet = parseInt((netEl.innerText || '0').replace(/[₦,]/g,'')) || 0;
-                            netEl.innerText = `₦${Math.max(0, currentNet-amt).toLocaleString()}`;
+                            const currentNet = parseInt((netEl?.innerText || '0').replace(/[â‚¦,]/g,'')) || 0;
+                            if (netEl) netEl.innerText = `â‚¦${Math.max(0, currentNet-amt).toLocaleString()}`;
 
-                            // Poll the transaction status every 5s until changed from pending
+                            if (withdrawalPollTimer) clearInterval(withdrawalPollTimer);
                             pollWithdrawalStatus(tx.$id);
                             showToast('Withdrawal request submitted. Processing will continue in the background.', 'success');
-                        } catch (e) { console.error('Withdrawal failed', e); alert('Failed to submit withdrawal: ' + (e.message || e)); }
+                        } catch (e) {
+                            isWithdrawalProcessing = false;
+                            syncWithdrawalControls(window.userProfile || null);
+                            setWithdrawalProgressUI('failed', 'Withdrawal request failed. Please try again.', 0);
+                            console.error('Withdrawal failed', e);
+                            dashboardAlert('Failed to submit withdrawal: ' + (e.message || e));
+                        }
                     }
 
                     async function pollWithdrawalStatus(txId) {
                         try {
+                            if (withdrawalPollTimer) clearInterval(withdrawalPollTimer);
                             let progress = 10;
-                            const id = setInterval(async () => {
+                            withdrawalPollTimer = setInterval(async () => {
                                 try {
                                     const res = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, txId).catch(()=>null);
                                     if (!res) return;
-                                    // Map status to progress
-                                    if (res.status === 'pending') { progress = Math.min(60, progress + 10); updateWithdrawProgress(progress, 'Processing'); }
-                                    else if (res.status === 'completed') { updateWithdrawProgress(100, 'Disbursed'); clearInterval(id); fetchPerformerEarningsData(); }
-                                    else if (res.status === 'failed') { updateWithdrawProgress(100, 'Failed'); clearInterval(id); fetchPerformerEarningsData(); }
-                                } catch (e) { console.warn('pollWithdrawalStatus check failed', e); }
+                                    if (res.status === 'pending') {
+                                        progress = Math.min(60, progress + 10);
+                                        setWithdrawalProgressUI('processing', 'Your withdrawal is still being processed.', progress);
+                                    } else if (res.status === 'completed') {
+                                        setWithdrawalProgressUI('completed', 'Your withdrawal has been disbursed successfully.', 100);
+                                        isWithdrawalProcessing = false;
+                                        if (withdrawalPollTimer) clearInterval(withdrawalPollTimer);
+                                        withdrawalPollTimer = null;
+                                        syncWithdrawalControls(window.userProfile || null);
+                                        fetchPerformerEarningsData();
+                                    } else if (res.status === 'failed') {
+                                        setWithdrawalProgressUI('failed', 'Your withdrawal could not be completed. Please try again.', 100);
+                                        isWithdrawalProcessing = false;
+                                        if (withdrawalPollTimer) clearInterval(withdrawalPollTimer);
+                                        withdrawalPollTimer = null;
+                                        syncWithdrawalControls(window.userProfile || null);
+                                        fetchPerformerEarningsData();
+                                    }
+                                } catch (e) {
+                                    console.warn('pollWithdrawalStatus check failed', e);
+                                }
                             }, 5000);
                         } catch (e) { console.warn('pollWithdrawalStatus failed', e); }
-                    }
-
-                    function updateWithdrawProgress(percent, text) {
-                        const bar = document.getElementById('withdraw-progress-bar');
-                        const txt = document.getElementById('withdraw-progress-text');
-                        if (bar) bar.style.width = percent + '%';
-                        if (txt) txt.innerText = text;
                     }
 
                     // Wire up UI
@@ -1709,14 +1905,14 @@
                             <div class="text-right">
                                 <div class="bg-green-500/10 text-green-600 px-4 py-2 rounded-2xl border border-green-500/20">
                                     <p class="text-[9px] font-bold uppercase mb-0.5">Payout</p>
-                                    <h3 class="text-xl font-black" id="task-detail-reward">₦0.00</h3>
+                                    <h3 class="text-xl font-black" id="task-detail-reward">â‚¦0.00</h3>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Creator's Instructions -->
                         <div class="space-y-4">
-                            <h4 class="text-xs font-black uppercase tracking-widest text-dash-secondary">Creator’s Instructions</h4>
+                            <h4 class="text-xs font-black uppercase tracking-widest text-dash-secondary">Creatorâ€™s Instructions</h4>
                             <div class="p-5 bg-dash-secondary/30 rounded-2xl border border-dash text-sm leading-relaxed text-dash-secondary italic" id="task-detail-instructions"></div>
                         </div>
 
@@ -1824,39 +2020,43 @@
                             </div>
                             <div>
                                 <p class="text-[11px] text-amber-800 font-bold mb-0.5">Don't forget the proof!</p>
-                                <p class="text-[10px] text-amber-700 leading-tight">Capture a clear screenshot showing your action (Like/Follow/Comment) before returning.</p>
+                                <p class="text-[10px] text-amber-700 leading-tight">Capture a clear screenshot showing your action (Like/Follow/Comment) before submitting.</p>
                             </div>
                         </div>
 
                         <button onclick="startLingerPhase()" id="start-linger-btn" class="w-full btn-fintech btn-primary justify-center py-5 shadow-xl font-black uppercase tracking-widest group">
-                            <span>Submit Proof</span>
+                            <span>Review & Submit</span>
                             <i data-feather="arrow-right" class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
                         </button>
                     </div>
 
                     <div id="task-step-3" class="task-wizard-step hidden space-y-6">
                         <div class="text-center space-y-2">
-                            <h3 class="text-2xl font-bold tracking-tight">Quality Control Protocol</h3>
-                            <p class="text-sm text-dash-secondary">We are verifying your human attention markers. Please remain on this screen for the duration of the dwell timer.</p>
+                            <h3 class="text-2xl font-bold tracking-tight">Review and Submit</h3>
+                            <p class="text-sm text-dash-secondary">Double-check your submission details, then send the task for review.</p>
                         </div>
 
-                        <div class="space-y-4">
-                            <div class="flex flex-col items-center gap-2 py-8">
-                                <div class="relative w-16 h-16">
-                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
-                                        <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="3" fill="transparent" class="text-dash-secondary opacity-10" />
-                                        <circle id="timer-circle" cx="32" cy="32" r="28" stroke="currentColor" stroke-width="3" fill="transparent" 
-                                                stroke-dasharray="175.9" stroke-dashoffset="0" 
-                                                class="text-[var(--accent-primary)] transition-all duration-1000 ease-linear" />
-                                    </svg>
-                                    <div class="absolute inset-0 flex items-center justify-center font-black text-[10px]" id="retention-timer">01:00</div>
-                                </div>
-                                <p class="text-[9px] font-black text-dash-secondary uppercase tracking-[0.2em]">Dwell Protocol Active</p>
+                        <div class="p-6 bg-dash-secondary/30 rounded-3xl border border-dash space-y-4 text-left">
+                            <div>
+                                <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest mb-1">Handle</p>
+                                <p id="task-review-handle" class="text-sm font-bold text-[var(--text-primary)]">â€”</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest mb-1">Comment</p>
+                                <p id="task-review-comment" class="text-sm text-dash-secondary leading-relaxed">â€”</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest mb-1">Screenshots</p>
+                                <p id="task-review-screenshots" class="text-sm text-dash-secondary">â€”</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest mb-1">Link</p>
+                                <p id="task-review-link" class="text-sm text-dash-secondary">â€”</p>
                             </div>
                         </div>
 
-                        <button onclick="submitTaskProof()" id="task-submit-btn" class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg" disabled>
-                            <span>Submit Mission for Review</span>
+                        <button onclick="submitTaskProof()" id="task-submit-btn" class="w-full btn-fintech btn-primary justify-center py-4 shadow-lg">
+                            <span>Submit for Review</span>
                             <i data-feather="check-circle" class="ml-2 w-4"></i>
                         </button>
                     </div>
@@ -1866,11 +2066,11 @@
                             <i data-feather="shield" class="w-12 h-12"></i>
                         </div>
                         <div class="space-y-3">
-                            <h2 class="text-3xl font-bold tracking-tight">Mission Locked In! 🚀</h2>
+                            <h2 class="text-3xl font-bold tracking-tight">Mission Locked In! ðŸš€</h2>
                             <div class="max-w-xs mx-auto space-y-4">
                                 <div class="p-4 bg-dash-secondary/30 rounded-2xl border border-dash">
                                     <p class="text-sm text-dash-secondary leading-relaxed">
-                                        Your reward of <span class="text-[var(--text-primary)] font-bold" id="success-reward-val">₦0</span> has been added to your <span class="font-bold">Pending Balance</span>.
+                                        Your reward of <span class="text-[var(--text-primary)] font-bold" id="success-reward-val">â‚¦0</span> has been added to your <span class="font-bold">Pending Balance</span>.
                                     </p>
                                 </div>
                                 <p class="text-[11px] text-dash-secondary leading-relaxed">
@@ -1934,12 +2134,12 @@
                         <div class="flex items-end gap-3 mt-4">
                             <div class="flex-1">
                                 <p class="text-[9px] font-bold text-dash-secondary uppercase">PIDI Avg</p>
-                                <p class="text-2xl font-black text-[var(--accent-primary)]">₦2.50</p>
+                                <p class="text-2xl font-black text-[var(--accent-primary)]">â‚¦2.50</p>
                             </div>
                             <div class="w-px h-10 bg-dash-secondary"></div>
                             <div class="flex-1 opacity-50">
                                 <p class="text-[9px] font-bold text-dash-secondary uppercase">Market Avg</p>
-                                <p class="text-xl font-bold line-through">₦45.00</p>
+                                <p class="text-xl font-bold line-through">â‚¦45.00</p>
                             </div>
                         </div>
                         <p class="text-[10px] text-dash-secondary mt-3">ROI Advantage: <span class="text-[var(--accent-primary)] font-bold">18x Cheaper</span> than IG Ads</p>
@@ -2156,7 +2356,7 @@
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-6 py-8 border-y border-dash">
                                 <div><p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Target Engagement</p><h4 id="detail-goal-count" class="text-xl font-bold">0</h4></div>
                                 <div><p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Current Progress</p><h4 id="detail-current-count" class="text-xl font-bold">0</h4></div>
-                                <div><p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Total Spend</p><h4 id="detail-total-cost" class="text-xl font-bold">₦0</h4></div>
+                                <div><p class="text-[9px] font-bold text-dash-secondary uppercase mb-1">Total Spend</p><h4 id="detail-total-cost" class="text-xl font-bold">â‚¦0</h4></div>
                             </div>
 
                             <div class="mt-8">
@@ -2213,17 +2413,17 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div class="bento-card card-azure">
                         <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest mb-3">Total Invested</p>
-                        <h3 class="text-3xl font-bold mb-1" id="wallet-total-paid">₦0</h3>
+                        <h3 class="text-3xl font-bold mb-1" id="wallet-total-paid">â‚¦0</h3>
                         <p class="text-[10px] text-dash-secondary">Lifetime deployment</p>
                     </div>
                     <div class="bento-card card-amber">
                         <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest mb-3">Working Capital</p>
-                        <h3 class="text-3xl font-bold mb-1" id="wallet-working-funds">₦0</h3>
+                        <h3 class="text-3xl font-bold mb-1" id="wallet-working-funds">â‚¦0</h3>
                         <p class="text-[10px] text-dash-secondary">Active campaign funding</p>
                     </div>
                     <div class="bento-card card-emerald">
                         <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest mb-3">Spent/Completed</p>
-                        <h3 class="text-3xl font-bold mb-1" id="wallet-spent-funds">₦0</h3>
+                        <h3 class="text-3xl font-bold mb-1" id="wallet-spent-funds">â‚¦0</h3>
                         <p class="text-[10px] text-dash-secondary">Fully delivered value</p>
                     </div>
                 </div>
@@ -2654,7 +2854,7 @@
                             if (!inviteArea) return;
                             // replace placeholder with actual form link
                             const text = inviteArea.value.replace('[FORM_LINK]', fullLink);
-                            try { await navigator.clipboard.writeText(text); copyBtn.innerText = 'Copied'; setTimeout(()=> copyBtn.innerText='Copy',1200); } catch(e) { alert('Copy failed — please select and copy manually.'); }
+                            try { await navigator.clipboard.writeText(text); copyBtn.innerText = 'Copied'; setTimeout(()=> copyBtn.innerText='Copy',1200); } catch(e) { dashboardAlert('Copy failed â€” please select and copy manually.'); }
                         });
 
                         // Share buttons
@@ -2810,10 +3010,10 @@
                                     <input type="number" id="goal-val" min="10" max="1000" value="10" class="w-24 bg-transparent border-b-2 border-dash focus:border-[var(--accent-primary)] outline-none text-3xl font-bold p-1 transition-colors" oninput="syncInputs('number')">
                                     <span class="text-sm font-bold text-dash-secondary uppercase">Units</span>
                                 </div>
-                                <span class="text-3xl font-bold text-[var(--accent-primary)]" id="cost-val">₦3,500</span>
+                                <span class="text-3xl font-bold text-[var(--accent-primary)]" id="cost-val">â‚¦3,500</span>
                             </div>
                         </div>
-                        <p class="text-xs text-dash-secondary italic">* 10-29 engagements: ₦350/ea | 30-99: ₦300/ea | 100+: ₦270/ea</p>
+                        <p class="text-xs text-dash-secondary italic">* 10-29 engagements: â‚¦350/ea | 30-99: â‚¦300/ea | 100+: â‚¦270/ea</p>
                     </div>
 
                     <!-- Step 3: Instructions -->
@@ -2836,7 +3036,7 @@
                                 
                                 <div class="p-6 bg-dash-secondary rounded-2xl border border-dash flex flex-col items-center gap-4">
                                     <div class="text-center">
-                                        <p class="text-3xl font-bold tracking-tighter text-[var(--text-primary)]" id="final-cost">₦3,500</p>
+                                        <p class="text-3xl font-bold tracking-tighter text-[var(--text-primary)]" id="final-cost">â‚¦3,500</p>
                                         <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest mt-1">Total Amount Payable</p>
                                     </div>
                                     <a id="paystack-link" href="https://paystack.shop/pay/pidistarter" target="_blank" class="w-full btn-fintech btn-primary justify-center py-4 text-sm shadow-xl">
@@ -2955,7 +3155,7 @@
             <p class="text-dash-secondary text-sm mb-6">Securely fund your growth account.</p>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Amount (₦)</label>
+                    <label class="block text-[10px] font-bold text-dash-secondary uppercase mb-2">Amount (â‚¦)</label>
                     <input type="number" id="deposit-amount" placeholder="e.g. 50000" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-lg font-bold focus:outline-none focus:border-[var(--accent-primary)]">
                 </div>
                 <button onclick="processDeposit()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Pay with Paystack</button>
@@ -3244,7 +3444,7 @@
         });
 
         // Utility for count-up animation
-        function countUp(element, endValue, prefix = "₦") {
+        function countUp(element, endValue, prefix = "â‚¦") {
             const duration = 1500;
             const start = 0;
             const startTime = performance.now();
@@ -3303,7 +3503,7 @@
                                 <td class="py-3 font-bold truncate max-w-[150px]">${c.target_url}</td>
                                 <td class="py-3 text-dash-secondary font-semibold">${c.full_name || 'System'}</td>
                                 <td class="py-3 uppercase font-bold text-[9px] text-dash-secondary">${c.platform}</td>
-                                <td class="py-3 font-bold">₦${(c.total_cost || 0).toLocaleString()}</td>
+                                <td class="py-3 font-bold">â‚¦${(c.total_cost || 0).toLocaleString()}</td>
                                 <td class="py-3"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-dash-secondary">${c.status}</span></td>
                                 <td class="py-3 text-right font-mono">${progress}%</td>
                             </tr>
@@ -3314,7 +3514,7 @@
                 if (allUsers) document.getElementById('admin-stat-users').innerText = allUsers.length;
                 if (transactions) {
                     const tvl = transactions.filter(t => t.status === 'pending').reduce((acc, t) => acc + (t.amount || 0), 0);
-                    document.getElementById('admin-stat-tvl').innerText = `₦${tvl.toLocaleString()}`;
+                    document.getElementById('admin-stat-tvl').innerText = `â‚¦${tvl.toLocaleString()}`;
                 }
             } catch (err) { console.error("Admin Sync Error:", err); }
         }
@@ -3369,7 +3569,7 @@
                 let vault = null;
                 try { const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', currentUser.id), Query.limit(1)]).catch(()=>({ documents: [] })); vault = (vres && vres.documents && vres.documents[0]) || null; } catch(e) { /* ignore */ }
                 if (vault) {
-                    document.getElementById('performer-stat-earnings').innerText = `₦${(vault.balance || 0).toLocaleString()}`;
+                    document.getElementById('performer-stat-earnings').innerText = `â‚¦${(vault.balance || 0).toLocaleString()}`;
                     document.getElementById('performer-stat-pending').innerText = vault.pending_balance || 0;
                     document.getElementById('performer-stat-approved').innerText = vault.completed_tasks || 0;
                 } else if (profile) {
@@ -3379,7 +3579,7 @@
                     const payouts = allTxLocal.filter(t => t.type === 'payout' && t.status === 'completed').reduce((s,t)=>s+(t.amount||0),0);
                     const withdrawalsCompleted = allTxLocal.filter(t => t.type === 'withdrawal' && t.status === 'completed').reduce((s,t)=>s+(t.amount||0),0);
                     const computedBal = payouts - withdrawalsCompleted;
-                    document.getElementById('performer-stat-earnings').innerText = `₦${(computedBal || 0).toLocaleString()}`;
+                    document.getElementById('performer-stat-earnings').innerText = `â‚¦${(computedBal || 0).toLocaleString()}`;
                     document.getElementById('performer-stat-pending').innerText = 0;
                     document.getElementById('performer-stat-approved').innerText = 0;
                 }
@@ -3416,7 +3616,7 @@
                     const reserved = activeCountsByCampaign[t.$id] || 0;
                     // current_count already reflects approved/completed engagements
                     const spotsLeft = Math.max(0, (t.goal_count || 0) - ((t.current_count || 0) + reserved));
-                    const reward = t.total_cost || t.reward || t.price || 0;
+                    const reward = window.getPerformerRewardForTask(t);
                     const creator = (creators || []).find(c => c.$id === t.creator_id) || { full_name: 'Creator', avatar: '' };
 
                     const claimable = spotsLeft > 0;
@@ -3436,7 +3636,7 @@
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-lg font-black text-green-500">₦${reward}</p>
+                                    <p class="text-lg font-black text-green-500">â‚¦${reward.toLocaleString()}</p>
                                     <p class="text-[8px] font-bold text-dash-secondary uppercase">reward</p>
                                 </div>
                             </div>
@@ -3579,7 +3779,7 @@
                 const adminCheck = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ADMIN_WHITELIST, [Query.equal('email', currentUser.email)]);
 
                 if (adminCheck.total === 0) {
-                    alert("Access Denied: You do not have administrator privileges.");
+                    dashboardAlert("Access Denied: You do not have administrator privileges.");
                     // Redirect to a non-admin view, e.g., creator dashboard
                     switchRole('creator'); // Recursively call to switch to creator
                     return;
@@ -3732,7 +3932,7 @@
             const todayStr = new Date().toISOString().slice(0,10);
             if (!endDateVal) endDateVal = todayStr;
 
-            // Platforms filter removed — show all platforms
+            // Platforms filter removed â€” show all platforms
 
             return (roles.creator.items || []).filter(c => {
                 const matchesFilter = archiveFilter === 'all' || c.status === archiveFilter;
@@ -3804,7 +4004,7 @@
                         </td>
                         <td class="p-4 uppercase font-bold text-[9px] text-dash-secondary tracking-widest hidden md:table-cell">${c.platform}</td>
                         <td class="p-4"><span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase ${statusColors[c.status] || 'bg-dash-secondary text-dash-secondary'}">${c.status === 'pending_verification' ? 'Verifying' : c.status}</span></td>
-                        <td class="p-4 font-bold">₦${(c.total_cost || 0).toLocaleString()}</td>
+                        <td class="p-4 font-bold">â‚¦${(c.total_cost || 0).toLocaleString()}</td>
                         <td class="p-4"><div class="flex items-center gap-3 min-w-[100px]"><div class="flex-1 bg-dash-secondary h-1 rounded-full overflow-hidden"><div class="bg-[var(--accent-primary)] h-full" style="width: ${progress}%"></div></div><span class="text-[9px] font-bold">${progress}%</span></div></td>
                         <td class="p-4 text-right">
                             <button onclick="window.open('${c.target_url}', '_blank')" class="w-8 h-8 rounded-lg hover:bg-white border border-transparent hover:border-dash flex items-center justify-center transition">
@@ -3826,7 +4026,7 @@
             document.getElementById('detail-created-at').innerText = `Deployed on ${new Date(campaign.created_at).toLocaleDateString()} at ${new Date(campaign.created_at).toLocaleTimeString()}`;
             document.getElementById('detail-goal-count').innerText = campaign.goal_count.toLocaleString();
             document.getElementById('detail-current-count').innerText = campaign.current_count.toLocaleString();
-            document.getElementById('detail-total-cost').innerText = `₦${campaign.total_cost.toLocaleString()}`;
+            document.getElementById('detail-total-cost').innerText = `â‚¦${campaign.total_cost.toLocaleString()}`;
             document.getElementById('detail-instructions').innerText = campaign.instructions || "No specific instructions provided for this mission.";
             
             const progress = Math.round((campaign.current_count / campaign.goal_count) * 100) || 0;
@@ -3971,6 +4171,21 @@
             }).join('');
         }
 
+        if (!window.getPerformerRewardForTask) {
+            window.getPerformerRewardForTask = function(task) {
+                if (!task) return 70;
+
+                const goalCount = Number(task.goal_count) || 1;
+                const totalCost = Number(task.total_cost);
+                const fallbackBase = Number(task.reward ?? task.price ?? 0);
+                const basePerPerformer = Number.isFinite(totalCost) && totalCost > 0
+                    ? totalCost / goalCount
+                    : (Number.isFinite(fallbackBase) && fallbackBase > 0 ? fallbackBase : 70);
+
+                return Math.round(basePerPerformer * 0.4);
+            };
+        }
+
         window.scrollToTasks = function() {
             const table = document.querySelector('.bento-grid .col-span-3');
             if (table) table.scrollIntoView({ behavior: 'smooth' });
@@ -4013,6 +4228,10 @@
                     setTimeout(() => toast.remove(), 500);
                 }
             }, 6000);
+        };
+
+        window.dashboardAlert = function(message, type = 'info') {
+            window.showToast(message, type);
         };
 
         function setupRealtimeSubscriptions() {
@@ -4124,7 +4343,7 @@
             if (growth >= 250) {
                 const alert = document.getElementById('milestone-alert');
                 alert.innerHTML = `
-                    <p class="text-[10px] font-bold">🚀 GROWTH MILESTONE: ${growth}%</p>
+                    <p class="text-[10px] font-bold">ðŸš€ GROWTH MILESTONE: ${growth}%</p>
                     <p class="text-xs">Your engagement is soaring! Ready for Google Ads?</p>
                     <a href="contact.html" class="text-[10px] underline font-bold mt-2 inline-block">BOOK LANDING PAGE AUDIT</a>
                 `;
@@ -4324,9 +4543,9 @@
                     const working = campaigns.filter(c => c.status === 'active').reduce((acc, c) => acc + c.total_cost, 0);
                     const spent = campaigns.filter(c => c.status === 'completed').reduce((acc, c) => acc + c.total_cost, 0);
 
-                    document.getElementById('wallet-total-paid').innerText = `₦${totalPaid.toLocaleString()}`;
-                    document.getElementById('wallet-working-funds').innerText = `₦${working.toLocaleString()}`;
-                    document.getElementById('wallet-spent-funds').innerText = `₦${spent.toLocaleString()}`;
+                    document.getElementById('wallet-total-paid').innerText = `â‚¦${totalPaid.toLocaleString()}`;
+                    document.getElementById('wallet-working-funds').innerText = `â‚¦${working.toLocaleString()}`;
+                    document.getElementById('wallet-spent-funds').innerText = `â‚¦${spent.toLocaleString()}`;
                 }
                 } catch (err) {
                     console.warn("Wallet fetch error:", err);
@@ -4342,7 +4561,7 @@
                             <p class="font-bold">${t.type === 'escrow_lock' ? 'Campaign Funding' : 'Manual Deposit'}</p>
                             <p class="text-[9px] text-dash-secondary">${new Date(t.created_at).toLocaleDateString()}</p>
                         </td>
-                        <td class="py-4 font-bold">₦${t.amount.toLocaleString()}</td>
+                        <td class="py-4 font-bold">â‚¦${t.amount.toLocaleString()}</td>
                         <td class="py-4 text-right">
                             <span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase ${t.status === 'completed' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'}">
                                 ${t.status}
@@ -4404,7 +4623,7 @@
                 await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, engagement.campaign_id, { current_count: (campaign.current_count || 0) + 1 });
 
                 // Reward performer: create transaction and update VAULTS (vault is canonical)
-                const rewardAmount = engagement.reward || 70; // fallback reward
+                const rewardAmount = Number(engagement.reward) || window.getPerformerRewardForTask(campaign) || 70;
                 // 1. Record transaction (ledger)
                 await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
                     user_id: engagement.performer_id,
@@ -4436,20 +4655,20 @@
                     }
                 } catch (err) { console.warn('Failed to update escrow transaction status on approval', err); }
 
-                alert('Engagement approved and performer rewarded.');
+                dashboardAlert('Engagement approved and performer rewarded.');
                 fetchAdminPendingMissions();
                 fetchPerformerDashboardData();
                 fetchAdminDashboardData();
             } catch (err) {
                 console.error('Approve error:', err);
-                alert('Failed to approve engagement: ' + (err.message || err));
+                dashboardAlert('Failed to approve engagement: ' + (err.message || err));
             }
         }
 
         async function adminRejectEngagement(engagementId) {
             try {
                 await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, engagementId, { status: 'rejected', reviewed_at: new Date().toISOString() });
-                alert('Engagement rejected.');
+                dashboardAlert('Engagement rejected.');
                 // Mark escrow as failed/released
                 try {
                     const escRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('engagement_id', engagementId), Query.equal('type', 'escrow_lock')]);
@@ -4458,7 +4677,7 @@
                 fetchAdminPendingMissions();
             } catch (err) {
                 console.error('Reject error:', err);
-                alert('Failed to reject engagement: ' + (err.message || err));
+                dashboardAlert('Failed to reject engagement: ' + (err.message || err));
             }
         }
 
@@ -4473,11 +4692,11 @@
                     await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, transRes.documents[0].$id, { status: newStatus === 'active' ? 'completed' : 'failed' });
                 }
 
-                alert(`Campaign ${newStatus} successfully.`);
+                dashboardAlert(`Campaign ${newStatus} successfully.`);
                 fetchAdminPendingMissions();
             } catch (err) {
                 console.error("Admin Error:", err);
-                alert("Failed to process action.");
+                dashboardAlert("Failed to process action.");
             }
         }
 
@@ -4611,8 +4830,8 @@
             if (!numEl) return;
             const qty = parseInt(numEl.value || '10', 10) || 10;
             const cost = calculateTotalCost(qty);
-            const costVal = document.getElementById('cost-val'); if (costVal) costVal.innerText = `₦${cost.toLocaleString()}`;
-            const finalCost = document.getElementById('final-cost'); if (finalCost) finalCost.innerText = `₦${cost.toLocaleString()}`;
+            const costVal = document.getElementById('cost-val'); if (costVal) costVal.innerText = `â‚¦${cost.toLocaleString()}`;
+            const finalCost = document.getElementById('final-cost'); if (finalCost) finalCost.innerText = `â‚¦${cost.toLocaleString()}`;
             const summary = document.getElementById('summary-text'); if (summary) {
                 const plt = selectedPlatform || 'instagram';
                 summary.innerText = `${qty} Human ${plt.charAt(0).toUpperCase() + plt.slice(1)} Engagements`;
@@ -4622,7 +4841,7 @@
         function nextStep() {
             if (currentStep === 1) {
                 if (!selectedPlatform) {
-                    alert("Please select a platform to proceed.");
+                    dashboardAlert("Please select a platform to proceed.");
                     return;
                 }
                 const config = PLATFORM_CONFIG[selectedPlatform];
@@ -4630,20 +4849,20 @@
                     const user = document.getElementById('target-username').value.trim();
                     const thumb = document.getElementById('target-thumbnail');
                     if (!user || !thumb.files[0]) {
-                        alert("Social missions require a @Username and a Thumbnail visual guide.");
+                        dashboardAlert("Social missions require a @Username and a Thumbnail visual guide.");
                         return;
                     }
                 } else {
                     const seed = document.getElementById('search-seed').value.trim();
                     const bread = document.getElementById('breadcrumb').value.trim();
                     if (!seed || !bread) {
-                        alert("SEO missions require a Search Seed and Breadcrumb instructions.");
+                        dashboardAlert("SEO missions require a Search Seed and Breadcrumb instructions.");
                         return;
                     }
                 }
                 const urlInput = document.getElementById('target-url');
                 if (!urlInput || !urlInput.value.trim()) {
-                    alert("Admin Verification Required: Please provide the Master URL.");
+                    dashboardAlert("Admin Verification Required: Please provide the Master URL.");
                     urlInput.focus();
                     return;
                 }
@@ -4715,7 +4934,7 @@
             const totalCost = calculateTotalCost(parseInt(qty));
 
             if (!url) {
-                alert("Please provide a target URL.");
+                dashboardAlert("Please provide a target URL.");
                 btnSpan.innerText = originalText;
                 finishBtn.disabled = false;
                 return;
@@ -4723,7 +4942,7 @@
 
             // Validation: Payment Proof is Compulsory
             if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Action Required: Please upload your payment receipt (screenshot or PDF) before submitting.");
+                dashboardAlert("Action Required: Please upload your payment receipt (screenshot or PDF) before submitting.");
                 btnSpan.innerText = originalText;
                 finishBtn.disabled = false;
                 return;
@@ -4812,7 +5031,7 @@
             } catch (err) {
                 console.error("Submission Error:", err);
                 if (loader) loader.classList.add('hidden');
-                alert("Failed to deploy campaign: " + err.message);
+                dashboardAlert("Failed to deploy campaign: " + err.message);
             } finally {
                 btnSpan.innerText = originalText;
                 finishBtn.disabled = false;
@@ -4887,7 +5106,7 @@
                 closeEditModal();
                 await fetchRoleData('creator');
                 viewCampaignDetails(campaignId);
-            } catch (err) { alert("Update failed: " + err.message); } finally { btn.disabled = false; btn.innerText = "Update Campaign"; feather.replace(); }
+            } catch (err) { dashboardAlert("Update failed: " + err.message); } finally { btn.disabled = false; btn.innerText = "Update Campaign"; feather.replace(); }
         }
 
         // --- TASK FLOW LOGIC (Performer) ---
@@ -4902,6 +5121,14 @@
                 await new Promise(res => setTimeout(res, 60));
 
                 const task = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, taskId);
+                if ((task.status || '').toLowerCase() !== 'active') {
+                    if ((task.status || '').toLowerCase() === 'completed') {
+                        await window.viewCompletedTaskDetails(taskId);
+                        return;
+                    }
+                    showToast('This task is still pending. You can start it once it becomes active.', 'info');
+                    return;
+                }
                 activeTask = task;
 
                 // LOCK: create or upsert an engagement to reserve the spot with a default expiry
@@ -4910,14 +5137,16 @@
                 const expiresAt = new Date(Date.now() + defaultExpiryMs).toISOString();
                 const existEngage = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', taskId), Query.equal('performer_id', currentUser.id)]);
 
+                const rewardValue = window.getPerformerRewardForTask(task);
                 if (existEngage.total > 0) {
-                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, existEngage.documents[0].$id, { status: 'in_progress', expires_at: expiresAt });
+                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, existEngage.documents[0].$id, { status: 'in_progress', expires_at: expiresAt, reward: rewardValue });
                 } else {
                     await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, ID.unique(), {
                         campaign_id: taskId,
                         performer_id: currentUser.id,
                         status: 'in_progress',
                         expires_at: expiresAt,
+                        reward: rewardValue,
                         created_at: new Date().toISOString()
                     });
                 }
@@ -4929,9 +5158,8 @@
                 const titleEl = document.getElementById('task-detail-title'); 
                 if (titleEl) titleEl.innerText = `Mission: ${task.platform.charAt(0).toUpperCase() + task.platform.slice(1)} Engagement`;
                 
-                const reward = Math.round((task.total_cost || 0) / (task.goal_count || 1)) || 70;
                 const rewardEl = document.getElementById('task-detail-reward');
-                if (rewardEl) rewardEl.innerText = `₦${reward.toLocaleString()}`;
+                if (rewardEl) rewardEl.innerText = `â‚¦${rewardValue.toLocaleString()}`;
 
                 const instrEl = document.getElementById('task-detail-instructions'); if (instrEl) instrEl.innerText = task.instructions || "Perform high-quality engagement. At least 10 words if commenting.";
                 const platformElStep1 = document.getElementById('task-platform-icon-step1'); if (platformElStep1) platformElStep1.innerHTML = `<i class="fa-brands fa-${task.platform}"></i>`;
@@ -4981,7 +5209,7 @@
                 const spotsLeft = Math.max(0, (campaign.goal_count || 0) - effectiveFilled);
 
                 if (spotsLeft <= 0) {
-                    showToast('Sorry — this mission is full. You can still view details but cannot claim.', 'error');
+                    showToast('Sorry â€” this mission is full. You can still view details but cannot claim.', 'error');
                     // Refresh list to reflect the updated state
                     fetchPerformerDashboardData();
                     return;
@@ -5009,7 +5237,7 @@
                 await startTaskFlow(campaignId);
             } catch (err) {
                 console.error('Claim failed:', err);
-                alert('Failed to claim task: ' + (err.message || err));
+                dashboardAlert('Failed to claim task: ' + (err.message || err));
             }
         }
 
@@ -5025,7 +5253,7 @@
                 const secs = String(remaining % 60).padStart(2, '0');
                 // Update any visible claim buttons text if they exist
                 document.querySelectorAll(`[onclick*="claimTask('${campaignId}')"]`).forEach(btn => {
-                    btn.innerText = remaining > 0 ? `Claimed — ${mins}:${secs}` : 'Claim Expired';
+                    btn.innerText = remaining > 0 ? `Claimed â€” ${mins}:${secs}` : 'Claim Expired';
                 });
 
                 if (remaining <= 0) {
@@ -5081,7 +5309,7 @@
 
         // Called when a performer clicks Accept Mission on step 1
         window.acceptMission = async function() {
-            if (!activeTask) return alert('No active task selected');
+            if (!activeTask) return dashboardAlert('No active task selected');
 
             try {
                 // Create or update engagement and set expiry to 30 minutes
@@ -5125,79 +5353,41 @@
                 updateTaskFlowNav();
             } catch (err) {
                 console.error('Accept mission failed:', err);
-                alert('Failed to accept mission: ' + (err.message || err));
+                dashboardAlert('Failed to accept mission: ' + (err.message || err));
             }
         }
 
-        // Performer clicked 'I opened the native app' — start linger/dwell phase and then enable submission
+        // Validate the proof form and move the performer to the final review step.
         window.startLingerPhase = function() {
-            // Validate Step 2 fields before proceeding
             const handle = document.getElementById('task-proof-username').value.trim();
             const text = document.getElementById('task-proof-text').value.trim();
             const fileInput = document.getElementById('task-proof-file');
-            
-            if (!handle) { alert("Please provide your social media handle."); return; }
+            const linkInput = document.getElementById('task-proof-link');
+
+            if (!handle) { dashboardAlert("Please provide your social media handle."); return; }
             if (text.split(/\s+/).filter(w => w.length > 0).length < 10) {
-                alert("Quality Check: Please provide at least 10 words for the comment.");
+                dashboardAlert("Quality Check: Please provide at least 10 words for the comment.");
                 return;
             }
             if (!fileInput.files || !fileInput.files[0]) {
-                alert("Please upload at least one screenshot for verification.");
+                dashboardAlert("Please upload at least one screenshot for verification.");
                 return;
             }
 
-            // move to step 3 which contains the proof capture and dwell timer
+            const handleReview = document.getElementById('task-review-handle');
+            const commentReview = document.getElementById('task-review-comment');
+            const screenshotsReview = document.getElementById('task-review-screenshots');
+            const linkReview = document.getElementById('task-review-link');
+
+            if (handleReview) handleReview.innerText = handle;
+            if (commentReview) commentReview.innerText = text;
+            if (screenshotsReview) screenshotsReview.innerText = `${fileInput.files.length} screenshot${fileInput.files.length > 1 ? 's' : ''} uploaded`;
+            if (linkReview) linkReview.innerText = linkInput && linkInput.value.trim() ? linkInput.value.trim() : 'No link provided';
+
             document.getElementById('task-step-2').classList.add('hidden');
             currentTaskStep = 3;
             document.getElementById('task-step-3').classList.remove('hidden');
             updateTaskFlowNav();
-
-            // Start dwell timer (60s) before enabling submission button
-            startRetentionTimer(60);
-        }
-
-        function startRetentionTimer(seconds) {
-            const timerEl = document.getElementById('retention-timer');
-            const circle = document.getElementById('timer-circle');
-            const submitBtn = document.getElementById('task-submit-btn');
-            if (!timerEl || !submitBtn) return;
-
-            const circumference = 2 * Math.PI * 28;
-            if (circle) {
-                circle.style.strokeDasharray = circumference;
-                circle.style.strokeDashoffset = 0;
-            }
-
-            // Initialize display
-            let remaining = seconds;
-            const interval = setInterval(() => {
-                const m = String(Math.floor(remaining / 60)).padStart(2, '0');
-                const s = String(remaining % 60).padStart(2, '0');
-                timerEl.innerText = `${m}:${s}`;
-                
-                if (circle) {
-                    circle.style.strokeDashoffset = circumference * (1 - remaining / seconds);
-                }
-
-                if (remaining <= 0) {
-                    clearInterval(interval);
-                    
-                    // Enforce 10-word rule before enabling button
-                    const textarea = document.getElementById('task-proof-text');
-                    const text = textarea ? textarea.value.trim() : '';
-                    const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
-
-                    if (words >= 10) {
-                        submitBtn.disabled = false;
-                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-dash-secondary');
-                        submitBtn.classList.add('btn-primary', 'text-white');
-                        const span = submitBtn.querySelector('span'); if (span) span.innerText = "Submit for Verification";
-                    } else {
-                        const span = submitBtn.querySelector('span'); if (span) span.innerText = "Minimum 10 words required";
-                    }
-                }
-                remaining--;
-            }, 1000);
         }
 
         function resetTaskFlowUI() {
@@ -5285,7 +5475,7 @@
             const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
             const isPassed = words >= 10;
             
-            feedback.innerText = isPassed ? `${words} words — Quality check passed` : `${words} words (${10 - words} more needed)`;
+            feedback.innerText = isPassed ? `${words} words â€” Quality check passed` : `${words} words (${10 - words} more needed)`;
             feedback.classList.toggle('text-rose-500', !isPassed);
             feedback.classList.toggle('text-green-500', isPassed);
 
@@ -5308,14 +5498,14 @@
             const fileInput = document.getElementById('task-proof-file');
             const submitBtn = document.getElementById('task-submit-btn');
 
-            if (!handle) { alert("Please provide your social media handle."); return; }
+            if (!handle) { dashboardAlert("Please provide your social media handle."); return; }
             if (text.split(/\s+/).filter(w => w.length > 0).length < 10) {
-                alert("Quality Check: Please provide at least 10 words.");
+                dashboardAlert("Quality Check: Please provide at least 10 words.");
                 return;
             }
 
             if (!fileInput.files || !fileInput.files[0]) {
-                alert("Please upload a screenshot for verification.");
+                dashboardAlert("Please upload a screenshot for verification.");
                 return;
             }
 
@@ -5345,7 +5535,7 @@
                 
                 // compute auto-approve timestamp (24 hours from now)
                 const autoApproveAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-                const rewardAmount = Math.round(((activeTask.total_cost || activeTask.reward || 0) / (activeTask.goal_count || 1)) || 0);
+                const rewardAmount = window.getPerformerRewardForTask(activeTask);
 
                 if (existEngage.total > 0) {
                     const engagementId = existEngage.documents[0].$id;
@@ -5355,6 +5545,7 @@
                         proof_url: primaryProofUrl,
                         status: 'pending',
                         auto_approve_at: autoApproveAt,
+                        reward: rewardAmount,
                         metadata: JSON.stringify(metadataObj)
                     });
                     // create a transaction record to mark funds locked for this engagement
@@ -5380,6 +5571,7 @@
                         proof_url: primaryProofUrl,
                         status: 'pending',
                         auto_approve_at: autoApproveAt,
+                        reward: rewardAmount,
                         metadata: JSON.stringify(metadataObj),
                         created_at: new Date().toISOString()
                     });
@@ -5407,14 +5599,14 @@
                 document.getElementById('task-step-4').classList.remove('hidden');
                 updateTaskFlowNav();
                 
-                const reward = Math.round(((activeTask.total_cost || activeTask.reward || 0) / (activeTask.goal_count || 1)) || 70);
+                const successRewardValue = window.getPerformerRewardForTask(activeTask);
                 const successReward = document.getElementById('success-reward-val');
-                if (successReward) successReward.innerText = `₦${reward}`;
+                if (successReward) successReward.innerText = `â‚¦${successRewardValue.toLocaleString()}`;
 
                 window.triggerConfetti();
                 fetchPerformerDashboardData();
             } catch (err) {
-                alert("Submission failed: " + err.message);
+                dashboardAlert("Submission failed: " + err.message);
                 submitBtn.disabled = false;
                 submitBtn.querySelector('span').innerText = "Submit for Verification";
             }
@@ -5429,12 +5621,12 @@
         }
         function processDeposit() {
             const amt = parseInt(document.getElementById('deposit-amount').value);
-            if (!amt || amt <= 0) return alert("Please enter a valid deposit amount.");
+            if (!amt || amt <= 0) return dashboardAlert("Please enter a valid deposit amount.");
             
             // Simulate Payment Gateway Handshake
             roles.creator.availableBalance += amt;
             window.triggerConfetti();
-            alert(`₦${amt.toLocaleString()} credited to your Available Balance via Paystack.`);
+            dashboardAlert(`â‚¦${amt.toLocaleString()} credited to your Available Balance via Paystack.`);
             closeDepositModal();
             updateWalletDisplay();
         }
@@ -5443,8 +5635,8 @@
             const walletBtn = document.getElementById('wallet-action-btn');
 
             if (currentRole === 'creator') {
-                document.getElementById('total-balance').innerText = `₦${roles.creator.availableBalance.toLocaleString()}`;
-                document.getElementById('pending-balance').innerText = `₦${roles.creator.allocatedFunds.toLocaleString()}`;
+                document.getElementById('total-balance').innerText = `â‚¦${roles.creator.availableBalance.toLocaleString()}`;
+                document.getElementById('pending-balance').innerText = `â‚¦${roles.creator.allocatedFunds.toLocaleString()}`;
                 document.getElementById('pending-balance-label').innerText = "Allocated: ";
                 document.getElementById('trust-indicator').innerText = "Ad Account Health: Excellent";
                 walletBtn.innerText = "Deposit";
@@ -5603,9 +5795,9 @@
                         <h2 class="text-3xl font-bold mb-2">Support Desk</h2>
                         <p class="text-dash-secondary mb-8">Need help? We typically respond within 15 minutes.</p>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                            <div onclick="alert('Support Ticket System Initialized. Please describe your issue.')" class="p-6 bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/30 rounded-2xl text-center cursor-pointer hover:bg-[var(--accent-primary)]/20 transition"><i class="fa-solid fa-ticket text-xl text-[var(--accent-primary)] mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Open Ticket</p></div>
+                            <div onclick="dashboardAlert('Support Ticket System Initialized. Please describe your issue.')" class="p-6 bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/30 rounded-2xl text-center cursor-pointer hover:bg-[var(--accent-primary)]/20 transition"><i class="fa-solid fa-ticket text-xl text-[var(--accent-primary)] mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Open Ticket</p></div>
                             <div onclick="window.open('https://pidimarketing.com/guides', '_blank')" class="p-6 bg-dash-secondary/50 border border-dash rounded-2xl text-center cursor-pointer hover:bg-dash-secondary transition"><i class="fa-solid fa-book-open text-xl text-dash-secondary mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Knowledge Base</p></div>
-                            <div onclick="alert('Connecting to WhatsApp Live Support...')" class="p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center cursor-pointer hover:bg-green-500/20 transition"><i class="fa-brands fa-whatsapp text-xl text-green-500 mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Live Chat</p></div>
+                            <div onclick="dashboardAlert('Connecting to WhatsApp Live Support...')" class="p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center cursor-pointer hover:bg-green-500/20 transition"><i class="fa-brands fa-whatsapp text-xl text-green-500 mb-2"></i><p class="text-xs font-bold uppercase tracking-widest">Live Chat</p></div>
                         </div>
                         <h4 class="font-bold mb-4 text-sm uppercase tracking-widest text-dash-secondary">Quick FAQ</h4>
                         <div class="space-y-2">
@@ -5628,7 +5820,7 @@
                     const profile = window.userProfile || {};
                     const accounts = profile.bank_accounts || [];
                     accounts.forEach((a, idx) => {
-                        const label = `${a.bank_name || 'Bank'} • ${String(a.account_number || '').slice(-4)} • ${a.account_name || ''}`;
+                        const label = `${a.bank_name || 'Bank'} â€¢ ${String(a.account_number || '').slice(-4)} â€¢ ${a.account_name || ''}`;
                         const opt = document.createElement('option');
                         opt.value = idx;
                         opt.text = label;
@@ -5654,7 +5846,7 @@
                             if (sel) {
                                 sel.innerHTML = '<option value="">Choose saved account</option>';
                                 const accounts = (window.userProfile && window.userProfile.bank_accounts) || [];
-                                accounts.forEach((a, idx) => { const opt = document.createElement('option'); opt.value = idx; opt.text = `${a.bank_name || 'Bank'} • ${String(a.account_number || '').slice(-4)} • ${a.account_name || ''}`; sel.appendChild(opt); });
+                                accounts.forEach((a, idx) => { const opt = document.createElement('option'); opt.value = idx; opt.text = `${a.bank_name || 'Bank'} â€¢ ${String(a.account_number || '').slice(-4)} â€¢ ${a.account_name || ''}`; sel.appendChild(opt); });
                             }
                             document.getElementById('add-bank-form')?.classList.add('hidden');
                         } catch(err) { console.warn('save bank failed', err); }
@@ -5679,7 +5871,7 @@
                             if (sel2) {
                                 sel2.innerHTML = '<option value="">Choose saved account</option>';
                                 const accs = (window.userProfile && window.userProfile.bank_accounts) || [];
-                                accs.forEach((a, idx2) => { const opt = document.createElement('option'); opt.value = idx2; opt.text = `${a.bank_name || 'Bank'} • ${String(a.account_number || '').slice(-4)} • ${a.account_name || ''}`; sel2.appendChild(opt); });
+                                accs.forEach((a, idx2) => { const opt = document.createElement('option'); opt.value = idx2; opt.text = `${a.bank_name || 'Bank'} â€¢ ${String(a.account_number || '').slice(-4)} â€¢ ${a.account_name || ''}`; sel2.appendChild(opt); });
                                 const rem = document.getElementById('remove-bank-btn'); if (rem) rem.classList.toggle('hidden', (accs.length === 0));
                             }
                         } catch(e) { console.warn('remove bank failed', e); }
@@ -5795,7 +5987,7 @@
                 const statusEl = document.getElementById('session-status');
                 if (descEl) {
                     const city = ipInfo.city ? `${ipInfo.city}, ${ipInfo.country}` : (ipInfo.country || 'Unknown Location');
-                    const deviceLabel = `${uaInfo.device === 'Desktop' ? uaInfo.os : uaInfo.device} • ${city}`;
+                    const deviceLabel = `${uaInfo.device === 'Desktop' ? uaInfo.os : uaInfo.device} â€¢ ${city}`;
                     descEl.innerText = `You are currently logged in on a ${uaInfo.device} (${uaInfo.os}) using ${uaInfo.browser} from ${city}. IP Address: ${ipInfo.ip}`;
                 }
                 if (statusEl) statusEl.innerText = 'Current Device';
@@ -5820,7 +6012,7 @@
                 // Appwrite does not provide a direct 'delete all other sessions' client API,
                 // but you can list and delete sessions on the server. Here we'll call a function
                 // that would perform that action if implemented server-side. For now, we show a message.
-                alert('Request to log out other sessions sent. If this is a production deployment, implement a server-side function to list and delete other sessions using the Appwrite SDK with the service key.');
+                dashboardAlert('Request to log out other sessions sent. If this is a production deployment, implement a server-side function to list and delete other sessions using the Appwrite SDK with the service key.');
             } catch (err) {
                 console.error('Logout other sessions failed:', err);
             }
@@ -5834,7 +6026,7 @@
             const whatsapp = document.getElementById('set-whatsapp')?.value?.trim();
             const avatarInput = document.getElementById('profile-avatar-file');
 
-            if (!currentUser || !currentUser.id) return alert('User not loaded. Please refresh and try again.');
+            if (!currentUser || !currentUser.id) return dashboardAlert('User not loaded. Please refresh and try again.');
 
             const profilePayload = {
                 // keep basic shape; profile fields allowed by Appwrite schema
@@ -5921,10 +6113,10 @@
                 const emailInputs = document.querySelectorAll('input[type="email"][id="set-email"]');
                 if (emailInputs && emailInputs.length) emailInputs.forEach(i => i.value = currentUser.email || '');
 
-                alert('Profile saved successfully.');
+                dashboardAlert('Profile saved successfully.');
             } catch (err) {
                 console.error('Failed to save profile:', err);
-                alert('Failed to save profile: ' + (err.message || err));
+                dashboardAlert('Failed to save profile: ' + (err.message || err));
             } finally {
                 if (btn) { btn.disabled = false; btn.innerText = 'SAVE CHANGES'; }
             }
@@ -5933,8 +6125,8 @@
         function updatePassword() {
             const cur = document.getElementById('cur-pass').value;
             const newP = document.getElementById('new-pass').value;
-            if(!cur || !newP) return alert("Please fill in both password fields.");
-            alert("Security check passed. Your password has been updated.");
+            if(!cur || !newP) return dashboardAlert("Please fill in both password fields.");
+            dashboardAlert("Security check passed. Your password has been updated.");
             document.getElementById('cur-pass').value = '';
             document.getElementById('new-pass').value = '';
         }
@@ -6149,11 +6341,11 @@
             { msg: "claimed a Google Search mission", icon: "search" },
             { msg: "reached 50% campaign completion", icon: "trending-up" },
             { msg: "verified 10 human interactions", icon: "shield" },
-            { msg: "earned ₦70 for engagement", icon: "dollar-sign" },
+            { msg: "earned â‚¦70 for engagement", icon: "dollar-sign" },
             { msg: "launched a new Authority campaign", icon: "plus-circle" },
             { msg: "completed an Instagram comment task", icon: "instagram" },
             { msg: "just reached Level 2 Elite status", icon: "star" },
-            { msg: "withdrew ₦5,000 to their bank", icon: "arrow-down-left" },
+            { msg: "withdrew â‚¦5,000 to their bank", icon: "arrow-down-left" },
             { msg: "updated their business profile", icon: "user-gear" },
             { msg: "started a viral engine mission", icon: "activity" },
             { msg: "linked a new verified bank account", icon: "building-columns" }
@@ -6537,3 +6729,4 @@
 
 </body>
 </html>
+
