@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#ef4444" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#b91c1c" media="(prefers-color-scheme: dark)">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Access | PIDI Internal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border-dash: #b5b5b5;
+            --text-primary: #1a1d23;
+            --text-secondary: #9ca3af;
+        }
+        body.dark-mode {
+            --bg-body: #09090b;
+            --bg-card: #18181b;
+            --border-dash: #27272a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease; }
+        .bento-card { background: var(--bg-card); border: 1px solid var(--border-dash); border-radius: 24px; padding: 2.5rem; transition: all 0.3s ease; }
+        .admin-gradient { 
+            background: linear-gradient(135deg, #ef4444 60%, #b91c1c 40%); 
+            color: #ffffff !important;
+            transition: transform 0.2s ease;
+        }
+        .admin-gradient:hover { transform: scale(1.02); }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
+
+    <main class="max-w-md w-full" id="login-main">
+        <div class="bento-card border-red-500/20 shadow-2xl shadow-red-500/5">
+            <div id="login-message" class="hidden p-3 rounded-xl text-sm mb-6 text-center font-bold"></div>
+            
+            <div class="mb-10 text-center">
+                <div class="w-16 h-16 bg-red-500 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-500/20">
+                    <i class="fa-solid fa-shield-halved text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold tracking-tight">Admin Gate</h2>
+                <p class="text-dash-secondary mt-2 uppercase text-[10px] font-black tracking-widest">Internal Use Only</p>
+            </div>
+
+            <form onsubmit="handleAdminAuth(event)" class="space-y-6">
+                <div>
+                    <label for="login-email" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Authorized Email</label>
+                    <input type="email" id="login-email" placeholder="admin@pidi.tasks" required class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-sm focus:outline-none focus:border-red-500 transition">
+                </div>
+
+                <div id="otp-field" class="hidden">
+                    <label for="login-otp" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">6-Digit Verification Code</label>
+                    <input type="text" id="login-otp" placeholder="000000" maxlength="6" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-center text-2xl font-black tracking-[0.5em] focus:outline-none focus:border-red-500 transition">
+                    <p class="text-[10px] text-dash-secondary mt-2 px-1 text-center">Code expires in 15 minutes.</p>
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="w-full admin-gradient py-4 rounded-2xl font-bold text-sm shadow-lg active:scale-[0.98] mt-4">
+                    Send Security Code
+                </button>
+            </form>
+
+            <div class="mt-8 pt-8 border-t border-dash text-center">
+                <a href="login.html" class="text-xs text-dash-secondary hover:text-red-500 transition">
+                    <i class="fa-solid fa-arrow-left text-[10px] mr-1"></i> Standard Login
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { account, ID } from './appwriteClient.js';
+
+        const AUTHORIZED_ADMINS = ['officialprincedike@gmail.com', 'officialpidimarketing@gmail.com'];
+        let otpSent = false;
+        let pendingUserId = null;
+
+        const displayAuthMessage = (message, type = 'info') => {
+            const msgDiv = document.getElementById('login-message');
+            msgDiv.className = `p-3 rounded-xl text-sm mb-6 text-center ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            msgDiv.innerHTML = message;
+            msgDiv.classList.remove('hidden');
+        };
+
+        const setButtonLoading = (isLoading, text) => {
+            const btn = document.getElementById('auth-submit-btn');
+            btn.disabled = isLoading;
+            btn.innerHTML = isLoading ? `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...` : text;
+        };
+
+        async function handleAdminAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const submitButton = document.getElementById('auth-submit-btn');
+
+            if (!AUTHORIZED_ADMINS.includes(email)) {
+                displayAuthMessage("Access Denied: Email not in administrative directory.", 'error');
+                return;
+            }
+
+            if (!otpSent) {
+                setButtonLoading(true, 'Send Security Code');
+                try {
+                    // Proactively clear any existing session to ensure a clean login state
+                    try {
+                        await account.deleteSession('current');
+                    } catch (e) {
+                        // Ignore if no session exists
+                    }
+
+                    // Try to send OTP. 
+                    // Note: In Appwrite Client SDK, createEmailToken(ID.unique(), email) 
+                    // creates a user if they don't exist.
+                    let tokenResponse;
+                    try {
+                        tokenResponse = await account.createEmailToken(ID.unique(), email);
+                    } catch (err) {
+                        // If user already exists (409), we unfortunately can't get the userId 
+                        // from the client SDK for security reasons. 
+                        // The admin must use their password on the regular login page.
+                        if (err.code === 409) {
+                            throw new Error("Account exists. Please use 'Standard Login' with your password.");
+                        }
+                        throw err;
+                    }
+                    
+                    pendingUserId = tokenResponse.userId;
+                    otpSent = true;
+                    document.getElementById('otp-field').classList.remove('hidden');
+                    document.getElementById('login-otp').required = true;
+                    document.getElementById('login-otp').focus();
+                    
+                    setButtonLoading(false, 'Verify & Enter');
+                    displayAuthMessage("A security code has been sent to your inbox.", 'success');
+                } catch (error) {
+                    console.error('Admin OTP Error:', error);
+                    const msg = error.message;
+                    displayAuthMessage("Error: " + msg, 'error');
+                    setButtonLoading(false, 'Send Security Code');
+                }
+            } else {
+                const token = document.getElementById('login-otp').value.trim();
+                if (!token) return displayAuthMessage("Please enter the verification code.", 'error');
+
+                setButtonLoading(true, 'Verifying...');
+                try {
+                    // For Email Token OTP, use createSession to establish the login
+                    await account.createSession(pendingUserId, token);
+                    window.location.href = 'admin.html';
+                } catch (error) {
+                    displayAuthMessage("Verification failed: " + error.message, 'error');
+                    setButtonLoading(false, 'Verify & Enter');
+                }
+            }
+        }
+
+        window.handleAdminAuth = handleAdminAuth;
+        
+        // Dark mode sync
+        if (localStorage.getItem('theme') === 'dark' || 
+           (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>

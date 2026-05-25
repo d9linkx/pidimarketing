@@ -98,21 +98,9 @@
                     </div>
                 </div>
 
-                <div id="otp-field" class="hidden">
-                    <label for="login-otp" class="block text-[10px] uppercase font-bold text-dash-secondary tracking-widest mb-1.5 px-1">Verification Code</label>
-                    <input type="text" id="login-otp" placeholder="6-digit code" class="w-full bg-dash-secondary border border-dash rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#6a26da] transition">
-                    <p class="text-[10px] text-dash-secondary mt-2 px-1">Check your inbox for the login code.</p>
-                </div>
-
                 <button type="submit" id="auth-submit-btn" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition active:scale-[0.98] mt-4">
                     Login
                 </button>
-
-                <div class="text-center mt-4">
-                    <button type="button" onclick="toggleAuthMode()" id="auth-mode-toggle" class="inline-flex items-center justify-center w-full px-4 py-3 rounded-2xl border border-[#6a26da]/20 bg-[#6a26da]/5 text-[10px] uppercase font-black text-[#6a26da] tracking-widest hover:bg-[#6a26da]/10 transition">
-                        Admin Login
-                    </button>
-                </div>
             </form>
 
             <div class="mt-8 pt-8 border-t border-dash text-center">
@@ -148,23 +136,6 @@
             button.innerHTML = isLoading ? `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...` : originalText;
         };
 
-        let isOTPMode = false;
-        let otpSent = false;
-        let pendingUserId = null; // To store userId from createEmailToken response
-
-        window.toggleAuthMode = () => {
-            isOTPMode = !isOTPMode;
-            document.getElementById('password-field').classList.toggle('hidden', isOTPMode);
-            document.getElementById('otp-field').classList.add('hidden');
-            document.getElementById('auth-mode-toggle').innerText = isOTPMode ? "Back to Standard Login" : "Admin Login";
-            document.getElementById('auth-submit-btn').innerText = isOTPMode ? "Send Code" : "Login";
-            
-            // Toggle 'required' attributes to prevent hidden fields from blocking form submission
-            document.getElementById('login-password').required = !isOTPMode;
-            document.getElementById('login-otp').required = false;
-            otpSent = false;
-        };
-
         async function handleAuthAction(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim().toLowerCase();
@@ -173,103 +144,37 @@
 
             if (msgDiv) msgDiv.classList.add('hidden');
 
-            if (!isOTPMode) {
-                // REGULAR LOGIN (Performers/Creators)
-                const password = document.getElementById('login-password').value;
-                setButtonLoading(submitButton, true, 'Login');
-                
+            // REGULAR LOGIN (Performers/Creators)
+            const password = document.getElementById('login-password').value;
+            setButtonLoading(submitButton, true, 'Login');
+            
+            try {
+                // Proactively clear any existing session to prevent "prohibited" error
                 try {
-                    // Proactively clear any existing session to prevent "prohibited" error
-                    try {
-                        await account.deleteSession('current');
-                    } catch (e) {
-                        // Silently ignore if no session exists
-                    }
-
-                    // Create new session
-                    await account.createEmailPasswordSession(email, password);
-                    const user = await account.get();
-
-                    // Check if the logged-in user is an admin for routing
-                    if (AUTHORIZED_ADMINS.includes(user.email.toLowerCase())) {
-                        window.location.href = 'admin.html';
-                    } else {
-                        window.location.href = 'dashboard.html';
-                    }
-                } catch (error) {
-                    console.error('Appwrite Login Error:', error);
-                    let msg = error.message;
-                    if (error.code === 401) msg = "Invalid email or password. Please try again.";
-                    if (error.type === 'user_session_already_exists') {
-                        msg = "A session is already active. Please refresh the page.";
-                    }
-                    displayAuthMessage('login-message', msg, 'error');
-                    setButtonLoading(submitButton, false, 'Login');
-                }
-            } else {
-                // ADMIN OTP LOGIN
-                
-                // 1. Unauthorized email check
-                if (!AUTHORIZED_ADMINS.includes(email)) {
-                    displayAuthMessage('login-message', "Access Denied: You are not an authorized admin.", 'error');
-                    return;
+                    await account.deleteSession('current');
+                } catch (e) {
+                    // Silently ignore if no session exists
                 }
 
-                if (!otpSent) {
-                    // Step 1: Request the 6-digit code via Appwrite
-                    setButtonLoading(submitButton, true, 'Send Code');
-                    try {
-                        // Note: ID.unique() creates a NEW user. If an admin already exists as a standard 
-                        // password user, Appwrite returns a 409 Conflict.
-                        const tokenResponse = await account.createEmailToken(ID.unique(), email);
-                        pendingUserId = tokenResponse.userId; // Store the userId
-                        otpSent = true;
-                        document.getElementById('otp-field').classList.remove('hidden');
-                        document.getElementById('login-otp').required = true;
-                        document.getElementById('login-otp').focus();
-                        
-                        setButtonLoading(submitButton, false, 'Verify Code');
-                        displayAuthMessage('login-message', "A 6-digit verification code has been sent to your inbox.", 'success');
-                    } catch (error) {
-                        console.error('Appwrite OTP Error:', error);
-                        let msg = error.message;
-                        if (error.code === 409) msg = "This admin already has an account. Please use 'Standard Login' with your password.";
-                        displayAuthMessage('login-message', "Error: " + msg, 'error');
-                        setButtonLoading(submitButton, false, 'Send Code');
-                    }
+                // Create new session
+                await account.createEmailPasswordSession(email, password);
+                const user = await account.get();
+
+                // Check if the logged-in user is an admin for routing
+                if (AUTHORIZED_ADMINS.includes(user.email.toLowerCase())) {
+                    window.location.href = 'admin.html';
                 } else {
-                    // Step 2: Validate the user-entered token
-                    const token = document.getElementById('login-otp').value.trim();
-                    if (!token) {
-                        displayAuthMessage('login-message', "Please enter the verification code.", 'error');
-                        setButtonLoading(submitButton, false, 'Verify Code');
-                        return;
-                    }
-
-                    setButtonLoading(submitButton, true, 'Verifying Code...');
-                    try {
-                        if (!pendingUserId) {
-                            displayAuthMessage('login-message', "User ID not found. Please resend the code.", 'error');
-                            setButtonLoading(submitButton, false, 'Verify Code');
-                            return;
-                        }
-                        
-                        // Complete the session using the stored userId and the entered OTP secret
-                        await account.updateEmailSession(pendingUserId, token);
-                        
-                        const user = await account.get();
-                        if (AUTHORIZED_ADMINS.includes(user.email.toLowerCase())) {
-                            window.location.href = 'admin.html';
-                        } else {
-                            // This case should ideally not happen if AUTHORIZED_ADMINS check is done upfront
-                            window.location.href = 'dashboard.html';
-                        }
-                        setButtonLoading(submitButton, false, 'Verify Code');
-                    } catch (error) {
-                        displayAuthMessage('login-message', "Verification failed: " + error.message, 'error');
-                        setButtonLoading(submitButton, false, 'Verify Code');
-                    }
+                    window.location.href = 'dashboard.html';
                 }
+            } catch (error) {
+                console.error('Appwrite Login Error:', error);
+                let msg = error.message;
+                if (error.code === 401) msg = "Invalid email or password. Please try again.";
+                if (error.type === 'user_session_already_exists') {
+                    msg = "A session is already active. Please refresh the page.";
+                }
+                displayAuthMessage('login-message', msg, 'error');
+                setButtonLoading(submitButton, false, 'Login');
             }
         }
 
