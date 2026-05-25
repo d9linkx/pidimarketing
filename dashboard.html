@@ -647,7 +647,7 @@
                         </button>
                         <div class="hidden md:flex items-center">
                             <div class="relative w-64 lg:w-96">
-                                <input type="text" placeholder="Search tasks, campaigns, users..." class="w-full bg-[var(--search-bg)] border border-dash rounded-xl p-2.5 pl-10 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                <input type="text" id="dashboard-header-search-desktop" data-dashboard-header-search="true" autocomplete="off" aria-label="Search dashboard" placeholder="Search tasks, campaigns, users..." class="w-full bg-[var(--search-bg)] border border-dash rounded-xl p-2.5 pl-10 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
                                 <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-dash-secondary w-4 h-4"></i>
                             </div>
                         </div>
@@ -657,7 +657,7 @@
                     <div class="flex-1 mx-2 order-2">
                         <div class="md:hidden">
                             <div class="relative">
-                                <input id="mobile-search-inline" type="text" placeholder="Search" class="w-full bg-dash-secondary border border-dash rounded-xl p-2.5 pl-10 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
+                                <input id="mobile-search-inline" type="text" data-dashboard-header-search="true" autocomplete="off" aria-label="Search dashboard" placeholder="Search" class="w-full bg-dash-secondary border border-dash rounded-xl p-2.5 pl-10 text-sm focus:outline-none focus:border-[var(--accent-primary)]">
                                 <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-dash-secondary w-4 h-4"></i>
                             </div>
                         </div>
@@ -789,7 +789,7 @@
         <div class="icon-box bg-green-500/10 text-green-500 mb-0 w-10 h-10"><i data-feather="shield" class="w-5"></i></div>
         <div>
             <p class="text-dash-secondary text-[8px] uppercase font-bold">Total Spent</p>
-            <h4 id="accuracy-score-val" class="text-lg font-bold">â‚¦0</h4>
+            <h4 id="accuracy-score-val" class="text-lg font-bold">₦0</h4>
         </div>
     </div>
 
@@ -819,7 +819,7 @@
         <div class="icon-box bg-amber-500/10 text-amber-500 mb-0 w-10 h-10"><i data-feather="users" class="w-5"></i></div>
         <div>
             <p class="text-dash-secondary text-[8px] uppercase font-bold">Average CPE</p>
-            <h4 id="live-workforce-val" class="text-lg font-bold">â‚¦0</h4>
+            <h4 id="live-workforce-val" class="text-lg font-bold">₦0</h4>
         </div>
         
         <!-- Hidden Wallet IDs to maintain JS compatibility -->
@@ -921,9 +921,9 @@
                             const elAvgCPE = document.getElementById('live-workforce-val');
 
                             if(elTotalCampaigns) elTotalCampaigns.innerText = totalCampaigns.toLocaleString();
-                            if(elTotalSpent) elTotalSpent.innerText = `â‚¦${totalSpent.toLocaleString()}`;
+                            if(elTotalSpent) elTotalSpent.innerText = `₦${totalSpent.toLocaleString()}`;
                             if(elTotalEngagements) elTotalEngagements.innerText = totalEngagements.toLocaleString();
-                            if(elAvgCPE) elAvgCPE.innerText = `â‚¦${avgCPE.toLocaleString()}`;
+                            if(elAvgCPE) elAvgCPE.innerText = `₦${avgCPE.toLocaleString()}`;
                         }catch(err){
                             console.warn('Failed to update insight cards:', err);
                         }
@@ -997,8 +997,257 @@
                         <h2 class="text-xl font-bold mb-4">Pending Submissions</h2>
                         <div id="performer-pending-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                     </div>
+
+                    <div id="performer-home-withdraw-card" class="bento-card col-span-full p-4">
+                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                            <div class="max-w-xl">
+                                <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest">Withdraw Funds</p>
+                                <h3 class="text-lg font-bold mt-2">Quick withdraw to your saved bank</h3>
+                                <p class="text-sm text-dash-secondary mt-2">Request a payout directly from your performer dashboard. We'll use the bank details saved in your profile and keep you updated while the request is processing.</p>
+                            </div>
+                            <div class="w-full lg:max-w-2xl grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+                                <div>
+                                    <label for="performer-home-withdraw-amount" class="block text-[10px] font-black text-dash-secondary uppercase mb-2">Amount</label>
+                                    <input id="performer-home-withdraw-amount" type="number" min="100" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="₦100" class="w-full bg-dash-secondary border border-dash rounded-xl p-3 text-sm focus:outline-none">
+                                </div>
+                                <div class="flex items-end">
+                                    <button id="performer-home-withdraw-btn" type="button" class="w-full md:w-auto btn-fintech btn-primary py-3 px-4 font-black min-h-[48px] touch-manipulation">Request Withdrawal</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 grid gap-4 md:grid-cols-2">
+                            <div>
+                                <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest mb-2">Available Balance</p>
+                                <div id="performer-home-available-balance" class="text-lg font-black">₦0</div>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-dash-secondary uppercase tracking-widest mb-2">Bank Details</p>
+                                <div id="performer-home-bank-status" class="text-sm text-dash-secondary">Checking your saved bank details…</div>
+                            </div>
+                        </div>
+                        <div id="performer-home-withdraw-progress" class="mt-4 hidden rounded-2xl border border-dash bg-white p-3" aria-live="polite">
+                            <div class="flex items-center justify-between gap-3 mb-2">
+                                <p id="performer-home-withdraw-progress-title" class="text-[10px] font-black text-dash-secondary uppercase">Withdrawal Progress</p>
+                                <span id="performer-home-withdraw-progress-status" class="text-[10px] font-black uppercase bg-amber-500/10 text-amber-500 px-2 py-1 rounded-full">Ready</span>
+                            </div>
+                            <div class="w-full bg-dash-secondary rounded-full h-3 overflow-hidden border border-dash">
+                                <div id="performer-home-withdraw-progress-bar" style="width:0%" class="h-3 bg-[var(--accent-primary)] transition-all"></div>
+                            </div>
+                            <div id="performer-home-withdraw-progress-text" class="text-[11px] text-dash-secondary mt-2">Request Received</div>
+                        </div>
+                    </div>
                 </div> <!-- End performer-dashboard-content -->
 
+                <script type="module">
+                    import { databases, Query, APPWRITE_CONFIG, ID } from './appwriteClient.js';
+
+                    const homeWithdrawAmount = document.getElementById('performer-home-withdraw-amount');
+                    const homeWithdrawBtn = document.getElementById('performer-home-withdraw-btn');
+                    const homeWithdrawProgress = document.getElementById('performer-home-withdraw-progress');
+                    const homeWithdrawBar = document.getElementById('performer-home-withdraw-progress-bar');
+                    const homeWithdrawText = document.getElementById('performer-home-withdraw-progress-text');
+                    const homeWithdrawTitle = document.getElementById('performer-home-withdraw-progress-title');
+                    const homeWithdrawStatus = document.getElementById('performer-home-withdraw-progress-status');
+                    const homeBankStatus = document.getElementById('performer-home-bank-status');
+                    const homeAvailableBalance = document.getElementById('performer-home-available-balance');
+
+                    let homeWithdrawalPollTimer = null;
+                    let homeWithdrawalProcessing = false;
+
+                    function getSavedBankDetails(profile) {
+                        if (!profile) return null;
+                        const bankName = (profile.bank_name || '').trim();
+                        const holder = (profile.bank_account_holder || '').trim();
+                        const accountNumber = profile.bank_account_number ? String(profile.bank_account_number).trim() : '';
+                        if (!bankName && !holder && !accountNumber) return null;
+                        return { bank_name: bankName || 'Bank', bank_account_holder: holder, bank_account_number: accountNumber };
+                    }
+
+                    function hasCompleteSavedBankDetails(profile) {
+                        const bank = getSavedBankDetails(profile);
+                        return !!(bank && bank.bank_name && bank.bank_account_holder && bank.bank_account_number);
+                    }
+
+                    function formatSavedBankDetails(profile) {
+                        const bank = getSavedBankDetails(profile);
+                        if (!bank) return 'No bank details saved. Add your bank in Settings → Bank.';
+                        if (!hasCompleteSavedBankDetails(profile)) {
+                            return 'Incomplete bank details. Complete bank name, account holder, and account number in Settings → Bank.';
+                        }
+                        const masked = bank.bank_account_number
+                            ? (bank.bank_account_number.length > 4 ? '****' + bank.bank_account_number.slice(-4) : '****' + bank.bank_account_number)
+                            : 'No account number';
+                        return `${bank.bank_name || 'Bank'} • ${masked} • ${bank.bank_account_holder || 'Account holder pending'}`;
+                    }
+
+                    function setHomeWithdrawalProgress(state, message, percent = 0) {
+                        if (!homeWithdrawProgress || !homeWithdrawBar || !homeWithdrawText || !homeWithdrawTitle || !homeWithdrawStatus) return;
+                        homeWithdrawProgress.classList.toggle('hidden', state === 'idle');
+                        homeWithdrawBar.style.width = `${percent}%`;
+                        homeWithdrawText.innerText = message;
+                        homeWithdrawTitle.innerText = state === 'idle' ? 'Withdrawal Progress' : 'Withdrawal in progress';
+                        homeWithdrawStatus.innerText = state === 'idle' ? 'Ready' : state === 'processing' ? 'In progress' : state === 'completed' ? 'Completed' : 'Needs attention';
+                        homeWithdrawStatus.className = `text-[10px] font-black uppercase px-2 py-1 rounded-full ${state === 'completed' ? 'bg-green-500/10 text-green-500' : state === 'failed' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}`;
+                    }
+
+                    function clampHomeWithdrawalAmount(input) {
+                        const value = Number(input.value || 0);
+                        if (value < 0) input.value = 0;
+                    }
+
+                    async function refreshHomeWithdrawalSummary() {
+                        try {
+                            if (!window.currentUser || !window.currentUser.id) {
+                                if (homeBankStatus) homeBankStatus.innerText = 'Loading your profile…';
+                                if (homeAvailableBalance) homeAvailableBalance.innerText = '₦0';
+                                return;
+                            }
+
+                            const profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, window.currentUser.id).catch(() => null);
+                            if (profile) window.userProfile = profile;
+
+                            if (homeBankStatus) homeBankStatus.innerText = formatSavedBankDetails(profile);
+
+                            let userBalance = 0;
+                            try {
+                                const vaultRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', window.currentUser.id), Query.limit(1)]).catch(() => ({ documents: [] }));
+                                const vault = (vaultRes && vaultRes.documents && vaultRes.documents[0]) || null;
+                                if (vault && typeof vault.balance !== 'undefined') {
+                                    userBalance = Number(vault.balance) || 0;
+                                } else {
+                                    const txRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', window.currentUser.id), Query.orderDesc('created_at'), Query.limit(500)]).catch(() => ({ documents: [] }));
+                                    const tx = txRes.documents || [];
+                                    const payouts = tx.filter(t => t.type === 'payout' && t.status === 'completed').reduce((s, t) => s + (t.amount || 0), 0);
+                                    const withdrawals = tx.filter(t => t.type === 'withdrawal' && t.status === 'completed').reduce((s, t) => s + (t.amount || 0), 0);
+                                    userBalance = payouts - withdrawals;
+                                }
+                            } catch (err) {
+                                userBalance = 0;
+                            }
+
+                            if (homeAvailableBalance) homeAvailableBalance.innerText = `₦${Math.max(0, Math.round(userBalance)).toLocaleString()}`;
+
+                            const complete = hasCompleteSavedBankDetails(profile);
+                            if (homeWithdrawBtn) {
+                                homeWithdrawBtn.disabled = homeWithdrawalProcessing || !complete;
+                                homeWithdrawBtn.classList.toggle('opacity-60', !complete || homeWithdrawalProcessing);
+                                homeWithdrawBtn.classList.toggle('cursor-not-allowed', !complete || homeWithdrawalProcessing);
+                                homeWithdrawBtn.innerText = homeWithdrawalProcessing ? 'Withdrawal Pending…' : complete ? 'Request Withdrawal' : 'Complete Bank Details';
+                            }
+                        } catch (err) {
+                            console.warn('Failed to refresh performer home withdrawal summary', err);
+                        }
+                    }
+
+                    async function submitHomeWithdrawal() {
+                        try {
+                            if (!window.currentUser || !window.currentUser.id) {
+                                dashboardAlert('Please wait for your profile to finish loading.');
+                                return;
+                            }
+
+                            if (homeWithdrawBtn && homeWithdrawBtn.disabled) {
+                                dashboardAlert('Complete your bank details in Settings → Bank before requesting a withdrawal.');
+                                return;
+                            }
+
+                            const amt = Math.round(Number(homeWithdrawAmount?.value || 0));
+                            if (!amt || amt < 100) {
+                                dashboardAlert('Enter an amount of at least ₦100.');
+                                return;
+                            }
+
+                            const profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, window.currentUser.id).catch(() => null);
+                            if (!hasCompleteSavedBankDetails(profile)) {
+                                dashboardAlert('Please complete and save your bank details in Settings → Bank before requesting a withdrawal.');
+                                return;
+                            }
+
+                            const bankDetails = getSavedBankDetails(profile);
+                            let vaultForWithdrawal = null;
+                            try {
+                                const vaultRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', window.currentUser.id), Query.limit(1)]).catch(() => ({ documents: [] }));
+                                vaultForWithdrawal = (vaultRes && vaultRes.documents && vaultRes.documents[0]) || null;
+                            } catch (err) {
+                                vaultForWithdrawal = null;
+                            }
+
+                            let balance = 0;
+                            if (vaultForWithdrawal && typeof vaultForWithdrawal.balance !== 'undefined') {
+                                balance = Number(vaultForWithdrawal.balance) || 0;
+                            } else {
+                                try {
+                                    const txRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', window.currentUser.id), Query.orderDesc('created_at'), Query.limit(500)]).catch(() => ({ documents: [] }));
+                                    const allTx = txRes.documents || [];
+                                    const payouts = allTx.filter(t => t.type === 'payout' && t.status === 'completed').reduce((s, t) => s + (t.amount || 0), 0);
+                                    const withdrawalsCompleted = allTx.filter(t => t.type === 'withdrawal' && t.status === 'completed').reduce((s, t) => s + (t.amount || 0), 0);
+                                    balance = payouts - withdrawalsCompleted;
+                                } catch (err) {
+                                    balance = 0;
+                                }
+                            }
+
+                            if (amt > balance) {
+                                dashboardAlert('Insufficient balance.');
+                                return;
+                            }
+
+                            homeWithdrawalProcessing = true;
+                            window.userProfile = profile;
+                            await refreshHomeWithdrawalSummary();
+                            setHomeWithdrawalProgress('processing', 'Your withdrawal request has been sent and is now being processed.', 10);
+
+                            const tx = await databases.createDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, ID.unique(), {
+                                user_id: window.currentUser.id,
+                                amount: amt,
+                                type: 'withdrawal',
+                                status: 'pending',
+                                bank_details: bankDetails,
+                                description: 'Performer withdrawal request',
+                                created_at: new Date().toISOString()
+                            });
+
+                            if (homeWithdrawalPollTimer) clearInterval(homeWithdrawalPollTimer);
+                            homeWithdrawalPollTimer = setInterval(async () => {
+                                try {
+                                    const res = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, tx.$id).catch(() => null);
+                                    if (!res) return;
+                                    if (res.status === 'pending') {
+                                        setHomeWithdrawalProgress('processing', 'Your withdrawal is still being processed.', 50);
+                                    } else if (res.status === 'completed') {
+                                        setHomeWithdrawalProgress('completed', 'Your withdrawal has been disbursed successfully.', 100);
+                                        homeWithdrawalProcessing = false;
+                                        if (homeWithdrawalPollTimer) clearInterval(homeWithdrawalPollTimer);
+                                        homeWithdrawalPollTimer = null;
+                                        await refreshHomeWithdrawalSummary();
+                                    } else if (res.status === 'failed') {
+                                        setHomeWithdrawalProgress('failed', 'Your withdrawal could not be completed. Please try again.', 100);
+                                        homeWithdrawalProcessing = false;
+                                        if (homeWithdrawalPollTimer) clearInterval(homeWithdrawalPollTimer);
+                                        homeWithdrawalPollTimer = null;
+                                        await refreshHomeWithdrawalSummary();
+                                    }
+                                } catch (err) {
+                                    console.warn('Home withdrawal poll failed', err);
+                                }
+                            }, 5000);
+
+                            showToast('Withdrawal request submitted. Processing will continue in the background.', 'success');
+                        } catch (err) {
+                            homeWithdrawalProcessing = false;
+                            if (homeWithdrawalPollTimer) clearInterval(homeWithdrawalPollTimer);
+                            homeWithdrawalPollTimer = null;
+                            setHomeWithdrawalProgress('failed', 'Withdrawal request failed. Please try again.', 0);
+                            await refreshHomeWithdrawalSummary();
+                            dashboardAlert('Failed to submit withdrawal: ' + (err.message || err));
+                        }
+                    }
+
+                    homeWithdrawAmount?.addEventListener('input', (e) => clampHomeWithdrawalAmount(e.target));
+                    homeWithdrawBtn?.addEventListener('click', submitHomeWithdrawal);
+                    refreshHomeWithdrawalSummary();
+                    setInterval(refreshHomeWithdrawalSummary, 30000);
+                </script>
 
                 <!-- Admin Dashboard Layout -->
                 <div id="admin-dashboard-content" class="bento-grid p-4 mt-[-1rem] hidden gap-3 lg:gap-4">
@@ -3384,18 +3633,20 @@
         // Function to render items to the active-list table
         function renderActiveList(items) {
             const list = document.getElementById('active-list');
-            list.innerHTML = ''; // Clear previous tasks
+            if (!list) return;
+
+            list.innerHTML = '';
 
             if (!items || items.length === 0) {
                 list.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-dash-secondary">No records found.</td></tr>';
                 return;
             }
-            
+
             list.innerHTML = items.map(item => `
                 <tr class="border-b border-dash task-item">
                     <td class="py-4 font-bold">
-                        ${item.isTask ? 
-                            `<button onclick="claimTask('${item.id}')" class="text-[var(--accent-primary)] hover:underline">${item.name}</button>` : 
+                        ${item.isTask ?
+                            `<button onclick="claimTask('${item.id}')" class="text-[var(--accent-primary)] hover:underline">${item.name}</button>` :
                             item.name
                         }
                     </td>
@@ -3406,12 +3657,18 @@
             `).join('');
         }
 
-        // Function to filter and render tasks based on search term
+        function getDashboardSearchScope() {
+            return document.getElementById('dashboard-viewport') || document.body;
+        }
+
         function filterAndRenderTasks(searchTerm = '') {
-            let itemsToFilter = [];
-            if (currentRole === 'creator') {
-                itemsToFilter = roles.creator.items.map(c => ({ name: c.target_url, status: c.status, metric: `${c.current_count}/${c.goal_count}` }));
-            }
+            if (currentRole !== 'creator') return;
+
+            const itemsToFilter = Array.isArray(roles?.creator?.items) ? roles.creator.items.map(c => ({
+                name: c?.target_url || '',
+                status: c?.status || '',
+                metric: `${c?.current_count || 0}/${c?.goal_count || 0}`
+            })) : [];
 
             const filteredItems = itemsToFilter.filter(item => {
                 const name = item.name ? item.name.toLowerCase() : '';
@@ -3424,12 +3681,41 @@
             renderActiveList(filteredItems);
         }
 
+        function applyDashboardSearch(searchTerm = '') {
+            const searchLower = (searchTerm || '').toLowerCase().trim();
+            const scope = getDashboardSearchScope();
+            const searchableCards = scope.querySelectorAll('.bento-card, .task-item, .mission-card, .dashboard-card');
+            searchableCards.forEach(card => {
+                const cardText = (card.textContent || '').toLowerCase();
+                card.classList.toggle('hidden', !!searchLower && !cardText.includes(searchLower));
+            });
+
+            const tableRows = scope.querySelectorAll('table tbody tr');
+            tableRows.forEach(row => {
+                const rowText = (row.textContent || '').toLowerCase();
+                row.classList.toggle('hidden', !!searchLower && !rowText.includes(searchLower));
+            });
+
+            if (currentRole === 'creator') {
+                filterAndRenderTasks(searchLower);
+            }
+        }
+
+        function syncDashboardSearchInputs(value) {
+            document.querySelectorAll('[data-dashboard-header-search="true"]').forEach(input => {
+                if (input.value !== String(value)) {
+                    input.value = value;
+                }
+            });
+            applyDashboardSearch(value);
+        }
+
         // Add event listeners for search bars
         document.addEventListener('DOMContentLoaded', () => {
-            const searchInputs = document.querySelectorAll('.search-bar-container input, .md\\:hidden input');
+            const searchInputs = document.querySelectorAll('[data-dashboard-header-search="true"]');
             searchInputs.forEach(input => {
                 input.addEventListener('input', (e) => {
-                    filterAndRenderTasks(e.target.value);
+                    syncDashboardSearchInputs(e.target.value);
                 });
             });
             // Prevent anchor tags with href="#" from causing page jumps which can
@@ -3786,8 +4072,11 @@
                 }
             }
 
-            // Switch to the main dashboard SPA view
-            switchSPAView('dashboard-home');
+            const savedView = getSavedDashboardViewForRole(role);
+            const targetView = savedView && hasDashboardTemplate(savedView) ? savedView : 'dashboard-home';
+
+            // Restore the last page for this role, or fall back to the home dashboard
+            switchSPAView(targetView);
 
             // Toggle the two main dashboard sections
             // Update Switcher UI Config
@@ -4371,6 +4660,32 @@
     // Map of active claim timers: campaignId -> { expiresAt, intervalId }
     const activeClaimTimers = {};
 
+        const DASHBOARD_VIEW_STORAGE_PREFIX = 'dashboard:last-view:';
+
+        function getSavedDashboardViewForRole(role) {
+            try {
+                const saved = localStorage.getItem(`${DASHBOARD_VIEW_STORAGE_PREFIX}${role}`);
+                return saved ? String(saved).trim() : '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function saveDashboardViewForRole(role, viewId) {
+            try {
+                if (!role || !viewId) return;
+                localStorage.setItem(`${DASHBOARD_VIEW_STORAGE_PREFIX}${role}`, String(viewId));
+            } catch (e) {
+                // Ignore storage failures
+            }
+        }
+
+        function hasDashboardTemplate(viewId) {
+            const templates = document.getElementById('dashboard-templates');
+            if (!templates) return false;
+            return !!templates.querySelector(`#${viewId}-view`) || !!templates.querySelector(`#${viewId}`);
+        }
+
         window.switchSPAView = function(viewId) {
             try {
                 // New strategy: render the requested view into the single dashboard viewport
@@ -4392,6 +4707,8 @@
                     console.warn(`switchSPAView: no template found for "${viewId}" (tried ${candidateIds.join(',')})`);
                     return;
                 }
+
+                saveDashboardViewForRole(currentRole, viewId);
 
                 // Replace viewport content with a cloned template
                 try {

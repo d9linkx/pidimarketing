@@ -109,8 +109,8 @@
                 </button>
 
                 <div class="text-center mt-4">
-                    <button type="button" onclick="toggleAuthMode()" id="auth-mode-toggle" class="text-[10px] uppercase font-black text-[#6a26da] tracking-widest hover:underline">
-                        Switch to Admin Code Login
+                    <button type="button" onclick="toggleAuthMode()" id="auth-mode-toggle" class="inline-flex items-center justify-center w-full px-4 py-3 rounded-2xl border border-[#6a26da]/20 bg-[#6a26da]/5 text-[10px] uppercase font-black text-[#6a26da] tracking-widest hover:bg-[#6a26da]/10 transition">
+                        Admin Login
                     </button>
                 </div>
             </form>
@@ -156,8 +156,12 @@
             isOTPMode = !isOTPMode;
             document.getElementById('password-field').classList.toggle('hidden', isOTPMode);
             document.getElementById('otp-field').classList.add('hidden');
-            document.getElementById('auth-mode-toggle').innerText = isOTPMode ? "Switch to Password Login" : "Switch to Admin Code Login";
+            document.getElementById('auth-mode-toggle').innerText = isOTPMode ? "Back to Standard Login" : "Admin Login";
             document.getElementById('auth-submit-btn').innerText = isOTPMode ? "Send Code" : "Login";
+            
+            // Toggle 'required' attributes to prevent hidden fields from blocking form submission
+            document.getElementById('login-password').required = !isOTPMode;
+            document.getElementById('login-otp').required = false;
             otpSent = false;
         };
 
@@ -212,30 +216,37 @@
                 }
 
                 if (!otpSent) {
-                    // Step 1: Request the 6-digit code from Supabase
-                    setButtonLoading(submitButton, true, 'Sending Code...');
+                    // Step 1: Request the 6-digit code via Appwrite
+                    setButtonLoading(submitButton, true, 'Send Code');
                     try {
-                        // Appwrite uses Email Token for numeric/link login
+                        // Note: ID.unique() creates a NEW user. If an admin already exists as a standard 
+                        // password user, Appwrite returns a 409 Conflict.
                         const tokenResponse = await account.createEmailToken(ID.unique(), email);
                         pendingUserId = tokenResponse.userId; // Store the userId
                         otpSent = true;
                         document.getElementById('otp-field').classList.remove('hidden');
+                        document.getElementById('login-otp').required = true;
+                        document.getElementById('login-otp').focus();
+                        
                         setButtonLoading(submitButton, false, 'Verify Code');
-                        displayAuthMessage('login-message', "A magic link has been sent to your inbox. Please extract the 'secret' parameter (the code) from the URL in the email and enter it below.", 'success');
+                        displayAuthMessage('login-message', "A 6-digit verification code has been sent to your inbox.", 'success');
                     } catch (error) {
                         console.error('Appwrite OTP Error:', error);
-                        displayAuthMessage('login-message', "Error sending code: " + error.message, 'error');
-                        setButtonLoading(submitButton, false, 'Login');
+                        let msg = error.message;
+                        if (error.code === 409) msg = "This admin already has an account. Please use 'Standard Login' with your password.";
+                        displayAuthMessage('login-message', "Error: " + msg, 'error');
+                        setButtonLoading(submitButton, false, 'Send Code');
                     }
                 } else {
                     // Step 2: Validate the user-entered token
                     const token = document.getElementById('login-otp').value.trim();
                     if (!token) {
                         displayAuthMessage('login-message', "Please enter the verification code.", 'error');
+                        setButtonLoading(submitButton, false, 'Verify Code');
                         return;
                     }
 
-                    setButtonLoading(submitButton, true, 'Verifying...');
+                    setButtonLoading(submitButton, true, 'Verifying Code...');
                     try {
                         if (!pendingUserId) {
                             displayAuthMessage('login-message', "User ID not found. Please resend the code.", 'error');
@@ -243,8 +254,8 @@
                             return;
                         }
                         
-                        // Complete the magic URL session using the stored userId and the entered secret (token)
-                        await account.updateMagicURLSession(pendingUserId, token);
+                        // Complete the session using the stored userId and the entered OTP secret
+                        await account.updateEmailSession(pendingUserId, token);
                         
                         const user = await account.get();
                         if (AUTHORIZED_ADMINS.includes(user.email.toLowerCase())) {
