@@ -2125,74 +2125,7 @@
                 </div>
             </div>
 
-            <!-- SPA CONTAINER: Task Flow View (Performer) -->
-            <div id="task-flow-view" class="spa-view hidden p-4 lg:p-8 max-w-4xl mx-auto">
-                <div class="bento-card w-full relative p-6 md:p-8">
-                    <!-- Flow Header -->
-                    <div class="flex items-center justify-between mb-8">
-                        <button onclick="prevTaskStep()" class="text-dash-secondary hover:text-[var(--text-primary)] flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors group">
-                            <i data-feather="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i> 
-                            <span id="task-back-btn-text">Cancel Task</span>
-                        </button>
-                        
-                        <div class="flex gap-1.5" id="task-progress-bars">
-                            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-[var(--accent-primary)] shadow-[0_0_8px_rgba(69,185,110,0.3)]" id="task-bar-1"></div>
-                            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-dash-secondary" id="task-bar-2"></div>
-                            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-dash-secondary" id="task-bar-3"></div>
-                            <div class="w-8 h-1.5 rounded-full transition-all duration-500 bg-dash-secondary" id="task-bar-4"></div>
-                        </div>
-                    </div>
-
-                    <div id="task-step-1" class="task-wizard-step space-y-6">
-                        <!-- Mission Header & Reward -->
-                        <div class="flex items-center justify-between gap-4">
-                            <div class="flex-1 min-w-0">
-                                <p class="text-[10px] font-black text-dash-secondary uppercase tracking-widest mb-1">Active Mission</p>
-                                <h2 class="text-2xl font-bold truncate" id="task-detail-title">Mission: Loading...</h2>
-                            </div>
-                            <div class="text-right">
-                                <div class="bg-green-500/10 text-green-600 px-4 py-2 rounded-2xl border border-green-500/20">
-                                    <p class="text-[9px] font-bold uppercase mb-0.5">Payout</p>
-                                    <h3 class="text-xl font-black" id="task-detail-reward">₦0.00</h3>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Creator's Instructions -->
-                        <div class="space-y-4">
-                            <h4 class="text-xs font-black uppercase tracking-widest text-dash-secondary">Creatorâ€™s Instructions</h4>
-                            <div class="p-5 bg-dash-secondary/30 rounded-2xl border border-dash text-sm leading-relaxed text-dash-secondary italic" id="task-detail-instructions"></div>
-                        </div>
-
-                        <!-- Organic Discovery Section -->
-                        <div class="p-6 bg-white border border-dash rounded-3xl space-y-4">
-                            <div class="flex items-center gap-3">
-                                <div id="task-platform-icon-step1" class="w-10 h-10 rounded-xl bg-dash-secondary flex items-center justify-center text-xl shadow-sm"></div>
-                                <h4 class="text-xs font-black uppercase tracking-widest text-dash-secondary">Organic Discovery</h4>
-                            </div>
-                            
-                            <p class="text-xs text-dash-secondary leading-relaxed">To ensure high-quality engagement, do not use direct links. Please search for the account manually on the platform.</p>
-                            
-                            <div class="p-4 bg-dash-secondary/50 rounded-2xl border border-dash">
-                                <p class="text-[10px] font-bold uppercase text-dash-secondary mb-2">Search Seed</p>
-                                <p id="task-search-seed-step1" class="text-sm font-bold text-[var(--text-primary)]">Loading...</p>
-                            </div>
-
-                            <a href="#" id="task-organic-button" target="_blank" class="w-full btn-fintech bg-dash-secondary border border-dash justify-center py-4 text-xs font-black uppercase tracking-widest text-dash-secondary hover:text-[var(--text-primary)] transition-all">
-                                <i data-feather="external-link" class="mr-2 w-4"></i> <span id="task-platform-name">Open Platform</span>
-                            </a>
-                        </div>
-
-                        <div class="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl flex items-start gap-3">
-                            <i data-feather="shield" class="w-4 h-4 text-amber-500 mt-0.5"></i>
-                            <p class="text-[11px] text-amber-700 leading-tight"><strong>Safety Notice:</strong> Do not close this tab. You have 30 minutes to submit proof after completing the action. Accepting starts your <span class="font-bold">30 minute</span> claim timer.</p>
-                        </div>
-
-                        <button id="accept-mission-btn" onclick="acceptMission()" class="w-full btn-fintech btn-primary justify-center py-5 shadow-xl font-black uppercase tracking-widest">
-                            Accept task
-                        </button>
-                    </div>
-
+ 
                     <div id="task-step-2" class="task-wizard-step hidden space-y-6 text-center py-4">
                         <!-- Status Badge -->
                         <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 text-blue-500 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-500/20 mb-2">

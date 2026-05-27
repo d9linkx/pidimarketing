@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Coding 101 | Build with AI without Coding</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAFAF7;
+            color: #111111;
+            scroll-behavior: smooth;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at 10% 20%, rgba(123, 97, 255, 0.03) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(110, 168, 255, 0.03) 0%, transparent 40%);
+        }
+        .btn-primary {
+            background: #111111;
+            color: #ffffff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-primary:hover {
+            background: #2A2A2A;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: rgba(123, 97, 255, 0.08);
+            border: 1px solid rgba(123, 97, 255, 0.2);
+            color: #7B61FF;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            background: rgba(123, 97, 255, 0.12);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #7B61FF 0%, #6EA8FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section-c {
+            background: linear-gradient(to bottom, rgba(123, 97, 255, 0.03), transparent);
+        }
+        .animate-pulse-strong {
+            animation: pulse-strong 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        @keyframes pulse-strong {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+        }
+        .animate-fade-in-up {
+            animation: fade-in-up 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes fade-in-up {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="hero-gradient">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-[#ECECEC]">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-[#111111] rounded-lg flex items-center justify-center">
+                    <i data-feather="zap" class="text-white w-5 h-5"></i>
+                </div>
+                <span class="font-extrabold text-xl tracking-tight text-[#111111]">VIBE with Prince</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. Hero Section -->
+    <header class="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#7B61FF]/10 text-[#7B61FF] rounded-full text-[10px] font-black uppercase tracking-widest border border-[#7B61FF]/20 animate-pulse-strong">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#7B61FF]"></span>
+                    Introductory Course Open
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight text-[#111111]">
+                    INTRODUCTION TO <span class="text-gradient">VIBE CODING</span> 101
+                </h1>
+                
+                <!-- PAC Content integrated into Hero -->
+                <div class="p-6 bg-white rounded-3xl border border-[#ECECEC] space-y-4 max-w-lg">
+                    <p class="text-sm font-medium text-[#5F6368]">
+                        <span class="text-[#111111] font-bold">The Reality:</span> Most people have great ideas, but they stay stuck in their heads because tech feels too hard.
+                    </p>
+                    <p class="text-sm font-medium text-[#5F6368]">
+                        Meanwhile, others are using AI to build Build apps, websites, startup ideas, and digital products with AI (without learning traditional coding first), and launch in hours. This course is your bridge.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#register" class="btn-primary px-10 py-4 rounded-2xl font-bold text-center hover-lift">Register Free</a>
+                    <a href="#curriculum" class="btn-secondary px-10 py-4 rounded-2xl font-bold text-center hover-lift">See What You'll Learn</a>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-6 pt-4 border-t border-[#ECECEC]">
+                    <div class="flex items-center gap-2 text-xs font-bold text-[#5F6368] uppercase tracking-wider hover-lift">
+                        <i data-feather="check-circle" class="w-4 h-4 text-[#7B61FF]"></i> Beginner-Friendly
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-bold text-[#5F6368] uppercase tracking-wider hover-lift">
+                        <i data-feather="code" class="w-4 h-4 text-[#7B61FF]"></i> No Prior Coding Experience Needed
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-bold text-[#5F6368] uppercase tracking-wider hover-lift">
+                        <i data-feather="video" class="w-4 h-4 text-[#7B61FF]"></i> Held Online
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-bold text-[#5F6368] uppercase tracking-wider hover-lift">
+                        <i data-feather="users" class="w-4 h-4 text-[#7B61FF]"></i> Limited Slots
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative">
+                <!-- Background elements -->
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-[#7B61FF]/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-[#6EA8FF]/10 rounded-full blur-3xl"></div>
+                
+                <!-- Hero Image -->
+                <div class="relative z-10 rounded-[2.5rem] overflow-hidden border-[12px] border-white">
+                    <img src="assets/vibehero.png" alt="Young Creator using AI" class="w-full h-auto">
+                </div>
+
+                <!-- Floating UI Cards -->
+                <div class="absolute top-10 -left-6 glass-card p-4 rounded-2xl w-48 animate-float hidden md:block">
+                    <p class="text-[10px] font-bold text-[#7B61FF] uppercase mb-2">AI Prompt Active</p>
+                    <div class="h-2 w-full bg-[#ECECEC] rounded-full mb-2"></div>
+                    <div class="h-2 w-2/3 bg-[#ECECEC] rounded-full"></div>
+                </div>
+                <div class="absolute bottom-10 -right-6 glass-card p-4 rounded-2xl w-56 animate-float delay-75 hidden md:block">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-6 h-6 bg-[#6EA8FF] rounded-md"></div>
+                        <p class="text-[10px] font-bold">App Generated</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="h-10 bg-[#ECECEC] rounded-lg"></div>
+                        <div class="h-10 bg-[#ECECEC] rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-20 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center space-y-4 mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Beginners Are Already Building With AI</h2>
+                <p class="text-[#5F6368] font-medium">Join 100+ beginners who have registered interest this week.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-[#FAFAF7] p-8 rounded-[2rem] border border-[#ECECEC] reveal hover-lift">
+                    <div class="flex gap-1 text-[#7B61FF] mb-6">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-lg font-medium italic mb-8">"I built my first landing page in 2 hours. I thought I needed a developer for months."</p>
+                    <div class="flex items-center gap-3">
+                        <img src="https://ui-avatars.com/api/?name=Chidi&background=10b981&color=fff" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="text-sm font-bold">Chidi O.</p>
+                            <p class="text-[10px] text-[#5F6368] uppercase font-bold">Entrepreneur</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-[#FAFAF7] p-8 rounded-[2rem] border border-[#ECECEC] reveal hover-lift">
+                    <div class="flex gap-1 text-[#7B61FF] mb-6">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-lg font-medium italic mb-8">"I finally understand how AI coding works. It's like having a superpower."</p>
+                    <div class="flex items-center gap-3">
+                        <img src="https://ui-avatars.com/api/?name=Sarah&background=3b82f6&color=fff" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="text-sm font-bold">Sarah M.</p>
+                            <p class="text-[10px] text-[#5F6368] uppercase font-bold">Designer</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-[#FAFAF7] p-8 rounded-[2rem] border border-[#ECECEC] reveal hover-lift">
+                    <div class="flex gap-1 text-[#7B61FF] mb-6">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-lg font-medium italic mb-8">"This changed how I think about startups. You don't need a huge team to launch."</p>
+                    <div class="flex items-center gap-3">
+                        <img src="https://ui-avatars.com/api/?name=Kofi&background=f59e0b&color=fff" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="text-sm font-bold">Kofi B.</p>
+                            <p class="text-[10px] text-[#5F6368] uppercase font-bold">Freelancer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Problem Section -->
+    <section class="py-24 px-6 max-w-5xl mx-auto">
+        <div class="text-center mb-16 reveal">
+            <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
+                You Don’t Need More Ideas.<br>
+                <span class="text-[#5F6368]">You Need The Ability To Build.</span>
+            </h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="p-8 rounded-[2.5rem] bg-white border border-[#ECECEC] flex items-start gap-6 reveal hover-lift">
+                <div class="w-12 h-12 bg-[#FAFAF7] rounded-2xl flex items-center justify-center flex-shrink-0 border border-[#ECECEC]">
+                    <i data-feather="frown" class="text-[#5F6368]"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-2">Startup ideas but no coding</h4>
+                    <p class="text-[#5F6368] text-sm leading-relaxed">Your brain is full of "The Next Big Thing" but your fingers don't know where to start.</p>
+                </div>
+            </div>
+            <div class="p-8 rounded-[2.5rem] bg-white border border-[#ECECEC] flex items-start gap-6 reveal hover-lift">
+                <div class="w-12 h-12 bg-[#FAFAF7] rounded-2xl flex items-center justify-center flex-shrink-0 border border-[#ECECEC]">
+                    <i data-feather="cpu" class="text-[#5F6368]"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-2">Tech feels too hard to learn</h4>
+                    <p class="text-[#5F6368] text-sm leading-relaxed">Years of study just to build a button? It doesn't have to be this way.</p>
+                </div>
+            </div>
+            <div class="p-8 rounded-[2.5rem] bg-white border border-[#ECECEC] flex items-start gap-6 reveal hover-lift">
+                <div class="w-12 h-12 bg-[#FAFAF7] rounded-2xl flex items-center justify-center flex-shrink-0 border border-[#ECECEC]">
+                    <i data-feather="eye" class="text-[#5F6368]"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-2">Watching others build while you stay stuck</h4>
+                    <p class="text-[#5F6368] text-sm leading-relaxed">The feeling of FOMO as the AI wave passes you by every single day.</p>
+                </div>
+            </div>
+            <div class="p-8 rounded-[2.5rem] bg-white border border-[#ECECEC] flex items-start gap-6 reveal hover-lift">
+                <div class="w-12 h-12 bg-[#FAFAF7] rounded-2xl flex items-center justify-center flex-shrink-0 border border-[#ECECEC]">
+                    <i data-feather="help-circle" class="text-[#5F6368]"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-2">Overwhelmed by where to start</h4>
+                    <p class="text-[#5F6368] text-sm leading-relaxed">ChatGPT? Cursor? Replit? Too much noise. You need a simple roadmap.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Agitation Section -->
+    <section class="py-24 section-c overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+            <div class="space-y-8 reveal">
+                <h2 class="text-4xl md:text-5xl font-extrabold leading-tight">
+                    AI Is Changing Everything.<br>
+                    <span class="text-[#7B61FF]">Most People Are Watching From The Sidelines.</span>
+                </h2>
+                
+                <div class="space-y-6">
+                    <div class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-[#7B61FF]/20 flex items-center justify-center mt-1">
+                            <div class="w-2 h-2 rounded-full bg-[#7B61FF]"></div>
+                        </div>
+                        <p class="text-[#5F6368] font-medium">Creators are launching full digital products in weekends.</p>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-[#7B61FF]/20 flex items-center justify-center mt-1">
+                            <div class="w-2 h-2 rounded-full bg-[#7B61FF]"></div>
+                        </div>
+                        <p class="text-[#5F6368] font-medium">Founders are validating and building MVPs for $0.</p>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-rose-500/20 flex items-center justify-center mt-1">
+                            <div class="w-2 h-2 rounded-full bg-rose-500"></div>
+                        </div>
+                        <p class="text-[#5F6368] font-medium">Meanwhile, you're still waiting for a developer's quote.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative reveal">
+                <div class="glass-card p-6 rounded-[2rem] space-y-4 hover-lift">
+                    <div class="flex justify-between items-center pb-4 border-b border-[#ECECEC]">
+                        <span class="text-xs font-bold uppercase tracking-widest text-[#5F6368]">Traditional Method</span>
+                        <span class="text-xs font-bold uppercase tracking-widest text-[#7B61FF]">Vibe Coding</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-[#FAFAF7] rounded-xl text-center border border-[#ECECEC]">
+                            <p class="text-2xl font-black text-[#111111]">6 Months</p>
+                            <p class="text-[10px] text-[#5F6368] uppercase mt-1">To learn basics</p>
+                        </div>
+                        <div class="p-4 bg-[#7B61FF]/10 rounded-xl text-center border border-[#7B61FF]/20">
+                            <p class="text-2xl font-black text-[#7B61FF]">2 Hours</p>
+                            <p class="text-[10px] text-[#7B61FF]/50 uppercase mt-1">To launch MVP</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Solution Section -->
+    <section id="curriculum" class="py-24 px-6 max-w-7xl mx-auto bg-white rounded-[3rem] mt-12 mb-12 border border-[#ECECEC]">
+        <div class="text-center space-y-4 mb-16 reveal">
+            <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight">This Course Helps You Start Building With AI</h2>
+            <p class="text-[#5F6368] text-lg">A beginner-friendly introduction to vibe coding and modern AI-assisted creation.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="p-8 rounded-[2.5rem] border border-[#ECECEC] hover:border-[#7B61FF] bg-[#FAFAF7] transition-all group reveal hover-lift">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform animate-fade-in-up">
+                    <i data-feather="book-open" class="text-[#7B61FF]"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Understand Vibe Coding</h4>
+                <p class="text-[#5F6368] text-sm">Learn the philosophy of building software by describing your 'vibe' to AI.</p>
+            </div>
+            <div class="p-8 rounded-[2.5rem] border border-[#ECECEC] hover:border-[#7B61FF] bg-[#FAFAF7] transition-all group reveal hover-lift">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform animate-fade-in-up">
+                    <i data-feather="tool" class="text-[#7B61FF]"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Learn AI Tooling</h4>
+                <p class="text-[#5F6368] text-sm">Get introduced to Cursor, Claude, and the modern stack for non-coders.</p>
+            </div>
+            <div class="p-8 rounded-[2.5rem] border border-[#ECECEC] hover:border-[#7B61FF] bg-[#FAFAF7] transition-all group reveal hover-lift">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform animate-fade-in-up">
+                    <i data-feather="layout" class="text-[#7B61FF]"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Real Examples</h4>
+                <p class="text-[#5F6368] text-sm">Case studies of apps built and launched by beginners in under 24 hours.</p>
+            </div>
+            <div class="p-8 rounded-[2.5rem] border border-[#ECECEC] hover:border-[#7B61FF] bg-[#FAFAF7] transition-all group reveal hover-lift">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform animate-fade-in-up">
+                    <i data-feather="terminal" class="text-[#7B61FF]"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Prompting Basics</h4>
+                <p class="text-[#5F6368] text-sm">Master the art of 'talking to the computer' so it gives you exactly what you want.</p>
+            </div>
+            <div class="p-8 rounded-[2.5rem] border border-[#ECECEC] hover:border-[#7B61FF] bg-[#FAFAF7] transition-all group reveal hover-lift">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform animate-fade-in-up">
+                    <i data-feather="package" class="text-[#7B61FF]"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Your First Mini Project</h4>
+                <p class="text-[#5F6368] text-sm">A live walkthrough of building a small functioning tool from a single prompt.</p>
+            </div>
+            <div class="p-8 rounded-[2.5rem] border border-[#ECECEC] hover:border-[#7B61FF] bg-[#FAFAF7] transition-all group reveal hover-lift">
+                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform animate-fade-in-up">
+                    <i data-feather="rocket" class="text-[#7B61FF]"></i>
+                </div>
+                <h4 class="font-bold text-lg mb-2">Speed Launching</h4>
+                <p class="text-[#5F6368] text-sm">Learn the workflows creators use to outpace entire engineering teams.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. What You'll Leave With -->
+    <section class="py-24">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl font-extrabold tracking-tight">After This Course, You’ll Think Differently</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-2xl flex items-center gap-6 border border-[#ECECEC] reveal hover-lift">
+                    <div class="w-8 h-8 rounded-full bg-[#7B61FF] text-white flex items-center justify-center flex-shrink-0">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-lg font-bold">Confidence to start building any idea today</span>
+                </div>
+                <div class="bg-white p-6 rounded-2xl flex items-center gap-6 border border-[#ECECEC] reveal hover-lift">
+                    <div class="w-8 h-8 rounded-full bg-[#7B61FF] text-white flex items-center justify-center flex-shrink-0">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-lg font-bold">Clarity on how AI creation actually works under the hood</span>
+                </div>
+                <div class="bg-white p-6 rounded-2xl flex items-center gap-6 border border-[#ECECEC] reveal hover-lift">
+                    <div class="w-8 h-8 rounded-full bg-[#7B61FF] text-white flex items-center justify-center flex-shrink-0">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-lg font-bold">Understanding of modern AI workflows (Cursor, Claude, Vercel)</span>
+                </div>
+                <div class="bg-white p-6 rounded-2xl flex items-center gap-6 border border-[#ECECEC] reveal hover-lift">
+                    <div class="w-8 h-8 rounded-full bg-[#7B61FF] text-white flex items-center justify-center flex-shrink-0">
+                        <i data-feather="check" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-lg font-bold">A roadmap to continue your journey as a 'Vibe Coder'</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Course Experience -->
+    <section class="py-24 px-6 max-w-7xl mx-auto overflow-hidden bg-white border border-[#ECECEC] rounded-[3rem]">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div class="relative reveal">
+                <div class="grid grid-cols-2 gap-4">
+                    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=400" class="rounded-3xl mt-12">
+                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=400" class="rounded-3xl">
+                </div>
+                <!-- Floating Overlays -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 glass-card p-6 rounded-3xl w-64">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-2 h-2 rounded-full bg-[#7B61FF]"></div>
+                        <span class="text-[10px] font-black uppercase">Live Build</span>
+                    </div>
+                    <p class="text-xs font-bold leading-relaxed text-[#5F6368]">"Build a SaaS landing page for a coffee brand."</p>
+                    <div class="mt-4 flex gap-2">
+                        <div class="h-2 w-1/2 bg-[#7B61FF]/10 rounded-full"></div>
+                        <div class="h-2 w-1/4 bg-[#7B61FF]/10 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8 reveal">
+                <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight">More Than A Webinar</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div class="space-y-2">
+                        <h5 class="font-bold flex items-center gap-2"><i data-feather="tv" class="w-4 h-4 text-emerald-500"></i> Interactive session</h5>
+                        <p class="text-sm text-slate-500">Not just a lecture. Ask questions and get answers in real-time.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <h5 class="font-bold flex items-center gap-2"><i data-feather="play" class="w-4 h-4 text-emerald-500"></i> Live demonstrations</h5>
+                        <p class="text-sm text-slate-500">Watch apps get built from zero to live on the internet.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <h5 class="font-bold flex items-center gap-2"><i data-feather="compass" class="w-4 h-4 text-[#7B61FF]"></i> Beginner walkthroughs</h5>
+                        <p class="text-sm text-slate-500">Slowed down so you can follow every logic jump.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <h5 class="font-bold flex items-center gap-2"><i data-feather="users" class="w-4 h-4 text-[#7B61FF]"></i> Community Access</h5>
+                        <p class="text-sm text-slate-500">Connect with other African builders after the event.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Instructor Section -->
+    <section class="py-24 bg-[#FAFAF7]">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="reveal">
+                    <img src="assets/prince.png" alt="Prince Dike" class="w-full h-auto rounded-[3rem] border-4 border-white">
+                </div>
+                <div class="space-y-6 reveal">
+                    <h3 class="text-3xl font-extrabold tracking-tight">Meet Your Host</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Hey, I'm Prince Dike, founder and co-founder of tech platforms like Prawnbox, Sabicrest, and other ventures. I've spent years in traditional marketing and inside tech trenches before realizing that the barriers to entry were too high for me to become who I want to become. So, I learned to code.
+                    </p>
+                    <p class="text-slate-600 leading-relaxed">
+                        Vibe Coding 101 exists because I believe African creators and founders shouldn't be sidelines. My mission is to show you that with the right AI tools and mindset, you can build anything you can imagine.
+                    </p>
+                    <div class="pt-6 flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white border border-[#ECECEC] flex items-center justify-center text-[#5F6368] hover:text-[#7B61FF] transition hover-lift">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white border border-[#ECECEC] flex items-center justify-center text-[#5F6368] hover:text-[#7B61FF] transition hover-lift">
+                            <i class="fa-brands fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. FAQ Section -->
+    <section id="faq" class="py-24 px-6 max-w-3xl mx-auto">
+        <div class="text-center mb-16 reveal">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Got Questions?</h2>
+        </div>
+        
+        <div class="space-y-4">
+            <details class="faq-item bg-white border border-[#ECECEC] rounded-3xl reveal hover-lift">
+                <summary class="p-6 font-bold flex justify-between items-center cursor-pointer">
+                    Is this beginner friendly?
+                    <i data-feather="chevron-down" class="w-4 h-4 text-[#5F6368] transition-transform"></i>
+                </summary>
+                <div class="px-6 pb-6 text-[#5F6368] text-sm">
+                    Yes! This is specifically designed for people who have zero technical background but want to build digital products.
+                </div>
+            </details>
+            <details class="faq-item bg-white border border-[#ECECEC] rounded-3xl reveal hover-lift">
+                <summary class="p-6 font-bold flex justify-between items-center cursor-pointer">
+                    Do I need coding experience?
+                    <i data-feather="chevron-down" class="w-4 h-4 text-[#5F6368] transition-transform"></i>
+                </summary>
+                <div class="px-6 pb-6 text-[#5F6368] text-sm">
+                    None at all. We will show you how to leverage AI to handle the syntax while you focus on the logic and 'vibe'.
+                </div>
+            </details>
+            <details class="faq-item bg-white border border-[#ECECEC] rounded-3xl reveal hover-lift">
+                <summary class="p-6 font-bold flex justify-between items-center cursor-pointer">
+                    Is it actually free?
+                    <i data-feather="chevron-down" class="w-4 h-4 text-[#5F6368] transition-transform"></i>
+                </summary>
+                <div class="px-6 pb-6 text-[#5F6368] text-sm">
+                    The introductory 101 course is 100% free to attend live.
+                </div>
+            </details>
+            <details class="faq-item bg-white border border-[#ECECEC] rounded-3xl reveal hover-lift">
+                <summary class="p-6 font-bold flex justify-between items-center cursor-pointer">
+                    Will there be replay access?
+                    <i data-feather="chevron-down" class="w-4 h-4 text-[#5F6368] transition-transform"></i>
+                </summary>
+                <div class="px-6 pb-6 text-[#5F6368] text-sm">
+                    Replay access will be shared with registered participants who are unable to attend live.
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- 10. Final CTA Section -->
+    <section id="register" class="py-24 px-6">
+        <div class="max-w-5xl mx-auto bg-white rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden border border-[#ECECEC]">
+            <!-- Decoration -->
+            <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(123,97,255,0.05),transparent_70%)]"></div>
+            
+            <div class="relative z-10 space-y-8">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-[#111111] leading-tight">
+                    Your Ideas Deserve More Than<br>Just Notes In Your Phone
+                </h2>
+                <p class="text-[#5F6368] text-lg">Start learning how to build with AI today.</p>
+                
+                <form id="registration-form" class="max-w-md mx-auto space-y-4">
+                    <input type="text" name="fullName" placeholder="Your Full Name" required class="w-full bg-[#FAFAF7] border border-[#ECECEC] rounded-2xl p-4 text-[#111111] focus:outline-none focus:border-[#7B61FF] transition hover-lift">
+                    <input type="email" name="email" placeholder="Your best email address" required class="w-full bg-[#FAFAF7] border border-[#ECECEC] rounded-2xl p-4 text-[#111111] focus:outline-none focus:border-[#7B61FF] transition hover-lift">
+                    <input type="tel" name="whatsapp" placeholder="WhatsApp Number (e.g. +234...)" required class="w-full bg-[#FAFAF7] border border-[#ECECEC] rounded-2xl p-4 text-[#111111] focus:outline-none focus:border-[#7B61FF] transition hover-lift">
+                    <button type="submit" class="w-full btn-primary py-4 rounded-2xl font-bold hover-lift">
+                        REGISTER FREE
+                    </button>
+                </form>
+
+                <div class="flex flex-col items-center gap-6 pt-8">
+                    <div class="flex flex-wrap justify-center gap-6 text-[#5F6368]">
+                        <div class="text-[10px] font-black uppercase tracking-widest">Limited slots</div>
+                        <div class="text-[10px] font-black uppercase tracking-widest">Beginner friendly</div>
+                        <div class="text-[10px] font-black uppercase tracking-widest">Free access</div>
+                        <div class="text-[10px] font-black uppercase tracking-widest">Online event</div>
+                    </div>
+                    <div class="flex items-center gap-4 opacity-60">
+                        <span class="text-[10px] font-bold text-[#5F6368] uppercase tracking-widest">Support</span>
+                        <a href="https://wa.me/2349027231243" target="_blank" class="text-[#5F6368] hover:text-[#7B61FF] transition"><i class="fa-brands fa-whatsapp"></i></a>
+                        <a href="mailto:officialprincedike@gmail.com" class="text-[#5F6368] hover:text-[#7B61FF] transition"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. Footer -->
+    <footer class="py-12 border-t border-[#ECECEC]">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-[#111111] rounded-md flex items-center justify-center hover-lift">
+                    <i data-feather="zap" class="text-white w-3 h-3"></i>
+                </div>
+                <span class="font-bold text-sm text-[#111111]">VIBE CODING 101</span>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <a href="https://wa.me/2349027231243" target="_blank" class="w-8 h-8 rounded-full bg-white border border-[#ECECEC] flex items-center justify-center text-[#5F6368] hover:text-[#7B61FF] transition" title="WhatsApp Support">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </a>
+                <a href="mailto:officialprincedike@gmail.com" class="w-8 h-8 rounded-full bg-white border border-[#ECECEC] flex items-center justify-center text-[#5F6368] hover:text-[#7B61FF] transition" title="Email Support">
+                    <i class="fa-solid fa-envelope"></i>
+                </a>
+            </div>
+
+            <p class="text-[10px] text-[#5F6368]">© 2026 PIDI Marketing. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Support Button -->
+    <a href="https://wa.me/2349027231243" target="_blank" class="fixed bottom-8 right-8 z-[100] w-16 h-16 bg-[#7B61FF] text-white rounded-full flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-[#6EA8FF] group" title="Chat with Support">
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
+        <!-- Tooltip -->
+        <span class="absolute right-full mr-4 bg-white text-[#111111] px-4 py-2 rounded-xl text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-[#ECECEC]">
+            Need help? Chat with us
+        </span>
+        <!-- Pulse Notification Dot -->
+        <span class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full border-2 border-white animate-pulse"></span>
+    </a>
+
+    <script>
+        feather.replace();
+
+        // Reveal on scroll
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Initial check
+        reveal();
+
+        // Registration Submission to Google Sheets
+        // For better security, consider using a server-side proxy to hide this URL.
+        // In a purely client-side context, breaking it into parts makes it less immediately obvious.
+        const scriptURL_part1 = 'https://script.google.com/macros/s/';
+        const scriptURL_part2 = 'AKfycbxi-5OFPJbpeHmMjYGT77ktdF4xZANB27r8yTP81lGx9hsnpNpXLOwZjo5Ux_f8eVl3';
+        const scriptURL_part3 = '/exec';
+        const scriptURL = scriptURL_part1 + scriptURL_part2 + scriptURL_part3;
+        const regForm = document.getElementById('registration-form');
+        
+        regForm?.addEventListener('submit', e => {
+            e.preventDefault();
+            const submitBtn = regForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> PROCESSING...';
+
+            const data = {
+                fullName: regForm.fullName.value,
+                email: regForm.email.value,
+                whatsapp: regForm.whatsapp.value
+            };
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                mode: 'no-cors'
+            })
+            .then(() => {
+                window.showToast("Registration successful! Check your email.", "success");
+                regForm.reset();
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'REGISTER FREE';
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                window.showToast("Connection error. Please try again.", "error");
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'REGISTER FREE';
+            });
+        });
+
+        // FAQ details animation helper
+        document.querySelectorAll('details').forEach((el) => {
+            const summary = el.querySelector('summary');
+            const content = el.querySelector('div');
+            const icon = summary.querySelector('i');
+
+            summary.addEventListener('click', (e) => {
+                if (el.open) {
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
