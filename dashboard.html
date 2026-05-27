@@ -893,52 +893,6 @@
                     </div>
                 </div>
 
-                <script type="module">
-                    import { databases, Query, APPWRITE_CONFIG } from './appwriteClient.js';
-
-                    async function updateCreatorInsightCards(){
-                        try{
-                            if(!window.currentUser || !window.currentUser.id) return;
-                            // Fetch campaigns for current creator
-                            const campsRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, [Query.equal('creator_id', currentUser.id)]);
-                            const camps = (campsRes && campsRes.documents) ? campsRes.documents : [];
-
-                            const totalCampaigns = camps.length;
-                            const totalSpent = camps.reduce((acc, c) => acc + (c.total_cost || 0), 0);
-
-                            // Count approved engagements for these campaigns
-                            let totalEngagements = 0;
-                            if (camps.length > 0) {
-                                const campaignIds = camps.map(c => c.$id);
-                                const engRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', campaignIds), Query.equal('status','approved')]);
-                                totalEngagements = (engRes && engRes.documents) ? engRes.documents.length : 0;
-                            }
-
-                            const avgCPE = totalEngagements > 0 ? Math.round(totalSpent / totalEngagements) : 0;
-
-                            const elTotalCampaigns = document.getElementById('total-reach-val');
-                            const elTotalSpent = document.getElementById('accuracy-score-val');
-                            const elTotalEngagements = document.getElementById('avg-cpe-val');
-                            const elAvgCPE = document.getElementById('live-workforce-val');
-
-                            if(elTotalCampaigns) elTotalCampaigns.innerText = totalCampaigns.toLocaleString();
-                            if(elTotalSpent) elTotalSpent.innerText = `₦${totalSpent.toLocaleString()}`;
-                            if(elTotalEngagements) elTotalEngagements.innerText = totalEngagements.toLocaleString();
-                            if(elAvgCPE) elAvgCPE.innerText = `₦${avgCPE.toLocaleString()}`;
-                        }catch(err){
-                            console.warn('Failed to update insight cards:', err);
-                        }
-                    }
-
-                    // Initial load and periodic refresh
-                    updateCreatorInsightCards();
-                    const __insightInterval = setInterval(updateCreatorInsightCards, 30000);
-
-                    // Clean up if the window unloads
-                    window.addEventListener('beforeunload', () => clearInterval(__insightInterval));
-                </script>
-
-
             </div> <!-- End creator-dashboard-content -->
 
                 <!-- Performer Dashboard Layout -->
@@ -4319,6 +4273,21 @@
                     roles.creator.items = campaignsRes.documents || [];
                 }
 
+                // 1.5 Calculate and Update Insight Stats Cards
+                const items = roles.creator.items || [];
+                const totalCampaigns = items.length;
+                const totalSpent = items.reduce((acc, c) => acc + (Number(c.total_cost) || 0), 0);
+                const totalEngagements = items.reduce((acc, c) => acc + (Number(c.current_count) || 0), 0);
+                const avgCPE = totalEngagements > 0 ? Math.round(totalSpent / totalEngagements) : 0;
+
+                const vp = document.getElementById('dashboard-viewport');
+                if (vp) {
+                    if (vp.querySelector('#total-reach-val')) vp.querySelector('#total-reach-val').innerText = totalCampaigns.toLocaleString();
+                    if (vp.querySelector('#accuracy-score-val')) vp.querySelector('#accuracy-score-val').innerText = `₦${totalSpent.toLocaleString()}`;
+                    if (vp.querySelector('#avg-cpe-val')) vp.querySelector('#avg-cpe-val').innerText = totalEngagements.toLocaleString();
+                    if (vp.querySelector('#live-workforce-val')) vp.querySelector('#live-workforce-val').innerText = `₦${avgCPE.toLocaleString()}`;
+                }
+
                 // 2. Update Dashboard Home View Components
                 const activeCampaigns = (roles.creator.items || []).filter(c => c.status === 'active');
                 const ongoingCountEl = document.getElementById('ongoing-count');
@@ -6981,4 +6950,3 @@
 
 </body>
 </html>
-
