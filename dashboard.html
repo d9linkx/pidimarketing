@@ -865,7 +865,7 @@
                                 <tbody id="ongoing-campaigns-list" class="divide-y divide-dash"></tbody>
                             </table>
                         </div>
-                        <a href="#" onclick="switchSPAView('campaigns')" class="block p-4 text-center text-[11px] font-bold uppercase tracking-widest text-dash-secondary border-t border-dash transition-all bg-white/50 underline decoration-[#45b96e] decoration-2 underline-offset-4">
+                        <a href="#" onclick="switchSPAView('campaigns')" class="block p-4 text-center text-[11px] font-bold uppercase tracking-widest text-dash-secondary border-t border-dash transition-all bg-white/50 underline decoration-[var(--accent-primary)] decoration-2 underline-offset-4">
                             View All Campaigns <i data-feather="arrow-right" class="w-3 h-3 inline ml-1 text-[#45b96e]"></i>
                         </a>
                         
@@ -2441,7 +2441,7 @@
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="text-dash-secondary border-b border-dash bg-dash-secondary/30">
-                                    <th class="p-4 uppercase tracking-widest font-bold">Campaign Name</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Mission Name</th>
                                     <th class="p-4 uppercase tracking-widest font-bold">Platform</th>
                                     <th class="p-4 uppercase tracking-widest font-bold">Status</th>
                                     <th class="p-4 uppercase tracking-widest font-bold">Spend</th>
@@ -2575,6 +2575,7 @@
                             <thead>
                                 <tr class="text-dash-secondary border-b border-dash">
                                     <th class="pb-3 uppercase tracking-widest">Transaction ID</th>
+                                    <th class="pb-3 uppercase tracking-widest">Campaign</th>
                                     <th class="pb-3 uppercase tracking-widest">Type</th>
                                     <th class="pb-3 uppercase tracking-widest">Amount</th>
                                     <th class="pb-3 uppercase tracking-widest text-right">Status</th>
@@ -2666,17 +2667,17 @@
                 <!-- Workflow Content Areas -->
                 <div class="relative min-h-[500px]">
                     <!-- CREATOR WORKFLOW -->
-                    <div id="creator-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300">
+                    <div id="creator-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-6">
                             <div class="bento-card p-8 border-l-4 border-l-[var(--accent-primary)] group">
-                                <div class="flex items-center gap-4 mb-4">
+                                <div class="flex items-center gap-4 mb-4 transition-all">
                                     <div class="w-10 h-10 rounded-xl bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] flex items-center justify-center"><i data-feather="target" class="w-5"></i></div>
                                     <h4 class="font-bold text-lg">01. Detail the task</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Select your platform (Instagram, Google, etc.). Define your engagement goals and the specific instructions our performers must follow to ensure brand alignment.</p>
                             </div>
                             <div class="bento-card p-8 border-1-4 border-1-[var(--accent-primary)] group">
-
+                                
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="lock" class="w-5"></i></div>
                                     <h4 class="font-bold text-lg">02. Make the payment (refundable)</h4>
@@ -2686,7 +2687,7 @@
                         </div>
 
                         <div class="space-y-6">
-
+                            
 
                             <div class="bento-card p-8 group">
                                 <div class="flex items-center gap-4 mb-4">
@@ -2698,7 +2699,7 @@
    
 
                             <div class="bento-card p-8 group">
-                                <div class="flex items-center gap-4 mb-4">
+                                <div class="flex items-center gap-4 mb-4 transition-all">
                                     <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center"><i data-feather="bar-chart" class="w-5"></i></div>
                                     <h4 class="font-bold text-lg">04. Review what was done</h4>
                                 </div>
@@ -2708,17 +2709,17 @@
                     </div>
 
                     <!-- PERFORMER WORKFLOW -->
-                    <div id="performer-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300 hidden">
+                    <div id="performer-how-it-works-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
                         <div class="space-y-6">
                             <div class="bento-card p-8 border-l-4 border-l-blue-500 group">
-                                <div class="flex items-center gap-4 mb-4">
+                                <div class="flex items-center gap-4 mb-4 transition-all">
                                     <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center"><i data-feather="check-square" class="w-5"></i></div>
                                     <h4 class="font-bold text-lg">01. Accept task</h4>
                                 </div>
                                 <p class="text-sm text-dash-secondary leading-relaxed">Browse the board and claim a mission before the pool fills up. Once accepted, you have <b>30 minutes</b> to complete the task and submit proof before the spot is released. Failure to complete the task within the timeframe releases the task for someone else to claim and complete.</p>
                             </div>
 
-                            <div class="bento-card p-8 group">
+                            <div class="bento-card p-8 group transition-all">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center"><i data-feather="eye" class="w-5"></i></div>
                                     <h4 class="font-bold text-lg">02. Start the task</h4>
@@ -2728,7 +2729,7 @@
                         </div>
 
                         <div class="space-y-6">
-                            <div class="bento-card p-8 group">
+                            <div class="bento-card p-8 group transition-all">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center"><i data-feather="message-circle" class="w-5"></i></div>
                                     <h4 class="font-bold text-lg">03. Use the '10-Word' rule (for comments)</h4>
@@ -2736,7 +2737,7 @@
                                 <p class="text-sm text-dash-secondary leading-relaxed">Every comment must be at least 10 words long and contextually relevant. No "Cool!" or "Nice!". We only reward high-value human interactions.</p>
                             </div>
 
-                            <div class="bento-card p-8 group">
+                            <div class="bento-card p-8 group transition-all">
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-10 h-10 rounded-xl bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] flex items-center justify-center"><i data-feather="zap" class="w-5"></i></div>
                                     <h4 class="font-bold text-lg">04. Confirm you've done it</h4>
@@ -4169,7 +4170,8 @@
                 const statusColors = {
                     active: 'bg-green-500/10 text-green-500',
                     pending_verification: 'bg-amber-500/10 text-amber-500',
-                    completed: 'bg-blue-500/10 text-blue-500'
+                    completed: 'bg-blue-500/10 text-blue-500',
+                    rejected: 'bg-red-500/10 text-red-500'
                 };
                 
                 return `
@@ -4177,10 +4179,15 @@
                         <td class="p-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${c.platform} text-xs"></i></div>
-                                <div class="max-w-[180px] truncate"><p class="font-bold truncate group-hover:text-[var(--accent-primary)] transition-colors">${c.target_url}</p><p class="text-[10px] text-dash-secondary">${new Date(c.created_at).toLocaleDateString()}</p></div>
+                                <div class="max-w-[180px] truncate"><p class="font-bold truncate group-hover:text-[var(--accent-primary)] transition-colors">${c.target_url.split('/')[2] || 'Mission'}</p><p class="text-[10px] text-dash-secondary">${new Date(c.created_at).toLocaleDateString()}</p></div>
                             </div>
                         </td>
-                        <td class="p-4 uppercase font-bold text-[9px] text-dash-secondary tracking-widest hidden md:table-cell">${c.platform}</td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-lg bg-dash-secondary flex items-center justify-center"><i class="fa-brands fa-${c.platform} text-xs"></i></div>
+                                <span class="uppercase font-bold text-[9px] text-dash-secondary tracking-widest">${c.platform}</span>
+                            </div>
+                        </td>
                         <td class="p-4"><span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase ${statusColors[c.status] || 'bg-dash-secondary text-dash-secondary'}">${c.status === 'pending_verification' ? 'Verifying' : c.status}</span></td>
                         <td class="p-4 font-bold">₦${(c.total_cost || 0).toLocaleString()}</td>
                         <td class="p-4"><div class="flex items-center gap-3 min-w-[100px]"><div class="flex-1 bg-dash-secondary h-1 rounded-full overflow-hidden"><div class="bg-[var(--accent-primary)] h-full" style="width: ${progress}%"></div></div><span class="text-[9px] font-bold">${progress}%</span></div></td>
@@ -4776,10 +4783,15 @@
             const ledger = document.getElementById('wallet-ledger-body');
             if (typeof transactions !== 'undefined' && transactions && transactions.length > 0) {
                 ledger.innerHTML = transactions.map(t => `
-                    <tr class="border-b border-dash hover:bg-dash-secondary/30 transition-colors">
+                    <tr class="border-b border-dash hover:bg-dash-secondary/30 transition-colors" ${t.campaign_id ? `onclick="viewCampaignDetails('${t.campaign_id}')"` : ''}>
                         <td class="py-4 font-mono text-[10px]">${t.$id.slice(0, 8)}...</td>
                         <td class="py-4">
                             <p class="font-bold">${t.type === 'escrow_lock' ? 'Campaign Funding' : 'Manual Deposit'}</p>
+                            <p class="text-[9px] text-dash-secondary">${new Date(t.created_at).toLocaleDateString()}</p>
+                        </td>
+                        <td class="py-4">
+                            ${t.campaign_id ? `<span class="font-bold text-[11px]">${campaigns.find(c => c.$id === t.campaign_id)?.target_url.split('/')[2] || 'Campaign'}</span>` : '—'}
+                            
                             <p class="text-[9px] text-dash-secondary">${new Date(t.created_at).toLocaleDateString()}</p>
                         </td>
                         <td class="py-4 font-bold">₦${t.amount.toLocaleString()}</td>
