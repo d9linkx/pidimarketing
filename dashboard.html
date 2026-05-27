@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- Sets the browser theme color to your brand green -->
-    <meta name="theme-color" content="#45b96e" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#7B61FF" media="(prefers-color-scheme: light)"
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PIDItasks | Earn as You Scroll</title>
@@ -60,13 +60,13 @@
             
             --nav-bg: #f1f5f9;
             --btn-secondary: #f8fafc;
-            --accent-primary: #45b96e; /* Deep Emerald */
+            --accent-primary: #7B61FF; /* Premium Purple */ /* Deep Emerald */
 
             /* Neutralized & Modernized Palette */
             --indigo-vibrant: #334155; /* Slate Blue-Gray (Replaces Purple) */
             --indigo-pale: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             
-            --emerald-vibrant: #45b96e; 
+            --emerald-vibrant: #7B61FF; 
             --emerald-pale: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
             
             --azure-vibrant: #0ea5e9; 
@@ -437,7 +437,7 @@
         /* Creation Flow Styles */
         .step-node { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; border: 2px solid var(--border-dash); background: var(--bg-card); transition: all 0.3s; }
         .step-node.active { border-color: var(--accent-primary); background: var(--accent-primary); color: white; }
-        .step-node.completed { border-color: #48bb78; background: #48bb78; color: white; }
+        .step-node.completed { border-color: var(--accent-primary); background: var(--accent-primary); color: white; }
 
         /* Reduction of font sizes globally */
         h2 { font-size: 1.75rem !important; }
@@ -465,7 +465,7 @@
 
         /* --- CONSTANT DARK GREEN SIDEBAR OVERRIDES --- */
         aside.sidebar, #mobile-drawer {
-            background: #0c7731 !important;
+            background: #2D1B69 !important;
             color: white !important;
         }
         
@@ -504,7 +504,7 @@
 
         aside.sidebar #role-dropdown-menu button:hover, 
         #mobile-drawer #role-dropdown-menu-mobile button:hover {
-            background-color: #0c7731 !important;
+            background-color: var(--accent-primary);
         }
 
         /* Text Gradient for Main Heading */
@@ -536,13 +536,13 @@
 
         /* Animated Gradient for Primary Button */
         .btn-primary { 
-            background: linear-gradient(135deg, var(--accent-primary) 60%, #3daf65 40%); 
-            color: var(--text-primary) !important;
+            background: linear-gradient(135deg, var(--accent-primary));
+            color: #ffffff !important;
             border: var(--accent-primary) !important;
             transition: background 0.5s ease, transform 0.2s ease; /* Animate background property */
         }
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--accent-primary) 60%, #14913f 40%); 
+            background: linear-gradient(135deg, var(--accent-primary)); 
             transform: scale(1.05); /* Keep existing hover effect */
         }
 
@@ -553,6 +553,7 @@
         .campaign-row.expanded { background: var(--nav-bg); }
         .proof-img { aspect-ratio: 9/16; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-dash); }
 
+ 
         #role-chevron.rotate-180, #role-chevron-mobile.rotate-180 { transform: rotate(180deg); }
 
         /* FAQ Chevron Styles */
@@ -568,6 +569,7 @@
     </style>
 </head>
 <body class="p-0">
+<body class="p-0 light-mode">
     <div class="dashboard-layout">
         <!-- Desktop Sidebar -->
         <aside class="sidebar hidden lg:flex">
@@ -736,16 +738,16 @@
                         <div id="welcome-section" class="relative z-10 flex flex-col md:flex-row md:justify-between md:items-center gap-8">
                             <div class="space-y-3">
                                 <h2 class="text-3xl md:text-5xl font-bold tracking-tight text-white !leading-tight">
-                                    Welcome back, <span class="user-name-display text-[#45b96e]"></span>
+                                    Welcome back, <span class="user-name-display text-[var(--accent-primary)]"></span>
                                 </h2>
-                                <p id="hero-subtitle" class="text-sm md:text-lg text-gray-400 font-medium max-w-lg leading-relaxed">
+                                <p id="hero-subtitle" class="text-sm md:text-lg text-white font-medium max-w-lg leading-relaxed">
                                     Your growth engine is primed. Review your performance analytics and scale your reach.
                                 </p>
                             </div>
 
                             <div class="w-full md:w-auto flex flex-col gap-3 mt-6">
-                                <button id="main-cta-btn" class="w-full btn-fintech btn-primary justify-center py-4 text-black text-sm">
-                                    <i data-feather="plus" class="mr-2"></i> <span id="main-cta">CREATE CAMPAIGN</span>
+                                <button id="main-cta-btn" class="w-full btn-fintech btn-primary justify-center py-4 text-white text-sm">
+                                    <span id="main-cta">CREATE CAMPAIGN</span> <i data-feather="plus" class="ml-2"></i>
                                 </button>
                                 <button id="secondary-cta-btn" class="w-full btn-fintech bg-white/10 hover:bg-white/20 text-white border border-white/20 justify-center py-4 text-sm">
                                     <span id="secondary-cta">SEE CAMPAIGNS</span> <i data-feather="arrow-up-right" class="ml-2"></i>
@@ -3340,6 +3342,7 @@
                     <input type="number" id="deposit-amount" placeholder="e.g. 50000" class="w-full bg-dash-secondary border border-dash rounded-xl p-4 text-lg font-bold focus:outline-none focus:border-[var(--accent-primary)]">
                 </div>
                 <button onclick="processDeposit()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Pay with Paystack</button>
+                <button onclick="processDeposit()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-sm shadow-lg hover:scale-[1.02] transition">Pay with Paystack</button> 
             </div>
         </div>
     </div>
