@@ -504,6 +504,9 @@
                 <a href="#" onclick="switchSPAView('admin-finance')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                     <i data-feather="dollar-sign" class="w-4 text-center"></i> Financial Audit
                 </a>
+                <a href="#" onclick="switchSPAView('admin-withdrawals-panel')" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                    <i data-feather="credit-card" class="w-4 text-center"></i> Withdrawal Requests
+                </a>
 
                 <div class="my-4 border-t border-dash"></div>
                 <p class="text-[9px] font-bold text-dash-secondary uppercase tracking-widest px-2 mb-2">Account</p>
@@ -727,6 +730,35 @@
                     </div>
                 </div>
             </div> <!-- End admin-finance-view -->
+
+            <div id="admin-withdrawals-panel" class="spa-view hidden p-6 lg:p-8 max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold">Withdrawal Requests</h2>
+                        <p class="text-dash-secondary text-sm">Review performer payout requests, approve amounts within balance, and mark payments complete.</p>
+                    </div>
+                    <button onclick="fetchAdminWithdrawals()" class="btn-fintech btn-secondary px-4 py-3 text-[11px] font-black uppercase tracking-widest">Refresh Requests</button>
+                </div>
+                <div class="bento-card p-0 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-dash-secondary/30">
+                                <tr class="text-dash-secondary border-b border-dash">
+                                    <th class="p-4 uppercase tracking-widest font-bold">Request</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Performer</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Amount</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Bank</th>
+                                    <th class="p-4 uppercase tracking-widest font-bold">Status</th>
+                                    <th class="p-4 text-right uppercase tracking-widest font-bold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-withdrawal-request-list" class="divide-y divide-dash">
+                                <tr><td colspan="6" class="py-8 text-center text-dash-secondary">Loading withdrawal requests…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             <!-- SPA CONTAINER: Campaigns View -->
             <div id="campaigns-view" class="spa-view hidden p-4 lg:p-8 max-w-7xl mx-auto">
@@ -1878,6 +1910,99 @@
             `).join('');
         }
 
+        window.fetchAdminWithdrawals = async function() {
+            try {
+                const res = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.WITHDRAWALS, [Query.orderDesc('requested_at')]);
+                const requests = res.documents || [];
+                const rows = await Promise.all(requests.map(async req => {
+                    let profile = null;
+                    try { profile = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.PROFILES, req.user_id); } catch(e) { profile = null; }
+                    let vault = null;
+                    try { const vres = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', req.user_id), Query.limit(1)]).catch(()=>({ documents: [] })); vault = (vres && vres.documents && vres.documents[0]) || null; } catch(e) { vault = null; }
+                    let balance = (vault && typeof vault.balance !== 'undefined') ? vault.balance : (profile && profile.balance ? profile.balance : 0);
+                    if (balance === 0) {
+                        try {
+                            const txRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('user_id', req.user_id), Query.limit(500)]).catch(()=>({ documents: [] }));
+                            const allTx = (txRes && txRes.documents) || [];
+                            const payouts = allTx.filter(t => t.type === 'payout' && t.status === 'completed').reduce((sum, t) => sum + (t.amount || 0), 0);
+                            const withdrawals = allTx.filter(t => t.type === 'withdrawal' && t.status === 'completed').reduce((sum, t) => sum + (t.amount || 0), 0);
+                            balance = payouts - withdrawals;
+                        } catch (e) { balance = balance || 0; }
+                    }
+                    const bankInfo = req.bank_details ? `${req.bank_details.bank_name || 'Bank'} • ****${String(req.bank_details.bank_account_number || '').slice(-4)} • ${req.bank_details.bank_account_holder || ''}` : 'Bank details missing';
+                    return `
+                        <tr class="hover:bg-dash-secondary/20 transition-colors border-b border-dash">
+                            <td class="p-4">
+                                <p class="font-bold text-[11px]">${req.$id.slice(0,8)}</p>
+                                <p class="text-[9px] text-dash-secondary">${new Date(req.requested_at || req.$createdAt || req.created_at).toLocaleString()}</p>
+                                <p class="text-[9px] text-dash-secondary">Balance: ₦${Number(balance || 0).toLocaleString()}</p>
+                            </td>
+                            <td class="p-4 font-semibold">${profile?.full_name || req.user_id || 'Unknown'}</td>
+                            <td class="p-4 font-black">₦${(req.amount || 0).toLocaleString()}</td>
+                            <td class="p-4 text-[11px] text-dash-secondary">${bankInfo}</td>
+                            <td class="p-4 text-[11px] uppercase font-black">${req.status || 'pending'}</td>
+                            <td class="p-4 text-right">
+                                <div class="flex flex-wrap justify-end gap-2">
+                                    <button ${req.status !== 'pending' ? 'disabled' : ''} onclick="adminProcessWithdrawal('${req.$id}', 'approved')" class="px-3 py-2 rounded-xl bg-green-500 text-white text-[10px] font-black uppercase tracking-widest ${req.status !== 'pending' ? 'opacity-50 cursor-not-allowed' : ''}">Approve</button>
+                                    <button ${req.status !== 'pending' ? 'disabled' : ''} onclick="adminProcessWithdrawal('${req.$id}', 'rejected')" class="px-3 py-2 rounded-xl bg-red-500 text-white text-[10px] font-black uppercase tracking-widest ${req.status !== 'pending' ? 'opacity-50 cursor-not-allowed' : ''}">Reject</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }));
+                const list = document.getElementById('admin-withdrawal-request-list');
+                if (list) list.innerHTML = rows.join('') || '<tr><td colspan="6" class="py-8 text-center text-dash-secondary">No withdrawal requests found.</td></tr>';
+            } catch (err) {
+                console.error('fetchAdminWithdrawals failed', err);
+                const list = document.getElementById('admin-withdrawal-request-list');
+                if (list) list.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-rose-500">Failed to load withdrawal requests.</td></tr>`;
+            }
+        }
+
+        window.adminProcessWithdrawal = async function(requestId, newStatus) {
+            const ok = confirm(`Mark withdrawal request ${requestId.slice(0,8)} as ${newStatus}?`);
+            if (!ok) return;
+            try {
+                const req = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.WITHDRAWALS, requestId);
+                if (!req) return alert('Withdrawal request not found.');
+                if (req.status !== 'pending') return alert('Request is no longer pending.');
+
+                const vaultRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, [Query.equal('user_id', req.user_id), Query.limit(1)]).catch(()=>({ documents: [] }));
+                const vault = (vaultRes && vaultRes.documents && vaultRes.documents[0]) || null;
+                const currentBalance = (vault && typeof vault.balance !== 'undefined') ? Number(vault.balance) : 0;
+                if (newStatus === 'approved' && Number(req.amount || 0) > currentBalance) {
+                    return alert('Cannot approve request: amount exceeds performer balance.');
+                }
+
+                await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.WITHDRAWALS, requestId, {
+                    status: newStatus,
+                    updated_at: new Date().toISOString()
+                });
+
+                const txRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, [Query.equal('withdrawal_id', requestId), Query.limit(1)]).catch(()=>({ documents: [] }));
+                const tx = (txRes && txRes.documents && txRes.documents[0]) || null;
+                if (tx) {
+                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.TRANSACTIONS, tx.$id, {
+                        status: newStatus === 'approved' ? 'completed' : 'failed',
+                        updated_at: new Date().toISOString()
+                    });
+                }
+
+                if (newStatus === 'approved' && vault) {
+                    await databases.updateDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.VAULTS, vault.$id, {
+                        balance: Math.max(0, currentBalance - Number(req.amount || 0)),
+                        updated_at: new Date().toISOString()
+                    });
+                }
+
+                showAdminMessageModal('Withdrawal Updated', `Request ${newStatus} successfully.`, 'success');
+                fetchAdminWithdrawals();
+            } catch (err) {
+                console.error('adminProcessWithdrawal failed', err);
+                showAdminMessageModal('Action failed', err.message || 'Unable to update withdrawal request.', 'error');
+            }
+        }
+
     window.editUser = async function(userId) {
             const user = allUsersData.find(u => u.$id === userId);
             if (!user) return;
@@ -2708,6 +2833,9 @@
                         // Ensure default tab
                         setHubView(hubState.view || 'campaigns');
                         fetchAdminPendingMissions();
+                    }
+                    if (viewId === 'admin-withdrawals-panel') {
+                        fetchAdminWithdrawals();
                     }
                     if (viewId === 'campaigns') fetchRoleData('creator');
                 } catch (err) {
@@ -4066,6 +4194,9 @@
             </a>
             <a href="#" onclick="switchSPAView('admin-finance'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
                 <i data-feather="dollar-sign" class="w-4 text-center"></i> Financial Audit
+            </a>
+            <a href="#" onclick="switchSPAView('admin-withdrawals-panel'); toggleMobileMenu()" class="flex items-center gap-3 p-2.5 rounded-xl text-xs text-dash-secondary hover:bg-dash-secondary hover:text-[var(--text-primary)] transition">
+                <i data-feather="credit-card" class="w-4 text-center"></i> Withdrawal Requests
             </a>
 
             <div class="my-4 border-t border-dash"></div>

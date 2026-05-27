@@ -13,6 +13,8 @@ const APPWRITE_CONFIG = {
         CAMPAIGNS: 'campaigns',
         TRANSACTIONS: 'transactions',
         ENGAGEMENTS: 'engagements',
+        VAULTS: 'vaults',
+        WITHDRAWALS: 'withdrawals',
         ADMIN_WHITELIST: 'admin_whitelist'
     },
     BUCKETS: {
