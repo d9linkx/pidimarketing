@@ -4824,6 +4824,7 @@
                 }
                 // Refresh icons for dynamically shown/updated content
                 setTimeout(() => feather.replace(), 10);
+                return viewport;
             } catch (err) {
                 console.error('Critical error in switchSPAView:', err);
             }
@@ -5423,14 +5424,11 @@
         let currentTaskStep = 1;
         let activeTask = null;
 
-    window.startTaskFlow = async function(taskId) {
+        window.startTaskFlow = async function(taskId) {
             try {
-                // Navigate to the Task Flow view first so its DOM is mounted, then populate
-                switchSPAView('task-flow');
-                // Allow the SPA view clone to mount
-                await new Promise(res => setTimeout(res, 60));
-
+                // 1. Fetch data first to ensure we have everything before rendering
                 const task = await databases.getDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.CAMPAIGNS, taskId);
+                
                 if ((task.status || '').toLowerCase() !== 'active') {
                     if ((task.status || '').toLowerCase() === 'completed') {
                         await window.viewCompletedTaskDetails(taskId);
@@ -5441,32 +5439,15 @@
                 }
                 activeTask = task;
 
-                // Do not create or upsert an engagement here.
-                // The reservation is made only when the performer clicks Claim Task.
+                // 2. Switch View and get the fresh viewport container
+                const vp = switchSPAView('task-flow');
+                if (!vp) return;
+
                 const rewardValue = window.getPerformerRewardForTask(task);
-
-                // Populate UI (now that task-flow DOM is present)
-                const titleEl = document.getElementById('task-detail-title'); 
-                if (titleEl) titleEl.innerText = `Mission: ${task.platform ? task.platform.charAt(0).toUpperCase() + task.platform.slice(1) : 'Creator'} Engagement`;
-                
-                const rewardEl = document.getElementById('task-detail-reward');
-                if (rewardEl) rewardEl.innerText = `₦${rewardValue.toLocaleString()}`;
-
-                const slotsEl = document.getElementById('task-detail-slots');
-                if (slotsEl) {
-                    const reservedCount = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', taskId)]).then(res => {
-                        const activeStatuses = ['in_progress', 'pending'];
-                        return (res.documents || []).filter(e => activeStatuses.includes((e.status || '').toLowerCase())).length;
-                    }).catch(() => 0);
-                    const spotsLeft = Math.max(0, (task.goal_count || 0) - ((task.current_count || 0) + reservedCount));
-                    slotsEl.innerText = `${spotsLeft} slot${spotsLeft === 1 ? '' : 's'} remaining`;
-                }
-
-                const instrEl = document.getElementById('task-detail-instructions'); if (instrEl) instrEl.innerText = task.instructions || "Perform high-quality engagement. At least 10 words if commenting.";
-                const platformElStep1 = document.getElementById('task-platform-icon-step1'); if (platformElStep1) platformElStep1.innerHTML = `<i class="fa-brands fa-${task.platform}"></i>`;
-                
-                const seedEl1 = document.getElementById('task-search-seed-step1');
-                if (seedEl1) seedEl1.innerText = task.search_seed || `Search for ${task.username || '@creator'}`;
+                const reservedRes = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTIONS.ENGAGEMENTS, [Query.equal('campaign_id', taskId)]);
+                const activeStatuses = ['in_progress', 'pending'];
+                const reservedCount = (reservedRes.documents || []).filter(e => activeStatuses.includes((e.status || '').toLowerCase())).length;
+                const spotsLeft = Math.max(0, (task.goal_count || 0) - ((task.current_count || 0) + reservedCount));
 
                 const platformUrls = {
                     instagram: "https://instagram.com",
@@ -5477,14 +5458,21 @@
                     google: "https://google.com",
                     youtube: "https://youtube.com"
                 };
-                const organicBtn = document.getElementById('task-organic-button');
-                if (organicBtn) {
-                    organicBtn.href = platformUrls[task.platform] || "#";
-                    const nameSpan = document.getElementById('task-platform-name');
-                    if (nameSpan) nameSpan.innerText = `Open ${task.platform.charAt(0).toUpperCase() + task.platform.slice(1)}`;
-                }
 
-                // Reset flow state and show first step
+                // 3. Populate ALL elements in Step 1 instantly
+                const find = (selector) => vp.querySelector(selector);
+                
+                if (find('#task-detail-title')) find('#task-detail-title').innerText = `Mission: ${task.platform?.toUpperCase() || 'Creator'} Engagement`;
+                if (find('#task-detail-reward')) find('#task-detail-reward').innerText = `₦${rewardValue.toLocaleString()}`;
+                if (find('#task-detail-slots')) find('#task-detail-slots').innerText = `${spotsLeft} slot${spotsLeft === 1 ? '' : 's'} remaining`;
+                if (find('#task-detail-instructions')) find('#task-detail-instructions').innerText = task.instructions || "Perform high-quality engagement.";
+                if (find('#task-platform-icon-step1')) find('#task-platform-icon-step1').innerHTML = `<i class="fa-brands fa-${task.platform}"></i>`;
+                if (find('#task-platform-name')) find('#task-platform-name').innerText = task.platform?.toUpperCase();
+                if (find('#task-search-seed-step1')) find('#task-search-seed-step1').innerText = task.search_seed || `Search for ${task.username || '@creator'}`;
+                if (find('#task-organic-button')) find('#task-organic-button').href = platformUrls[task.platform] || "#";
+                if (find('#task-flow-description')) find('#task-flow-description').innerText = task.instructions || "Standard high-quality engagement.";
+                if (find('#task-flow-goal')) find('#task-flow-goal').innerText = `${task.goal_count} Engagements`;
+
                 currentTaskStep = 1;
                 resetTaskFlowUI();
             } catch (err) {
@@ -5631,20 +5619,19 @@
 
                 startClaimTimer(activeTask.$id, 30 * 60);
 
-                // Ensure the task-flow view is mounted into the dashboard viewport before touching its internals
-                switchSPAView('task-flow');
-                // small delay to allow switchSPAView to clone/mount the template
-                await new Promise(res => setTimeout(res, 60));
+                // Ensure Step 2 content is populated before switching
+                const vp = document.getElementById('dashboard-viewport');
+                const find = (s) => vp.querySelector(s);
 
-                // Populating Step 2 (Action Phase Tracker)
-                const visualClear = document.getElementById('task-visual-clear');
-                if (visualClear) visualClear.src = activeTask.visual_fingerprint || activeTask.thumbnail_url || 'assets/headshot-placeholder.svg';
-                
-                const seedEl = document.getElementById('task-search-seed');
-                if (seedEl) seedEl.innerText = activeTask.search_seed || `Search for ${activeTask.username || '@creator'}`;
-                
-                const actionInstrRecap = document.getElementById('task-action-instructions');
-                if (actionInstrRecap) actionInstrRecap.innerText = activeTask.instructions || "Follow the platform-specific instructions for this mission.";
+                if (find('#task-visual-clear')) {
+                    find('#task-visual-clear').src = activeTask.thumbnail_url || 'assets/headshot-placeholder.svg';
+                }
+                if (find('#task-search-seed')) {
+                    find('#task-search-seed').innerText = activeTask.search_seed || activeTask.username || 'Search organically';
+                }
+                if (find('#task-action-instructions')) {
+                    find('#task-action-instructions').innerText = activeTask.instructions || "Complete the task as requested.";
+                }
 
                 // Advance to step 2 in the mounted template
                 window.showTaskFlowStep(2);
