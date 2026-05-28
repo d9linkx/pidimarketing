@@ -2140,27 +2140,27 @@
                 </div>
 
                 <div class="bento-card p-6 space-y-6">
-                    <div class="grid gap-4 lg:grid-cols-[2fr_1fr]">
-                        <div class="space-y-4">
-                            <p class="text-sm text-dash-secondary leading-relaxed" id="task-detail-instructions">Review the task details and click Claim Task to reserve your spot.</p>
-                            <div class="p-4 rounded-3xl bg-dash-secondary/30 border border-dash">
-                                <div class="mb-4">
-                                    <p class="text-[9px] uppercase tracking-widest font-black text-dash-secondary">Reward</p>
-                                    <p id="task-detail-reward" class="text-3xl font-black">₦0</p>
+                    <div id="task-step-1" class="task-wizard-step space-y-6">
+                            <div class="grid gap-4 lg:grid-cols-[2fr_1fr]">
+                                <div class="space-y-4">
+                                    <p class="text-sm text-dash-secondary leading-relaxed" id="task-detail-instructions">Review the task details and click Claim Task to reserve your spot.</p>
+                                    <div class="p-4 rounded-3xl bg-dash-secondary/30 border border-dash">
+                                        <div class="mb-4">
+                                            <p class="text-[9px] uppercase tracking-widest font-black text-dash-secondary mb-2">Reward</p>
+                                            <p id="task-detail-reward" class="text-3xl font-black">₦0</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[9px] uppercase tracking-widest font-black text-dash-secondary mb-2">Search Seed</p>
+                                            <p id="task-search-seed-step1" class="text-sm font-semibold text-[var(--text-primary)]">Loading...</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="text-[9px] uppercase tracking-widest font-black text-dash-secondary">Search Seed</p>
-                                    <p id="task-search-seed-step1" class="text-sm font-semibold text-[var(--text-primary)]">Loading...</p>
+                                <div class="space-y-4">
+                                    <a id="task-organic-button" href="#" target="_blank" rel="noopener noreferrer" class="btn-fintech btn-secondary w-full justify-center py-4 rounded-3xl text-sm font-black uppercase tracking-widest">Open platform</a>
+                                    <button onclick="acceptMission()" class="btn-fintech btn-primary w-full justify-center py-4 rounded-3xl text-sm font-black uppercase tracking-widest">Claim Task & Start</button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="space-y-4">
-                            <a id="task-organic-button" href="#" target="_blank" rel="noopener noreferrer" class="btn-fintech btn-secondary w-full justify-center py-4 rounded-3xl text-sm font-black uppercase tracking-widest">Open platform</a>
-                            <button onclick="acceptMission()" class="btn-fintech btn-primary w-full justify-center py-4 rounded-3xl text-sm font-black uppercase tracking-widest">Claim Task & Start</button>
-                        </div>
-                    </div>
 
-                    <div id="task-step-1" class="task-wizard-step space-y-6">
                         <div class="text-center">
                             <p class="text-[10px] font-black uppercase tracking-[0.25em] text-dash-secondary mb-2">Task Overview</p>
                             <p class="text-sm text-dash-secondary">Read the instructions carefully. Once you claim the task, you will have 30 minutes to submit proof.</p>
@@ -7070,4 +7070,3 @@
 
 </body>
 </html>
-
